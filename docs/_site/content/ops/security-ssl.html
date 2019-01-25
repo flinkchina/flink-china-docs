@@ -1,0 +1,3879 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Apache Flink 1.8-SNAPSHOT Documentation: SSL Setup</title>
+    <link rel="shortcut icon" href="/page/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/page/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="//ci.apache.org/projects/flink/flink-docs-stable/ops/security-ssl.html">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/page/css/flink.css">
+    <link rel="stylesheet" href="/page/css/syntax.css">
+    <link rel="stylesheet" href="/page/css/codetabs.css">
+    <link rel="stylesheet" href="/page/font-awesome/css/font-awesome.min.css">
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    
+
+    <!-- Main content. -->
+    <div class="container">
+      
+      <div class="row">
+        <div class="col-lg-3" id="sidenavcol">
+          
+
+
+
+
+
+
+
+  
+    
+    
+    
+      
+    
+  
+
+  
+    
+    
+    
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="sidenav-logo">
+  <p><a href=""><img class="bottom" alt="Apache Flink" src="/page/img/navbar-brand-logo.jpg"></a> v1.8-SNAPSHOT</p>
+</div>
+<ul id="sidenav">
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/"><i class="fa fa-home title" aria-hidden="true"></i> Home</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    <hr class="section-break"></hr>
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-2" data-toggle="collapse"><i class="fa fa-map-o title appetizer" aria-hidden="true"></i> Concepts <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-2"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+<li><a href="/concepts/programming-model.html">Programming Model</a></li>
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/concepts/runtime.html">Distributed Runtime</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-6" data-toggle="collapse"><i class="fa fa-power-off title appetizer" aria-hidden="true"></i> Tutorials <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-6"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-7" data-toggle="collapse">API Tutorials <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-7"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/tutorials/datastream_api.html">DataStream API</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-10" data-toggle="collapse">Setup Tutorials <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-10"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/tutorials/local_setup.html">Local Setup</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/tutorials/flink_on_windows.html">Running Flink on Windows</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-15" data-toggle="collapse"><i class="fa fa-file-code-o title appetizer" aria-hidden="true"></i> Examples <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-15"><ul>
+  <li><a href="/examples/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/examples.html">Batch Examples</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    <hr class="section-break"></hr>
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-18" data-toggle="collapse"><i class="fa fa-code title maindish" aria-hidden="true"></i> Application Development <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-18"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-19" data-toggle="collapse">Project Build Setup <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-19"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/projectsetup/java_api_quickstart.html">Project Template for Java</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/projectsetup/scala_api_quickstart.html">Project Template for Scala</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/projectsetup/dependencies.html">Configuring Dependencies, Connectors, Libraries</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-24" data-toggle="collapse">Basic API Concepts <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-24"><ul>
+  <li><a href="/dev/api_concepts.html">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/scala_api_extensions.html">Scala API Extensions</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/java_lambdas.html">Java Lambda Expressions</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-28" data-toggle="collapse">Streaming (DataStream API) <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-28"><ul>
+  <li><a href="/dev/datastream_api.html">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-29" data-toggle="collapse">Event Time <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-29"><ul>
+  <li><a href="/dev/event_time.html">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/event_timestamps_watermarks.html">Generating Timestamps / Watermarks</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/event_timestamp_extractors.html">Pre-defined Timestamp Extractors / Watermark Emitters</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-33" data-toggle="collapse">State & Fault Tolerance <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-33"><ul>
+  <li><a href="/dev/stream/state/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/state/state.html">Working with State</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/state/broadcast_state.html">The Broadcast State Pattern</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/state/checkpointing.html">Checkpointing</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/state/queryable_state.html">Queryable State</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/state/state_backends.html">State Backends</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/state/schema_evolution.html">State Schema Evolution</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/state/custom_serialization.html">Custom State Serialization</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-42" data-toggle="collapse">Operators <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-42"><ul>
+  <li><a href="/dev/stream/operators/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+<li><a href="/dev/stream/operators/windows.html">Windows</a></li>
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+<li><a href="/dev/stream/operators/joining.html">Joining</a></li>
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/operators/process_function.html">Process Function</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/operators/asyncio.html">Async I/O</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-48" data-toggle="collapse">Connectors <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
+  <li><a href="/dev/connectors/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/guarantees.html">Fault Tolerance Guarantees</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/kafka.html">Kafka</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/cassandra.html">Cassandra</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/kinesis.html">Kinesis</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/elasticsearch.html">Elasticsearch</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/filesystem_sink.html">Rolling File Sink</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/streamfile_sink.html">Streaming File Sink</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/rabbitmq.html">RabbitMQ</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/nifi.html">NiFi</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/connectors/twitter.html">Twitter</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/side_output.html">Side Outputs</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/stream/python.html">Python API</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+<li><a href="/dev/stream/testing.html">Testing</a></li>
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+<li><a href="/dev/stream/experimental.html">Experimental Features</a></li>
+      
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-65" data-toggle="collapse">Batch (DataSet API) <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-65"><ul>
+  <li><a href="/dev/batch/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/dataset_transformations.html">Transformations</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/fault_tolerance.html">Fault Tolerance</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/zip_elements_guide.html">Zipping Elements</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/iterations.html">Iterations</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/python.html">Python API</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/connectors.html">Connectors</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/batch/hadoop_compatibility.html">Hadoop Compatibility</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/local_execution.html">Local Execution</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/cluster_execution.html">Cluster Execution</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-76" data-toggle="collapse">Table API & SQL <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-76"><ul>
+  <li><a href="/dev/table/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/common.html">Concepts & Common API</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-78" data-toggle="collapse">Streaming Concepts <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-78"><ul>
+  <li><a href="/dev/table/streaming/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/streaming/dynamic_tables.html">Dynamic Tables</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/streaming/time_attributes.html">Time Attributes</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/streaming/joins.html">Joins in Continuous Queries</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/streaming/temporal_tables.html">Temporal Tables</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/streaming/match_recognize.html">Detecting Patterns</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/streaming/query_configuration.html">Query Configuration</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/connect.html">Connect to External Systems</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/tableApi.html">Table API</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/sql.html">SQL</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/functions.html">Built-In Functions</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/sourceSinks.html">User-defined Sources & Sinks</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/udfs.html">User-defined Functions</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/table/sqlClient.html">SQL Client</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-94" data-toggle="collapse">Data Types & Serialization <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-94"><ul>
+  <li><a href="/dev/types_serialization.html">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/custom_serializers.html">Custom Serializers</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-97" data-toggle="collapse">Managing Execution <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-97"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/execution_configuration.html">Execution Configuration</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/packaging.html">Program Packaging</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/parallel.html">Parallel Execution</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/execution_plans.html">Execution Plans</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/restart_strategies.html">Restart Strategies</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-104" data-toggle="collapse">Libraries <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-104"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/cep.html">Event Processing (CEP)</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-106" data-toggle="collapse">Graphs: Gelly <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-106"><ul>
+  <li><a href="/dev/libs/gelly/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/gelly/graph_api.html">Graph API</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/gelly/iterative_graph_processing.html">Iterative Graph Processing</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/gelly/library_methods.html">Library Methods</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/gelly/graph_algorithms.html">Graph Algorithms</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/gelly/graph_generators.html">Graph Generators</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/gelly/bipartite_graph.html">Bipartite Graph</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-114" data-toggle="collapse">Machine Learning <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-114"><ul>
+  <li><a href="/dev/libs/ml/">Overview</a></li>
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/quickstart.html">Quickstart</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/contribution_guide.html">How to Contribute</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/cross_validation.html">Cross Validation</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/distance_metrics.html">Distance Metrics</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/knn.html">k-Nearest Neighbors Join</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/min_max_scaler.html">MinMax Scaler</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/multiple_linear_regression.html">Multiple Linear Regression</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/pipelines.html">Pipelines</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/polynomial_features.html">Polynomial Features</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/sos.html">Stochastic Outlier Selection</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/standard_scaler.html">Standard Scaler</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/als.html">ALS</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/libs/ml/svm.html">SVM using CoCoA</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/best_practices.html">Best Practices</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/dev/migration.html">API Migration Guides</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-133" data-toggle="collapse" class="active"><i class="fa fa-sliders title maindish" aria-hidden="true"></i> Deployment & Operations</a><div class="collapse in" id="collapse-133"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-134" data-toggle="collapse">Clusters & Deployment <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-134"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/cluster_setup.html">Standalone Cluster</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/yarn_setup.html">YARN</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/mesos.html">Mesos</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/kubernetes.html">Kubernetes</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/docker.html">Docker</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/aws.html">AWS</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/gce_setup.html">Google Compute Engine</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/mapr_setup.html">MapR</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/hadoop.html">Hadoop Integration</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/deployment/oss.html">Aliyun OSS</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/jobmanager_high_availability.html">High Availability (HA)</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-147" data-toggle="collapse">State & Fault Tolerance <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-147"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/state/checkpoints.html">Checkpoints</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/state/savepoints.html">Savepoints</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/state/state_backends.html">State Backends</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/state/large_state_tuning.html">Tuning Checkpoints and Large State</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+<li><a href="/ops/config.html">Configuration</a></li>
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/production_ready.html">Production Readiness Checklist</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/cli.html">CLI</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/scala_shell.html">Scala REPL</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/security-kerberos.html">Kerberos</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/security-ssl.html" class="active">SSL Setup</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/filesystems.html">File Systems</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/ops/upgrading.html">Upgrading Applications and Flink Versions</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-162" data-toggle="collapse"><i class="fa fa-bug title maindish" aria-hidden="true"></i> Debugging & Monitoring <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-162"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/metrics.html">Metrics</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/logging.html">Logging</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/historyserver.html">History Server</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/checkpoint_monitoring.html">Monitoring Checkpointing</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/back_pressure.html">Monitoring Back Pressure</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/rest_api.html">Monitoring REST API</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/debugging_event_time.html">Debugging Windows & Event Time</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/debugging_classloading.html">Debugging Classloading</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/monitoring/application_profiling.html">Application Profiling</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    <hr class="section-break"></hr>
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-173" data-toggle="collapse"><i class="fa fa-cogs title dessert" aria-hidden="true"></i> Flink Development <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-173"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/flinkDev/ide_setup.html">Importing Flink into an IDE</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/flinkDev/building.html">Building Flink from Source</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+        
+        
+<li><a href="#collapse-177" data-toggle="collapse"><i class="fa fa-book title dessert" aria-hidden="true"></i> Internals <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-177"><ul>
+  
+        
+        
+        
+
+        
+        
+      
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/internals/components.html">Component Stack</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/internals/stream_checkpointing.html">Fault Tolerance for Data Streaming</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/internals/job_scheduling.html">Jobs and Scheduling</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/internals/task_lifecycle.html">Task Lifecycle</a></li>
+    
+  
+
+  
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+    
+<li><a href="/internals/filesystems.html">File Systems</a></li>
+    
+  
+
+  
+    
+      
+      
+</li></ul></div>
+      
+      
+    
+  
+
+  
+    
+      
+  <li class="divider"></li>
+  <li><a href="//ci.apache.org/projects/flink/flink-docs-master/api/java"><i class="fa fa-external-link title" aria-hidden="true"></i> Javadocs</a></li>
+  <li><a href="//ci.apache.org/projects/flink/flink-docs-master/api/scala/index.html#org.apache.flink.api.scala.package"><i class="fa fa-external-link title" aria-hidden="true"></i> Scaladocs</a></li>
+  <li><a href="http://flink.apache.org"><i class="fa fa-external-link title" aria-hidden="true"></i> Project Page</a></li>
+</ul>
+
+<div class="sidenav-search-box">
+  <form class="navbar-form" role="search" action="/search-results.html">
+    <div class="form-group">
+      <input type="text" class="form-control" size="16px" name="q" placeholder="Search">
+    </div>
+    <button type="submit" class="btn btn-default">Go</button>
+  </form>
+</div>
+
+<div class="sidenav-versions">
+  <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Pick Docs Version
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.7">v1.7</a></li>
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.6">v1.6</a></li>
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.5">v1.5</a></li>
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.4">v1.4</a></li>
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.3">v1.3</a></li>
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.2">v1.2</a></li>
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.1">v1.1</a></li>
+      
+      <li><a href="http://ci.apache.org/projects/flink/flink-docs-release-1.0">v1.0</a></li>
+      
+    </ul>
+  </div>
+</div>
+
+        </div>
+        <div class="col-lg-9 content" id="contentcol">
+          
+
+          
+
+
+
+
+
+  
+  
+    
+    
+      
+    
+  
+
+  
+  
+    
+    
+      
+
+
+
+<ol class="breadcrumb">
+
+  
+  
+    <li><i class="fa fa-sliders title maindish" aria-hidden="true"></i> Deployment & Operations</li>
+  
+
+  
+  
+    <li class="active">SSL Setup</li>
+  
+
+</ol>
+
+<h1>SSL Setup</h1>
+
+
+
+
+<ul id="markdown-toc">
+  <li><a href="#internal-and-external-connectivity" id="markdown-toc-internal-and-external-connectivity">Internal and External Connectivity</a>    <ul>
+      <li><a href="#internal-connectivity" id="markdown-toc-internal-connectivity">Internal Connectivity</a></li>
+      <li><a href="#external--rest-connectivity" id="markdown-toc-external--rest-connectivity">External / REST Connectivity</a></li>
+      <li><a href="#queryable-state" id="markdown-toc-queryable-state">Queryable State</a></li>
+    </ul>
+  </li>
+  <li><a href="#configuring-ssl" id="markdown-toc-configuring-ssl">Configuring SSL</a>    <ul>
+      <li><a href="#keystores-and-truststores" id="markdown-toc-keystores-and-truststores">Keystores and Truststores</a></li>
+      <li><a href="#cipher-suites" id="markdown-toc-cipher-suites">Cipher suites</a></li>
+      <li><a href="#complete-list-of-ssl-options" id="markdown-toc-complete-list-of-ssl-options">Complete List of SSL Options</a></li>
+    </ul>
+  </li>
+  <li><a href="#creating-and-deploying-keystores-and-truststores" id="markdown-toc-creating-and-deploying-keystores-and-truststores">Creating and Deploying Keystores and Truststores</a></li>
+  <li><a href="#example-ssl-setup-standalone-and-kubernetes" id="markdown-toc-example-ssl-setup-standalone-and-kubernetes">Example SSL Setup Standalone and Kubernetes</a></li>
+  <li><a href="#tips-for-yarn--mesos-deployment" id="markdown-toc-tips-for-yarn--mesos-deployment">Tips for YARN / Mesos Deployment</a></li>
+</ul>
+
+<p>This page provides instructions on how to enable TLS/SSL authentication and encryption for network communication with and between Flink processes.</p>
+
+<h2 id="internal-and-external-connectivity">Internal and External Connectivity</h2>
+
+<p>When securing network connections between machines processes through authentication and encryption, Apache Flink differentiates between <em>internal</em> and <em>external</em> connectivity.
+<em>Internal Connectivity</em> refers to all connections made between Flink processes. These connections run Flink custom protocols. Users never connect directly to internal connectivity endpoints.
+<em>External / REST Connectivity</em> endpoints refers to all connections made from the outside to Flink processes. This includes the web UI and REST commands to
+start and control running Flink jobs/applications, including the communication of the Flink CLI with the JobManager / Dispatcher.</p>
+
+<p>For more flexibility, security for internal and external connectivity can be enabled and configured separately.</p>
+
+<div style="text-align: center">
+  <img src="/fig/ssl_internal_external.svg" alt="Internal and External Connectivity" style="width:75%; padding-top:10px; padding-bottom:10px;" />
+</div>
+
+<h3 id="internal-connectivity">Internal Connectivity</h3>
+
+<p>Internal connectivity includes:</p>
+
+<ul>
+  <li>Control messages: RPC between JobManager / TaskManager / Dispatcher / ResourceManager</li>
+  <li>The data plane: The connections between TaskManagers to exchange data during shuffles, broadcasts, redistribution, etc.</li>
+  <li>The Blob Service (distribution of libraries and other artifacts).</li>
+</ul>
+
+<p>All internal connections are SSL authenticated and encrypted. The connections use <strong>mutual authentication</strong>, meaning both server
+and client side of each connection need to present the certificate to each other. The certificate acts effectively as a shared
+secret.</p>
+
+<p>A common setup is to generate a dedicated certificate (may be self-signed) for a Flink deployment. The certificate for internal communication
+is not needed by any other party to interact with Flink, and can be simply added to the container images, or attached to the YARN deployment.</p>
+
+<p><em>Note: Because internal connections are mutually authenticated with shared certificates, Flink can skip hostname verification. This makes container-based setups easier.</em></p>
+
+<h3 id="external--rest-connectivity">External / REST Connectivity</h3>
+
+<p>All external connectivity is exposed via an HTTP/REST endpoint, used for example by the web UI and the CLI:</p>
+
+<ul>
+  <li>Communication with the <em>Dispatcher</em> to submit jobs (session clusters)</li>
+  <li>Communication with the <em>JobManager</em> to inspect and modify a running job/application</li>
+</ul>
+
+<p>The REST endpoints can be configured to require SSL connections. The server will, however, accept connections from any client by default, meaning the REST endpoint does not authenticate the client.</p>
+
+<p>Simple mutual authentication may be enabled by configuration if authentication of connections to the REST endpoint is required, but we recommend to deploy a “side car proxy”:
+Bind the REST endpoint to the loopback interface (or the pod-local interface in Kubernetes) and start a REST proxy that authenticates and forwards the requests to Flink.
+Examples for proxies that Flink users have deployed are <a href="https://www.envoyproxy.io/">Envoy Proxy</a> or
+<a href="http://nginx.org/en/docs/http/ngx_http_auth_request_module.html">NGINX with MOD_AUTH</a>.</p>
+
+<p>The rationale behind delegating authentication to a proxy is that such proxies offer a wide variety of authentication options and thus better integration into existing infrastructures.</p>
+
+<h3 id="queryable-state">Queryable State</h3>
+
+<p>Connections to the queryable state endpoints is currently not authenticated or encrypted.</p>
+
+<h2 id="configuring-ssl">Configuring SSL</h2>
+
+<p>SSL can be enabled separately for <em>internal</em> and <em>external</em> connectivity:</p>
+
+<ul>
+  <li><strong>security.ssl.internal.enabled</strong>: Enable SSL for all <em>internal</em> connections.</li>
+  <li><strong>security.ssl.rest.enabled</strong>: Enable SSL for <em>REST / external</em> connections.</li>
+</ul>
+
+<p><em>Note: For backwards compatibility, the <strong>security.ssl.enabled</strong> option still exists and enables SSL for both internal and REST endpoints.</em></p>
+
+<p>For internal connectivity, you can optionally disable security for different connection types separately.
+When <code class="highlighter-rouge">security.ssl.internal.enabled</code> is set to <code class="highlighter-rouge">true</code>, you can set the following parameters to <code class="highlighter-rouge">false</code> to disable SSL for that particular connection type:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">taskmanager.data.ssl.enabled</code>: Data communication between TaskManagers</li>
+  <li><code class="highlighter-rouge">blob.service.ssl.enabled</code>: Transport of BLOBs from JobManager to TaskManager</li>
+  <li><code class="highlighter-rouge">akka.ssl.enabled</code>: Akka-based RPC connections between JobManager / TaskManager / ResourceManager</li>
+</ul>
+
+<h3 id="keystores-and-truststores">Keystores and Truststores</h3>
+
+<p>The SSL configuration requires to configure a <strong>keystore</strong> and a <strong>truststore</strong>. The <em>keystore</em> contains the public certificate
+(public key) and the private key, while the truststore contains the trusted certificates or the trusted authorities. Both stores
+need to be set up such that the truststore trusts the keystore’s certificate.</p>
+
+<h4 id="internal-connectivity-1">Internal Connectivity</h4>
+
+<p>Because internal communication is mutually authenticated, keystore and truststore typically contain the same dedicated certificate.
+The certificate can use wild card hostnames or addresses, because the certificate is expected to be a shared secret and host
+names are not verified. It is even possible to use the same file (the keystore) also as the truststore.</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">security.ssl.internal.keystore</span><span class="pi">:</span> <span class="s">/path/to/file.keystore</span>
+<span class="s">security.ssl.internal.keystore-password</span><span class="pi">:</span> <span class="s">keystore_password</span>
+<span class="s">security.ssl.internal.key-password</span><span class="pi">:</span> <span class="s">key_password</span>
+<span class="s">security.ssl.internal.truststore</span><span class="pi">:</span> <span class="s">/path/to/file.truststore</span>
+<span class="s">security.ssl.internal.truststore-password</span><span class="pi">:</span> <span class="s">truststore_password</span></code></pre></figure>
+
+<h4 id="rest-endpoints-external-connectivity">REST Endpoints (external connectivity)</h4>
+
+<p>For REST endpoints, by default the keystore is used by the server endpoint, and the truststore is used by the REST clients (including the CLI client)
+to accept the server’s certificate. In the case where the REST keystore has a self-signed certificate, the truststore must trust that certificate directly.
+If the REST endpoint uses a certificate that is signed through a proper certification hierarchy, the roots of that hierarchy should
+be in the trust store.</p>
+
+<p>If mutual authentication is enabled, the keystore and the truststore are used by both, the server endpoint and the REST clients as with internal connectivity.</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">security.ssl.rest.keystore</span><span class="pi">:</span> <span class="s">/path/to/file.keystore</span>
+<span class="s">security.ssl.rest.keystore-password</span><span class="pi">:</span> <span class="s">keystore_password</span>
+<span class="s">security.ssl.rest.key-password</span><span class="pi">:</span> <span class="s">key_password</span>
+<span class="s">security.ssl.rest.truststore</span><span class="pi">:</span> <span class="s">/path/to/file.truststore</span>
+<span class="s">security.ssl.rest.truststore-password</span><span class="pi">:</span> <span class="s">truststore_password</span>
+<span class="s">security.ssl.rest.authentication-enabled</span><span class="pi">:</span> <span class="no">false</span></code></pre></figure>
+
+<h3 id="cipher-suites">Cipher suites</h3>
+
+<p><span class="label label-danger">IMPORTANT</span>
+The <a href="https://tools.ietf.org/html/rfc7525">IETF RFC 7525</a> recommends to use a specific set of cipher suites for strong security.
+Because these cipher suites were not available on many setups out of the box, Flink’s default value is set to a slightly
+weaker but more compatible cipher suite.
+We recommend that SSL setups update to the stronger cipher suites, if possible, by adding the below entry to the Flink configuration:</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">security.ssl.algorithms</span><span class="pi">:</span> <span class="s">TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span></code></pre></figure>
+
+<p>If these cipher suites are not supported on your setup, you will see that Flink processes will not be able to connect to each other.</p>
+
+<h3 id="complete-list-of-ssl-options">Complete List of SSL Options</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-left" style="width: 20%">Key</th>
+            <th class="text-left" style="width: 15%">Default</th>
+            <th class="text-left" style="width: 65%">Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><h5>security.ssl.algorithms</h5></td>
+            <td style="word-wrap: break-word;">"TLS_RSA_WITH_AES_128_CBC_SHA"</td>
+            <td>The comma separated list of standard SSL algorithms to be supported. Read more <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#ciphersuites">here</a></td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.close-notify-flush-timeout</h5></td>
+            <td style="word-wrap: break-word;">-1</td>
+            <td>The timeout (in ms) for flushing the `close_notify` that was triggered by closing a channel. If the `close_notify` was not flushed in the given timeout the channel will be closed forcibly. (-1 = use system default)</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.enabled</h5></td>
+            <td style="word-wrap: break-word;">false</td>
+            <td>Turns on SSL for internal network communication. Optionally, specific components may override this through their own settings (rpc, data transport, REST, etc).</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.handshake-timeout</h5></td>
+            <td style="word-wrap: break-word;">-1</td>
+            <td>The timeout (in ms) during SSL handshake. (-1 = use system default)</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.key-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The secret to decrypt the key in the keystore for Flink's internal endpoints (rpc, data transport, blob server).</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.keystore</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The Java keystore file with SSL Key and Certificate, to be used Flink's internal endpoints (rpc, data transport, blob server).</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.keystore-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The secret to decrypt the keystore file for Flink's for Flink's internal endpoints (rpc, data transport, blob server).</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.session-cache-size</h5></td>
+            <td style="word-wrap: break-word;">-1</td>
+            <td>The size of the cache used for storing SSL session objects. According to https://github.com/netty/netty/issues/832, you should always set this to an appropriate number to not run into a bug with stalling IO threads during garbage collection. (-1 = use system default).</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.session-timeout</h5></td>
+            <td style="word-wrap: break-word;">-1</td>
+            <td>The timeout (in ms) for the cached SSL session objects. (-1 = use system default)</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.truststore</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The truststore file containing the public CA certificates to verify the peer for Flink's internal endpoints (rpc, data transport, blob server).</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.internal.truststore-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The password to decrypt the truststore for Flink's internal endpoints (rpc, data transport, blob server).</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.key-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The secret to decrypt the server key in the keystore.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.keystore</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The Java keystore file to be used by the flink endpoint for its SSL Key and Certificate.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.keystore-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The secret to decrypt the keystore file.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.protocol</h5></td>
+            <td style="word-wrap: break-word;">"TLSv1.2"</td>
+            <td>The SSL protocol version to be supported for the ssl transport. Note that it doesn’t support comma separated list.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.rest.authentication-enabled</h5></td>
+            <td style="word-wrap: break-word;">false</td>
+            <td>Turns on mutual SSL authentication for external communication via the REST endpoints.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.rest.enabled</h5></td>
+            <td style="word-wrap: break-word;">false</td>
+            <td>Turns on SSL for external communication via the REST endpoints.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.rest.key-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The secret to decrypt the key in the keystore for Flink's external REST endpoints.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.rest.keystore</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The Java keystore file with SSL Key and Certificate, to be used Flink's external REST endpoints.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.rest.keystore-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The secret to decrypt the keystore file for Flink's for Flink's external REST endpoints.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.rest.truststore</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The truststore file containing the public CA certificates to verify the peer for Flink's external REST endpoints.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.rest.truststore-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The password to decrypt the truststore for Flink's external REST endpoints.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.truststore</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The truststore file containing the public CA certificates to be used by flink endpoints to verify the peer’s certificate.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.truststore-password</h5></td>
+            <td style="word-wrap: break-word;">(none)</td>
+            <td>The secret to decrypt the truststore.</td>
+        </tr>
+        <tr>
+            <td><h5>security.ssl.verify-hostname</h5></td>
+            <td style="word-wrap: break-word;">true</td>
+            <td>Flag to enable peer’s hostname verification during ssl handshake.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 id="creating-and-deploying-keystores-and-truststores">Creating and Deploying Keystores and Truststores</h2>
+
+<p>Keys, Certificates, and the Keystores and Truststores can be generated using the <a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html">keytool utility</a>.
+You need to have an appropriate Java Keystore and Truststore accessible from each node in the Flink cluster.</p>
+
+<ul>
+  <li>For standalone setups, this means copying the files to each node, or adding them to a shared mounted directory.</li>
+  <li>For container based setups, add the keystore and truststore files to the container images.</li>
+  <li>For Yarn/Mesos setups, the cluster deployment phase can automatically distribute the keystore and truststore files.</li>
+</ul>
+
+<p>For the externally facing REST endpoint, the common name or subject alternative names in the certificate should match the node’s hostname and IP address.</p>
+
+<h2 id="example-ssl-setup-standalone-and-kubernetes">Example SSL Setup Standalone and Kubernetes</h2>
+
+<p><strong>Internal Connectivity</strong></p>
+
+<p>Execute the following keytool commands to create a key pair in a keystore:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">keytool <span class="nt">-genkeypair</span> <span class="nt">-alias</span> flink.internal <span class="nt">-keystore</span> internal.keystore <span class="nt">-dname</span> <span class="s2">"CN=flink.internal"</span> <span class="nt">-storepass</span> internal_store_password <span class="nt">-keypass</span> internal_key_password <span class="nt">-keyalg</span> RSA <span class="nt">-keysize</span> 4096</code></pre></figure>
+
+<p>The single key/certificate in the keystore is used the same way by the server and client endpoints (mutual authentication).
+The key pair acts as the shared secret for internal security, and we can directly use it as keystore and truststore.</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">security.ssl.internal.enabled</span><span class="pi">:</span> <span class="no">true</span>
+<span class="s">security.ssl.internal.keystore</span><span class="pi">:</span> <span class="s">/path/to/flink/conf/internal.keystore</span>
+<span class="s">security.ssl.internal.truststore</span><span class="pi">:</span> <span class="s">/path/to/flink/conf/internal.keystore</span>
+<span class="s">security.ssl.internal.keystore-password</span><span class="pi">:</span> <span class="s">internal_store_password</span>
+<span class="s">security.ssl.internal.truststore-password</span><span class="pi">:</span> <span class="s">internal_store_password</span>
+<span class="s">security.ssl.internal.key-password</span><span class="pi">:</span> <span class="s">internal_key_password</span></code></pre></figure>
+
+<p><strong>REST Endpoint</strong></p>
+
+<p>The REST endpoint may receive connections from external processes, including tools that are not part of Flink (for example curl request to the REST API).
+Setting up a proper certificate that is signed though a CA hierarchy may make sense for the REST endpoint.</p>
+
+<p>However, as mentioned above, the REST endpoint does not authenticate clients and thus typically needs to be secured via a proxy anyways.</p>
+
+<p><strong>REST Endpoint (simple self signed certificate)</strong></p>
+
+<p>This example shows how to create a simple keystore / truststore pair. The truststore does not contain the primary key and can
+be shared with other applications. In this example, <em>myhost.company.org / ip:10.0.2.15</em> is the node (or service) for the Flink master.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">keytool <span class="nt">-genkeypair</span> <span class="nt">-alias</span> flink.rest <span class="nt">-keystore</span> rest.keystore <span class="nt">-dname</span> <span class="s2">"CN=myhost.company.org"</span> <span class="nt">-ext</span> <span class="s2">"SAN=dns:myhost.company.org,ip:10.0.2.15"</span> <span class="nt">-storepass</span> rest_keystore_password <span class="nt">-keypass</span> rest_key_password <span class="nt">-keyalg</span> RSA <span class="nt">-keysize</span> 4096 <span class="nt">-storetype</span> PKCS12
+
+keytool <span class="nt">-exportcert</span> <span class="nt">-keystore</span> rest.keystore <span class="nt">-alias</span> flink.rest <span class="nt">-storepass</span> rest_keystore_password <span class="nt">-file</span> flink.cer
+
+keytool <span class="nt">-importcert</span> <span class="nt">-keystore</span> rest.truststore <span class="nt">-alias</span> flink.rest <span class="nt">-storepass</span> rest_truststore_password <span class="nt">-file</span> flink.cer <span class="nt">-noprompt</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">security.ssl.rest.enabled</span><span class="pi">:</span> <span class="no">true</span>
+<span class="s">security.ssl.rest.keystore</span><span class="pi">:</span> <span class="s">/path/to/flink/conf/rest.keystore</span>
+<span class="s">security.ssl.rest.truststore</span><span class="pi">:</span> <span class="s">/path/to/flink/conf/rest.truststore</span>
+<span class="s">security.ssl.rest.keystore-password</span><span class="pi">:</span> <span class="s">rest_keystore_password</span>
+<span class="s">security.ssl.rest.truststore-password</span><span class="pi">:</span> <span class="s">rest_truststore_password</span>
+<span class="s">security.ssl.rest.key-password</span><span class="pi">:</span> <span class="s">rest_key_password</span></code></pre></figure>
+
+<p><strong>REST Endpoint (with a self signed CA)</strong></p>
+
+<p>Execute the following keytool commands to create a truststore with a self signed CA.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">keytool <span class="nt">-genkeypair</span> <span class="nt">-alias</span> ca <span class="nt">-keystore</span> ca.keystore <span class="nt">-dname</span> <span class="s2">"CN=Sample CA"</span> <span class="nt">-storepass</span> ca_keystore_password <span class="nt">-keypass</span> ca_key_password <span class="nt">-keyalg</span> RSA <span class="nt">-keysize</span> 4096 <span class="nt">-ext</span> <span class="s2">"bc=ca:true"</span> <span class="nt">-storetype</span> PKCS12
+
+keytool <span class="nt">-exportcert</span> <span class="nt">-keystore</span> ca.keystore <span class="nt">-alias</span> ca <span class="nt">-storepass</span> ca_keystore_password <span class="nt">-file</span> ca.cer
+
+keytool <span class="nt">-importcert</span> <span class="nt">-keystore</span> ca.truststore <span class="nt">-alias</span> ca <span class="nt">-storepass</span> ca_truststore_password <span class="nt">-file</span> ca.cer <span class="nt">-noprompt</span></code></pre></figure>
+
+<p>Now create a keystore for the REST endpoint with a certificate signed by the above CA.
+Let <em>flink.company.org / ip:10.0.2.15</em> be the hostname of the Flink master (JobManager).</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">keytool <span class="nt">-genkeypair</span> <span class="nt">-alias</span> flink.rest <span class="nt">-keystore</span> rest.signed.keystore <span class="nt">-dname</span> <span class="s2">"CN=flink.company.org"</span> <span class="nt">-ext</span> <span class="s2">"SAN=dns:flink.company.org"</span> <span class="nt">-storepass</span> rest_keystore_password <span class="nt">-keypass</span> rest_key_password <span class="nt">-keyalg</span> RSA <span class="nt">-keysize</span> 4096 <span class="nt">-storetype</span> PKCS12
+
+keytool <span class="nt">-certreq</span> <span class="nt">-alias</span> flink.rest <span class="nt">-keystore</span> rest.signed.keystore <span class="nt">-storepass</span> rest_keystore_password <span class="nt">-keypass</span> rest_key_password <span class="nt">-file</span> rest.csr
+
+keytool <span class="nt">-gencert</span> <span class="nt">-alias</span> ca <span class="nt">-keystore</span> ca.keystore <span class="nt">-storepass</span> ca_keystore_password <span class="nt">-keypass</span> ca_key_password <span class="nt">-ext</span> <span class="s2">"SAN=dns:flink.company.org,ip:10.0.2.15"</span> <span class="nt">-infile</span> rest.csr <span class="nt">-outfile</span> rest.cer
+
+keytool <span class="nt">-importcert</span> <span class="nt">-keystore</span> rest.signed.keystore <span class="nt">-storepass</span> rest_keystore_password <span class="nt">-file</span> ca.cer <span class="nt">-alias</span> ca <span class="nt">-noprompt</span>
+
+keytool <span class="nt">-importcert</span> <span class="nt">-keystore</span> rest.signed.keystore <span class="nt">-storepass</span> rest_keystore_password <span class="nt">-keypass</span> rest_key_password <span class="nt">-file</span> rest.cer <span class="nt">-alias</span> flink.rest <span class="nt">-noprompt</span></code></pre></figure>
+
+<p>Now add the following configuration to your <code class="highlighter-rouge">flink-conf.yaml</code>:</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">security.ssl.rest.enabled</span><span class="pi">:</span> <span class="no">true</span>
+<span class="s">security.ssl.rest.keystore</span><span class="pi">:</span> <span class="s">/path/to/flink/conf/rest.signed.keystore</span>
+<span class="s">security.ssl.rest.truststore</span><span class="pi">:</span> <span class="s">/path/to/flink/conf/ca.truststore</span>
+<span class="s">security.ssl.rest.keystore-password</span><span class="pi">:</span> <span class="s">rest_keystore_password</span>
+<span class="s">security.ssl.rest.key-password</span><span class="pi">:</span> <span class="s">rest_key_password</span>
+<span class="s">security.ssl.rest.truststore-password</span><span class="pi">:</span> <span class="s">ca_truststore_password</span></code></pre></figure>
+
+<p><strong>Tips to query REST Endpoint with curl utility</strong></p>
+
+<p>You can convert the keystore into the <code class="highlighter-rouge">PEM</code> format using <code class="highlighter-rouge">openssl</code>:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">openssl pkcs12 <span class="nt">-passin</span> pass:rest_keystore_password <span class="nt">-in</span> rest.keystore <span class="nt">-out</span> rest.pem <span class="nt">-nodes</span></code></pre></figure>
+
+<p>Then you can query REST Endpoint with <code class="highlighter-rouge">curl</code>:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">curl <span class="nt">--cacert</span> rest.pem flink_url</code></pre></figure>
+
+<p>If mutual SSL is enabled:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">curl <span class="nt">--cacert</span> rest.pem <span class="nt">--cert</span> rest.pem flink_url</code></pre></figure>
+
+<h2 id="tips-for-yarn--mesos-deployment">Tips for YARN / Mesos Deployment</h2>
+
+<p>For YARN and Mesos, you can use the tools of Yarn and Mesos to help:</p>
+
+<ul>
+  <li>
+    <p>Configuring security for internal communication is exactly the same as in the example above.</p>
+  </li>
+  <li>
+    <p>To secure the REST endpoint, you need to issue the REST endpoint’s certificate such that it is valid for all hosts
+that the Flink master may get deployed to. This can be done with a wild card DNS name, or by adding multiple DNS names.</p>
+  </li>
+  <li>
+    <p>The easiest way to deploy keystores and truststore is by YARN client’s <em>ship files</em> option (<code class="highlighter-rouge">-yt</code>).
+Copy the keystore and truststore files into a local directory (say <code class="highlighter-rouge">deploy-keys/</code>) and start the YARN session as
+follows: <code class="highlighter-rouge">flink run -m yarn-cluster -yt deploy-keys/ flinkapp.jar</code></p>
+  </li>
+  <li>
+    <p>When deployed using YARN, Flink’s web dashboard is accessible through YARN proxy’s Tracking URL.
+To ensure that the YARN proxy is able to access Flink’s HTTPS URL, you need to configure YARN proxy to accept Flink’s SSL certificates.
+For that, add the custom CA certificate into Java’s default truststore on the YARN Proxy node.</p>
+  </li>
+</ul>
+
+<p><a href="#top" class="top pull-right"><span class="glyphicon glyphicon-chevron-up"></span> Back to top</a></p>
+
+
+        </div>
+      </div>
+    </div><!-- /.container -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/page/js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/3.1.0/anchor.min.js"></script>
+    <script src="/page/js/flink.js"></script>
+
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-52545728-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+    <!-- Disqus -->
+    
+  </body>
+</html>
