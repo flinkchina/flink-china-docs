@@ -4,3 +4,5 @@
 content/
 ruby2/.bundle/
 ruby2/.rubydeps/
+*.lock
+

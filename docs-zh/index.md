@@ -1,5 +1,5 @@
 ---
-title: "Apache Flink Documentation"
+title: "Apache Flink 官方翻译 中文文档"
 nav-pos: 0
 nav-title: '<i class="fa fa-home title" aria-hidden="true"></i> Home'
 nav-parent_id: root
@@ -24,9 +24,10 @@ under the License.
 -->
 
 
-
+本文档翻译适用于Apache Flink {{ site.version_title }}版本。该页面构建于{% build_time %}。
 This documentation is for Apache Flink version {{ site.version_title }}. These pages were built at: {% build_time %}.
 
+Apache Flink是一个用于分布式流计算和批处理数据的开源平台。Flink的核心是流式数据计算引擎，它为数据流上的分布式计算提供了数据分发、通信和容错功能。Flink在流引擎上构建批处理，原生支持了迭代计算、内存管理和程序优化。
 Apache Flink is an open source platform for distributed stream and batch data processing. Flink’s core is a streaming dataflow engine that provides data distribution, communication, and fault tolerance for distributed computations over data streams. Flink builds batch processing on top of the streaming engine, overlaying native iteration support, managed memory, and program optimization.
 
 ## First Steps
