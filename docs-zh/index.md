@@ -28,9 +28,9 @@ under the License.
 
 Apache Flink是一个用于分布式流计算和批处理数据的开源平台。Flink的核心是流式数据计算引擎，它为数据流上的分布式计算提供了数据分发、通信和容错功能。Flink在流引擎上构建批处理，原生支持了迭代计算、内存管理和程序优化。
 
-## 第一步
+## 首要步骤
 
-- **概念**: 从Flink的基本概念 [数据流编程模型](concepts/programming-model.html) and [分布式运行时环境](concepts/runtime.html)。 这将有助于您理解这份文档的其他部分， 包含步骤和编程指南. 建议您优先阅读这部分。
+- **概念**: 从Flink的基本概念 [数据流编程模型](concepts/programming-model.html)和[分布式运行时环境](concepts/runtime.html)。 这将有助于您理解这份文档的其他部分，包含步骤和编程指南. 建议您优先阅读这部分。
 
 - **教程**: 
   * [编写实现和运行一个数据流应用程序](./tutorials/datastream_api.html)

@@ -1,5 +1,5 @@
 ---
-title: Dataflow Programming Model
+title: 数据流编程模型
 nav-id: programming-model
 nav-pos: 1
 nav-title: Programming Model
@@ -27,25 +27,17 @@ under the License.
 * This will be replaced by the TOC
 {:toc}
 
-## Levels of Abstraction
+## 层次的抽象
 
-Flink offers different levels of abstraction to develop streaming/batch applications.
+Flink为开发流式/批处理应用程序提供了不同层次的抽象。
 
 <img src="../fig/levels_of_abstraction.svg" alt="Programming levels of abstraction" class="offset" width="80%" />
 
-  - The lowest level abstraction simply offers **stateful streaming**. It is embedded into the [DataStream API](../dev/datastream_api.html)
-    via the [Process Function](../dev/stream/operators/process_function.html). It allows users freely process events from one or more streams,
-    and use consistent fault tolerant *state*. In addition, users can register event time and processing time callbacks,
-    allowing programs to realize sophisticated computations.
+  - 最底层的抽象只提供**状态流**. 它通过[Process Function](../dev/stream/operators/process_function.html)嵌入到[DataStream API](../dev/datastream_api.html)。 它允许用户自由的处理来自一个或多个流的事件，并使用一致的容错**状态**。此外，用户可以注册事件时间和处理时间回调，允许程序实现复杂的计算。
 
-  - In practice, most applications would not need the above described low level abstraction, but would instead program against the
-    **Core APIs** like the [DataStream API](../dev/datastream_api.html) (bounded/unbounded streams) and the [DataSet API](../dev/batch/index.html)
-    (bounded data sets). These fluent APIs offer the common building blocks for data processing, like various forms of user-specified
-    transformations, joins, aggregations, windows, state, etc. Data types processed in these APIs are represented as classes
-    in the respective programming languages.
+  - 在实践中，大多数应用程序不太需要上述底层低级别的抽象，而是针对**Core API**编程，如[DataStream API](../dev/datastream_api.html) (有界/无界流) 和[DataSet API](../dev/batch/index.html)(有界数据集)。这些流畅的API为数据处理提供了通用的构建模块，例如各种形式的用户指定的转换，连接，聚合，窗口，状态等等。在这些API中处理的数据类型在相应的编程语言中表示为类。  
 
-    The low level *Process Function* integrates with the *DataStream API*, making it possible to go the lower level abstraction 
-    for certain operations only. The *DataSet API* offers additional primitives on bounded data sets, like loops/iterations.
+    低级别的*Process Function 处理函数*与*DataStream API*集成在一起，针对某些具体操作去访问低级抽象成为可能。*DataSet API*在有界数据集上提供了额外的原生能力，例如循环/迭代。
 
   - The **Table API** is a declarative DSL centered around *tables*, which may be dynamically changing tables (when representing streams).
     The [Table API](../dev/table_api.html) follows the (extended) relational model: Tables have a schema attached (similar to tables in relational databases)
@@ -57,11 +49,15 @@ Flink offers different levels of abstraction to develop streaming/batch applicat
 
     One can seamlessly convert between tables and *DataStream*/*DataSet*, allowing programs to mix *Table API* and with the *DataStream*
     and *DataSet* APIs.
+  - **Table API**是以**Table表**为中心的声明式DSL，可以是动态更改表(当表示为流时)。[Table API](../dev/table_api.html)遵循(拓展)关系模型:表具有附加的模式(类似于关系数据库中的表)，API提供了类似的操作，例如select,project,join,group-by,aggregate等等。Table API以声明式的方式指定**应该做什么逻辑操作**,而不是精确指定**操作的代码看起来如何**。虽然Table API可以被各种类型的用户定义函数进行拓展，表现力不如Core APIs，但是它使用起来更加简洁(写更少的代码)。另外，Table API程序在执行前也要经过一个应用优化规则的优化器。  
+  
+    可以在Tabe API和**DataStream API**、**DataSet API**之间无缝转换，允许程序混合**Table API**和**DataStream API**、**DataSet API**
+
 
   - The highest level abstraction offered by Flink is **SQL**. This abstraction is similar to the *Table API* both in semantics and
     expressiveness, but represents programs as SQL query expressions.
     The [SQL](../dev/table_api.html#sql) abstraction closely interacts with the Table API, and SQL queries can be executed over tables defined in the *Table API*.
-
+  - Flink提供的最高层次的抽象是**SQL**。这种抽象在语义和表达上类似于**Table API**，但它将程序表示为SQL查询表达式。
 
 ## Programs and Dataflows
 
