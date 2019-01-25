@@ -27,7 +27,7 @@ under the License.
 * This will be replaced by the TOC
 {:toc}
 
-## 层次的抽象
+## 抽象层次
 
 Flink为开发流式/批处理应用程序提供了不同层次的抽象。
 
@@ -39,27 +39,14 @@ Flink为开发流式/批处理应用程序提供了不同层次的抽象。
 
     低级别的*Process Function 处理函数*与*DataStream API*集成在一起，针对某些具体操作去访问低级抽象成为可能。*DataSet API*在有界数据集上提供了额外的原生能力，例如循环/迭代。
 
-  - The **Table API** is a declarative DSL centered around *tables*, which may be dynamically changing tables (when representing streams).
-    The [Table API](../dev/table_api.html) follows the (extended) relational model: Tables have a schema attached (similar to tables in relational databases)
-    and the API offers comparable operations, such as select, project, join, group-by, aggregate, etc.
-    Table API programs declaratively define *what logical operation should be done* rather than specifying exactly
-   *how the code for the operation looks*. Though the Table API is extensible by various types of user-defined
-    functions, it is less expressive than the *Core APIs*, but more concise to use (less code to write).
-    In addition, Table API programs also go through an optimizer that applies optimization rules before execution.
-
-    One can seamlessly convert between tables and *DataStream*/*DataSet*, allowing programs to mix *Table API* and with the *DataStream*
-    and *DataSet* APIs.
+  
   - **Table API**是以**Table表**为中心的声明式DSL，可以是动态更改表(当表示为流时)。[Table API](../dev/table_api.html)遵循(拓展)关系模型:表具有附加的模式(类似于关系数据库中的表)，API提供了类似的操作，例如select,project,join,group-by,aggregate等等。Table API以声明式的方式指定**应该做什么逻辑操作**,而不是精确指定**操作的代码看起来如何**。虽然Table API可以被各种类型的用户定义函数进行拓展，表现力不如Core APIs，但是它使用起来更加简洁(写更少的代码)。另外，Table API程序在执行前也要经过一个应用优化规则的优化器。  
   
     可以在Tabe API和**DataStream API**、**DataSet API**之间无缝转换，允许程序混合**Table API**和**DataStream API**、**DataSet API**
 
+  - Flink提供的最高层次的抽象是**SQL**。这种抽象在语义和表达上类似于**Table API**，但它将程序表示为SQL查询表达式。SQL抽象于Table API紧密交互，SQL查询可以在Table API中定义的表上执行。
 
-  - The highest level abstraction offered by Flink is **SQL**. This abstraction is similar to the *Table API* both in semantics and
-    expressiveness, but represents programs as SQL query expressions.
-    The [SQL](../dev/table_api.html#sql) abstraction closely interacts with the Table API, and SQL queries can be executed over tables defined in the *Table API*.
-  - Flink提供的最高层次的抽象是**SQL**。这种抽象在语义和表达上类似于**Table API**，但它将程序表示为SQL查询表达式。
-
-## Programs and Dataflows
+## 程序和数据流
 
 The basic building blocks of Flink programs are **streams** and **transformations**. (Note that the
 DataSets used in Flink's DataSet API are also streams internally -- more about that
@@ -67,19 +54,25 @@ later.) Conceptually a *stream* is a (potentially never-ending) flow of data rec
 operation that takes one or more streams as input, and produces one or more output streams as a
 result.
 
+Flink程序的基本构建块是**Stream流**和**Transformations转换**。(请注意在Flink的DataSet API中使用的DataSets也是内部流 --稍后会详细介绍。) 从概念上讲*Stream流*(可能永无止境的)是数据记录流，*transformation*是将一个或多个流作为输入的操作，并且产生一个或多个流作为结果。
+
 When executed, Flink programs are mapped to **streaming dataflows**, consisting of **streams** and transformation **operators**.
 Each dataflow starts with one or more **sources** and ends in one or more **sinks**. The dataflows resemble
 arbitrary **directed acyclic graphs** *(DAGs)*. Although special forms of cycles are permitted via
 *iteration* constructs, for the most part we will gloss over this for simplicity.
+
+当执行时，Flink程序被映射到**Streaming dataflows** 数据流上，由**stream流**和**transformation转换运算符**组成。每个Dataflow开始于一个或多个**source源**，结束于一个或多个**sink接收器**。数据流类似于任意**有向无环图**(DAGs)。尽管通过迭代构造允许特殊形式的循环，但是为了简单起见，我们将在大多数情况下将掩饰忽略。
 
 <img src="../fig/program_dataflow.svg" alt="A DataStream program, and its dataflow." class="offset" width="80%" />
 
 Often there is a one-to-one correspondence between the transformations in the programs and the operators
 in the dataflow. Sometimes, however, one transformation may consist of multiple transformation operators.
 
+通常在程序的转换和数据流中的操作符存在一一对应的关系。然而一个转换也可能包含多个转换操作符。
+
 Sources and sinks are documented in the [streaming connectors](../dev/connectors/index.html) and [batch connectors](../dev/batch/connectors.html) docs.
 Transformations are documented in [DataStream operators]({{ site.baseurl }}/dev/stream/operators/index.html) and [DataSet transformations](../dev/batch/dataset_transformations.html).
-
+sources源和sink接收器被记录在[流连接器](../dev/connectors/index.html) and [批处理连接器](../dev/batch/connectors.html)文档中。Transformations转换被记录在了 [DataStream operators 数据流流操作]({{ site.baseurl }}/dev/stream/operators/index.html)和[DataSet transaction 有界数据集转换](../dev/batch/dataset_transformations.html)。
 {% top %}
 
 ## Parallel Dataflows
