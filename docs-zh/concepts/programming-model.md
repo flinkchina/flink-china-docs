@@ -62,51 +62,41 @@ sources源和sink接收器被记录在[流连接器](../dev/connectors/index.htm
 
 ## 并行数据流
 
-Programs in Flink are inherently parallel and distributed. During execution, a *stream* has one or more **stream partitions**,
-and each *operator* has one or more **operator subtasks**. The operator subtasks are independent of one another, and execute in different threads
-and possibly on different machines or containers.
 Flink程序本质是分布式且并行的。在执行期间，*Stream流*有一个或多个**Stream流分区**，并且每个*operator操作运算符*有一个或多个**operator subtasks操作运算符子任务**。运算符子任务彼此独立，并在不同的线程中执行，并且可能在不同的机器上或容器上。
 
-The number of operator subtasks is the **parallelism** of that particular operator. The parallelism of a stream
-is always that of its producing operator. Different operators of the same program may have different
-levels of parallelism.
 运算符子任务的数量是特定运算符的**并行度**。Stream流的并行度始终是其生成的运算符的并行度。同样程序的不同操作运算符可能有不同级别的并行度。  
 
 <img src="../fig/parallel_dataflow.svg" alt="A parallel dataflow" class="offset" width="80%" />
 
-Streams can transport data between two operators in a *one-to-one* (or *forwarding*) pattern, or in a *redistributing* pattern:
 Stream流可以在两个操作运算符符之间以*one to one 一对一*(或*forward转发*)模式或者*redistributing 重新分发*模式传递数据:
 
   - **One-to-one 一对一模式** streams 流(例如上图中的  *Source源* 和 *map()映射* 操作运算符)保留了元素的分区和顺序. 这意味着*map()映射*操作运算符的子任务[1]将以与*Source源*操作运算符的子任务[1]生成的元素相同的顺序看到相同相同的元素。
 
   - **Redistributing 重新分发** Streams流 (在*map()* 和 *keyBy/window*之间 ,以及*keyBy/window* 和 *Sink*之间) 修改流的分区. 每个 *operator subtask操作符子任务* 发送数据到不同目标的子任务，取决于所选的转换。例子中是*keyBy()*(通过哈希键重新分区),*broadcast广播*,或者*rebalance()*(重新随机分区)。
-    *keyBy()* (which re-partitions by hashing the key), *broadcast()*, or *rebalance()* (which
-    re-partitions randomly). In a *redistributing* exchange the ordering among the elements is
-    only preserved within each pair of sending and receiving subtasks (for example, subtask[1]
-    of *map()* and subtask[2] of *keyBy/window*). So in this example, the ordering within each key
-    is preserved, but the parallelism does introduce non-determinism regarding the order in
-    which the aggregated results for different keys arrive at the sink.
+   
 在*redistributing重新分配*交换中，元素的顺序仅保留在每队发送和接收子任务中(例如子任务[1]*map()*和子任务[2]*keyBy/window*)。所以在该例子中，每个键内的顺序被保留了，但是并行度确实引入了关于不同键的聚合结果到达接收器的顺序的不确定性。
 
-Details about configuring and controlling parallelism can be found in the docs on [parallel execution](../dev/parallel.html).
 有关配置和控制并行度的详细信息请参见文档[并行执行](../dev/parallel.html)  
 {% top %}
 
-## Windows
+## 窗口
 
 Aggregating events (e.g., counts, sums) works differently on streams than in batch processing.
 For example, it is impossible to count all elements in a stream,
 because streams are in general infinite (unbounded). Instead, aggregates on streams (counts, sums, etc),
 are scoped by **windows**, such as *"count over the last 5 minutes"*, or *"sum of the last 100 elements"*.
 
+聚合事件(例如 计数count，总和sum)在流上的工作方式和批处理是不同的。例如，对流上所有元素进行计数是不可能的因为流通常是无限的(无界的)。相反，流上的聚合(count,sum等)的作用域是**windows窗口**,例如**最后5分钟的计数**或者**最后100个元素的和**。
+
 Windows can be *time driven* (example: every 30 seconds) or *data driven* (example: every 100 elements).
 One typically distinguishes different types of windows, such as *tumbling windows* (no overlap),
 *sliding windows* (with overlap), and *session windows* (punctuated by a gap of inactivity).
+窗口可以是*time driven 时间驱动*(例如: 每隔30s) 或者 *data drive数据驱动*(例如: 每100个元素)。通常可以区分不同类型的窗口，例如*tumbling windows滚动窗口*(无重叠)，*slding windows 滑动窗口*(有重叠)和*session windows会话窗口*(中间有不活动的间隙)。
 
 <img src="../fig/windows.svg" alt="Time- and Count Windows" class="offset" width="80%" />
 
-More window examples can be found in this [blog post](https://flink.apache.org/news/2015/12/04/Introducing-windows.html).
-More details are in the [window docs](../dev/stream/operators/windows.html).
+更多窗口案例可以在 [博客文章](https://flink.apache.org/news/2015/12/04/Introducing-windows.html)中学习.
+更多[window 窗口相关文档](../dev/stream/operators/windows.html)。
 
 {% top %}
 
