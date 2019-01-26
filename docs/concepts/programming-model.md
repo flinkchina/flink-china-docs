@@ -100,22 +100,25 @@ One typically distinguishes different types of windows, such as *tumbling window
 
 {% top %}
 
-## Time
+## 时间
 
 When referring to time in a streaming program (for example to define windows), one can refer to different notions
 of time:
+在流程序中引用时间时(例如定义窗口)，可以引用不同的时间概念。
 
-  - **Event Time** is the time when an event was created. It is usually described by a timestamp in the events,
+  - **Event Time 事件时间** 时间发生的时间. It is usually described by a timestamp in the events,
     for example attached by the producing sensor, or the producing service. Flink accesses event timestamps
     via [timestamp assigners]({{ site.baseurl }}/dev/event_timestamps_watermarks.html).
+它通常由事件中的时间戳描述，例如由生产传感器或生产服务附加的时间戳。Flink通过[时间戳分配程序]({{ site.baseurl }}/dev/event_timestamps_watermarks.html)访问事件时间戳。
 
-  - **Ingestion time** is the time when an event enters the Flink dataflow at the source operator.
+  - **Ingestion time 摄入时间** is the time when an event enters the Flink dataflow at the source operator.事件在source源操作符进入Flink数据流的时间。
 
-  - **Processing Time** is the local time at each operator that performs a time-based operation.
+  - **Processing Time 处理时间** is the local time at each operator that performs a time-based operation.
+  每个基于时间的操作符的本地时间。
 
 <img src="../fig/event_ingestion_processing_time.svg" alt="Event Time, Ingestion Time, and Processing Time" class="offset" width="80%" />
 
-More details on how to handle time are in the [event time docs]({{ site.baseurl }}/dev/event_time.html).
+关于如何处理时间的更多细节在 [event time 事件时间相关文档]({{ site.baseurl }}/dev/event_time.html)中。
 
 {% top %}
 
