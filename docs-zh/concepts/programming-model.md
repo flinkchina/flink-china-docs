@@ -44,7 +44,7 @@ Flink为开发流式/批处理应用程序提供了不同层次的抽象。
   
     可以在Tabe API和**DataStream API**、**DataSet API**之间无缝转换，允许程序混合**Table API**和**DataStream API**、**DataSet API**
 
-  - Flink提供的最高层次的抽象是**SQL**。这种抽象在语义和表达上类似于**Table API**，但它将程序表示为SQL查询表达式。SQL抽象于Table API紧密交互，SQL查询可以在Table API中定义的表上执行。
+  - Flink提供的最高层次的抽象是**SQL**。这种抽象在语义和表达上类似于**Table API**，但它将程序表示为SQL查询表达式。SQL抽象和Table API紧密交互，SQL查询可以在Table API中定义的表上执行。
 
 ## 程序和数据流
 
@@ -60,37 +60,36 @@ Flink程序的基本构建块是**Stream流**和**Transformations转换**。(请
 sources源和sink接收器被记录在[流连接器](../dev/connectors/index.html) and [批处理连接器](../dev/batch/connectors.html)文档中。Transformations转换被记录在了 [DataStream operators 数据流流操作]({{ site.baseurl }}/dev/stream/operators/index.html)和[DataSet transaction 有界数据集转换](../dev/batch/dataset_transformations.html)。
 {% top %}
 
-## Parallel Dataflows
+## 并行数据流
 
 Programs in Flink are inherently parallel and distributed. During execution, a *stream* has one or more **stream partitions**,
 and each *operator* has one or more **operator subtasks**. The operator subtasks are independent of one another, and execute in different threads
 and possibly on different machines or containers.
+Flink程序本质是分布式且并行的。在执行期间，*Stream流*有一个或多个**Stream流分区**，并且每个*operator操作运算符*有一个或多个**operator subtasks操作运算符子任务**。运算符子任务彼此独立，并在不同的线程中执行，并且可能在不同的机器上或容器上。
 
 The number of operator subtasks is the **parallelism** of that particular operator. The parallelism of a stream
 is always that of its producing operator. Different operators of the same program may have different
 levels of parallelism.
+运算符子任务的数量是特定运算符的**并行度**。Stream流的并行度始终是其生成的运算符的并行度。同样程序的不同操作运算符可能有不同级别的并行度。  
 
 <img src="../fig/parallel_dataflow.svg" alt="A parallel dataflow" class="offset" width="80%" />
 
 Streams can transport data between two operators in a *one-to-one* (or *forwarding*) pattern, or in a *redistributing* pattern:
+Stream流可以在两个操作运算符符之间以*one to one 一对一*(或*forward转发*)模式或者*redistributing 重新分发*模式传递数据:
 
-  - **One-to-one** streams (for example between the *Source* and the *map()* operators in the figure
-    above) preserve the partitioning and ordering of the
-    elements. That means that subtask[1] of the *map()* operator will see the same elements in the same order as they
-    were produced by subtask[1] of the *Source* operator.
+  - **One-to-one 一对一模式** streams 流(例如上图中的  *Source源* 和 *map()映射* 操作运算符)保留了元素的分区和顺序. 这意味着*map()映射*操作运算符的子任务[1]将以与*Source源*操作运算符的子任务[1]生成的元素相同的顺序看到相同相同的元素。
 
-  - **Redistributing** streams (as between *map()* and *keyBy/window* above, as well as between
-    *keyBy/window* and *Sink*) change the partitioning of streams. Each *operator subtask* sends
-    data to different target subtasks, depending on the selected transformation. Examples are
+  - **Redistributing 重新分发** Streams流 (在*map()* 和 *keyBy/window*之间 ,以及*keyBy/window* 和 *Sink*之间) 修改流的分区. 每个 *operator subtask操作符子任务* 发送数据到不同目标的子任务，取决于所选的转换。例子中是*keyBy()*(通过哈希键重新分区),*broadcast广播*,或者*rebalance()*(重新随机分区)。
     *keyBy()* (which re-partitions by hashing the key), *broadcast()*, or *rebalance()* (which
     re-partitions randomly). In a *redistributing* exchange the ordering among the elements is
     only preserved within each pair of sending and receiving subtasks (for example, subtask[1]
     of *map()* and subtask[2] of *keyBy/window*). So in this example, the ordering within each key
     is preserved, but the parallelism does introduce non-determinism regarding the order in
     which the aggregated results for different keys arrive at the sink.
+在*redistributing重新分配*交换中，元素的顺序仅保留在每队发送和接收子任务中(例如子任务[1]*map()*和子任务[2]*keyBy/window*)。所以在该例子中，每个键内的顺序被保留了，但是并行度确实引入了关于不同键的聚合结果到达接收器的顺序的不确定性。
 
 Details about configuring and controlling parallelism can be found in the docs on [parallel execution](../dev/parallel.html).
-
+有关配置和控制并行度的详细信息请参见文档[并行执行](../dev/parallel.html)  
 {% top %}
 
 ## Windows
