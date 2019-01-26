@@ -122,11 +122,12 @@ of time:
 
 {% top %}
 
-## Stateful Operations
+## 状态操作
 
 While many operations in a dataflow simply look at one individual *event at a time* (for example an event parser),
 some operations remember information across multiple events (for example window operators).
 These operations are called **stateful**.
+虽然数据流中的许多操作一次只查看一个单独的事件 *enent at a time*(例如事件解析器)，但有些操作会记住多个事件之间的信息(例如窗口操作符)。这些操作称为 **stateful 有状态**。
 
 The state of stateful operations is maintained in what can be thought of as an embedded key/value store.
 The state is partitioned and distributed strictly together with the streams that are read by the
@@ -135,13 +136,16 @@ and is restricted to the values associated with the current event's key. Alignin
 makes sure that all state updates are local operations, guaranteeing consistency without transaction overhead.
 This alignment also allows Flink to redistribute the state and adjust the stream partitioning transparently.
 
+有状态操作的状态保持在可以被认为是嵌入式的key/value存储的状态中。状态与有状态操作符读取的流一起被严格的分区和分发。因此，只能在*keyBy()*函数之后的*keyed streams 键的流*上访问key/value是可能的，并且只能访问与当前事件的键关联的值。对流和状态的键进行对齐可以确保所有的状态更新都是本地操作，从而保证一致性而不存在事务开销。这种对齐还允许Flink重新分配状态并透明地调整流分区。
+
 <img src="../fig/state_partitioning.svg" alt="State and Partitioning" class="offset" width="50%" />
 
-For more information, see the documentation on [state](../dev/stream/state/index.html).
+有关更多信息，请参阅有关的文档
+ [State状态](../dev/stream/state/index.html).
 
 {% top %}
 
-## Checkpoints for Fault Tolerance
+## 容错检查点 
 
 Flink implements fault tolerance using a combination of **stream replay** and **checkpointing**. A
 checkpoint is related to a specific point in each of the input streams along with the corresponding state for each
@@ -149,8 +153,12 @@ of the operators. A streaming dataflow can be resumed from a checkpoint while ma
 processing semantics)* by restoring the state of the operators and replaying the events from the
 point of the checkpoint.
 
+Flink使用**流重播 stream replay**和**检查点 checkpointing**的组合实现容错。检查点与每个输入流中的特定点以及每个操作符的对应状态相关。流数据流可以从检查点恢复，同时通过恢复操作符的状态并从检查点重新播放事件来维护一致性*(exactly-once 精准处理一次的语义)*。
+
+
 The checkpoint interval is a means of trading off the overhead of fault tolerance during execution with the recovery time (the number
 of events that need to be replayed).
+检查点间隔是一种平衡执行期间容错开销和恢复时间(需要重播的事件数量)的方法。
 
 The description of the [fault tolerance internals]({{ site.baseurl }}/internals/stream_checkpointing.html) provides
 more information about how Flink manages checkpoints and related topics.
