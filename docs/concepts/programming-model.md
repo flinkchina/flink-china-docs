@@ -81,16 +81,8 @@ Stream流可以在两个操作运算符符之间以*one to one 一对一*(或*fo
 
 ## 窗口
 
-Aggregating events (e.g., counts, sums) works differently on streams than in batch processing.
-For example, it is impossible to count all elements in a stream,
-because streams are in general infinite (unbounded). Instead, aggregates on streams (counts, sums, etc),
-are scoped by **windows**, such as *"count over the last 5 minutes"*, or *"sum of the last 100 elements"*.
-
 聚合事件(例如 计数count，总和sum)在流上的工作方式和批处理是不同的。例如，对流上所有元素进行计数是不可能的因为流通常是无限的(无界的)。相反，流上的聚合(count,sum等)的作用域是**windows窗口**,例如**最后5分钟的计数**或者**最后100个元素的和**。
 
-Windows can be *time driven* (example: every 30 seconds) or *data driven* (example: every 100 elements).
-One typically distinguishes different types of windows, such as *tumbling windows* (no overlap),
-*sliding windows* (with overlap), and *session windows* (punctuated by a gap of inactivity).
 窗口可以是*time driven 时间驱动*(例如: 每隔30s) 或者 *data drive数据驱动*(例如: 每100个元素)。通常可以区分不同类型的窗口，例如*tumbling windows滚动窗口*(无重叠)，*slding windows 滑动窗口*(有重叠)和*session windows会话窗口*(中间有不活动的间隙)。
 
 <img src="../fig/windows.svg" alt="Time- and Count Windows" class="offset" width="80%" />
@@ -102,18 +94,15 @@ One typically distinguishes different types of windows, such as *tumbling window
 
 ## 时间
 
-When referring to time in a streaming program (for example to define windows), one can refer to different notions
-of time:
+
 在流程序中引用时间时(例如定义窗口)，可以引用不同的时间概念。
 
-  - **Event Time 事件时间** 时间发生的时间. It is usually described by a timestamp in the events,
-    for example attached by the producing sensor, or the producing service. Flink accesses event timestamps
-    via [timestamp assigners]({{ site.baseurl }}/dev/event_timestamps_watermarks.html).
+  - **Event Time 事件时间** 时间发生的时间. 
 它通常由事件中的时间戳描述，例如由生产传感器或生产服务附加的时间戳。Flink通过[时间戳分配程序]({{ site.baseurl }}/dev/event_timestamps_watermarks.html)访问事件时间戳。
 
-  - **Ingestion time 摄入时间** is the time when an event enters the Flink dataflow at the source operator.事件在source源操作符进入Flink数据流的时间。
+  - **Ingestion time 摄入时间** 事件在source源操作符进入Flink数据流的时间。
 
-  - **Processing Time 处理时间** is the local time at each operator that performs a time-based operation.
+  - **Processing Time 处理时间** 
   每个基于时间的操作符的本地时间。
 
 <img src="../fig/event_ingestion_processing_time.svg" alt="Event Time, Ingestion Time, and Processing Time" class="offset" width="80%" />
@@ -124,9 +113,6 @@ of time:
 
 ## 状态操作
 
-While many operations in a dataflow simply look at one individual *event at a time* (for example an event parser),
-some operations remember information across multiple events (for example window operators).
-These operations are called **stateful**.
 虽然数据流中的许多操作一次只查看一个单独的事件 *enent at a time*(例如事件解析器)，但有些操作会记住多个事件之间的信息(例如窗口操作符)。这些操作称为 **stateful 有状态**。
 
 The state of stateful operations is maintained in what can be thought of as an embedded key/value store.
@@ -147,45 +133,38 @@ This alignment also allows Flink to redistribute the state and adjust the stream
 
 ## 容错检查点 
 
-Flink implements fault tolerance using a combination of **stream replay** and **checkpointing**. A
-checkpoint is related to a specific point in each of the input streams along with the corresponding state for each
-of the operators. A streaming dataflow can be resumed from a checkpoint while maintaining consistency *(exactly-once
-processing semantics)* by restoring the state of the operators and replaying the events from the
-point of the checkpoint.
-
 Flink使用**流重播 stream replay**和**检查点 checkpointing**的组合实现容错。检查点与每个输入流中的特定点以及每个操作符的对应状态相关。流数据流可以从检查点恢复，同时通过恢复操作符的状态并从检查点重新播放事件来维护一致性*(exactly-once 精准处理一次的语义)*。
 
-
-The checkpoint interval is a means of trading off the overhead of fault tolerance during execution with the recovery time (the number
-of events that need to be replayed).
 检查点间隔是一种平衡执行期间容错开销和恢复时间(需要重播的事件数量)的方法。
 
-The description of the [fault tolerance internals]({{ site.baseurl }}/internals/stream_checkpointing.html) provides
-more information about how Flink manages checkpoints and related topics.
-Details about enabling and configuring checkpointing are in the [checkpointing API docs](../dev/stream/state/checkpointing.html).
-
+[内部容错]({{ site.baseurl }}/internals/stream_checkpointing.html)的描述提供了更多关于Flink如何管理检查点的信息和相关联的主题。开启和配置检查点的细节在[检查点APIs文档](../dev/stream/state/checkpointing.html)
 
 {% top %}
 
-## Batch on Streaming
+## Batch on Streaming 流上的批处理
 
-Flink executes [batch programs](../dev/batch/index.html) as a special case of streaming programs, where the streams are bounded (finite number of elements).
-A *DataSet* is treated internally as a stream of data. The concepts above thus apply to batch programs in the
-same way as well as they apply to streaming programs, with minor exceptions:
+Flink executes [batch programs](../dev/batch/index.html) as a special case of streaming programs, where the streams are bounded (finite number of elements).Flink执行批处理程序(../dev/batch/index.html)将其作为流程序的一种特殊情况，其中流式有界的(元素数量是有限的)。
+
+在内部将*DataSet*视为数据流。因此，上述概念适用于
+同样的方法，以及他们适用于流媒体程序，除了小的例外:
 
   - [Fault tolerance for batch programs](../dev/batch/fault_tolerance.html) does not use checkpointing.
     Recovery happens by fully replaying the streams.
     That is possible, because inputs are bounded. This pushes the cost more towards the recovery,
     but makes the regular processing cheaper, because it avoids checkpoints.
+  - [批处理程序的容错能力](../dev/batch/fault_tolerance.html)不使用检查点。恢复是通过完全重播流来实现的。这是可能的，因为输入是有界的。这将使恢复的花销成本上升，但是常规处理更便宜，因为它避免了检查点。
 
   - Stateful operations in the DataSet API use simplified in-memory/out-of-core data structures, rather than
     key/value indexes.
+  - 数据集API中的有状态操作使用简化的内存/内核外数据结构，而不是
+键/值索引。
 
-  - The DataSet API introduces special synchronized (superstep-based) iterations, which are only possible on
+  - The DataSet API introduces special synchronized () iterations, which are only possible on
     bounded streams. For details, check out the [iteration docs]({{ site.baseurl }}/dev/batch/iterations.html).
+  - 数据集API引入了特殊的同步(superstep-based)迭代，这只有在有界流。有关详细信息，请查看[迭代文档]({{ site.baseurl }}/dev/batch/iterations.html).
 
 {% top %}
 
-## Next Steps
+## 接下来
 
-Continue with the basic concepts in Flink's [Distributed Runtime](runtime.html).
+继续Flink的基本概念[分布式运行时](runtime.html)
