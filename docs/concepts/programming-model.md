@@ -115,13 +115,6 @@ Stream流可以在两个操作运算符符之间以*one to one 一对一*(或*fo
 
 虽然数据流中的许多操作一次只查看一个单独的事件 *enent at a time*(例如事件解析器)，但有些操作会记住多个事件之间的信息(例如窗口操作符)。这些操作称为 **stateful 有状态**。
 
-The state of stateful operations is maintained in what can be thought of as an embedded key/value store.
-The state is partitioned and distributed strictly together with the streams that are read by the
-stateful operators. Hence, access to the key/value state is only possible on *keyed streams*, after a *keyBy()* function,
-and is restricted to the values associated with the current event's key. Aligning the keys of streams and state
-makes sure that all state updates are local operations, guaranteeing consistency without transaction overhead.
-This alignment also allows Flink to redistribute the state and adjust the stream partitioning transparently.
-
 有状态操作的状态保持在可以被认为是嵌入式的key/value存储的状态中。状态与有状态操作符读取的流一起被严格的分区和分发。因此，只能在*keyBy()*函数之后的*keyed streams 键的流*上访问key/value是可能的，并且只能访问与当前事件的键关联的值。对流和状态的键进行对齐可以确保所有的状态更新都是本地操作，从而保证一致性而不存在事务开销。这种对齐还允许Flink重新分配状态并透明地调整流分区。
 
 <img src="../fig/state_partitioning.svg" alt="State and Partitioning" class="offset" width="50%" />
@@ -143,24 +136,16 @@ Flink使用**流重播 stream replay**和**检查点 checkpointing**的组合实
 
 ## Batch on Streaming 流上的批处理
 
-Flink executes [batch programs](../dev/batch/index.html) as a special case of streaming programs, where the streams are bounded (finite number of elements).Flink执行批处理程序(../dev/batch/index.html)将其作为流程序的一种特殊情况，其中流式有界的(元素数量是有限的)。
+Flink执行[批处理程序](../dev/batch/index.html)将其作为流程序的一种特殊情况，其中流式有界的(元素数量是有限的)。
 
 在内部将*DataSet*视为数据流。因此，上述概念适用于
 同样的方法，以及他们适用于流媒体程序，除了小的例外:
 
-  - [Fault tolerance for batch programs](../dev/batch/fault_tolerance.html) does not use checkpointing.
-    Recovery happens by fully replaying the streams.
-    That is possible, because inputs are bounded. This pushes the cost more towards the recovery,
-    but makes the regular processing cheaper, because it avoids checkpoints.
   - [批处理程序的容错能力](../dev/batch/fault_tolerance.html)不使用检查点。恢复是通过完全重播流来实现的。这是可能的，因为输入是有界的。这将使恢复的花销成本上升，但是常规处理更便宜，因为它避免了检查点。
 
-  - Stateful operations in the DataSet API use simplified in-memory/out-of-core data structures, rather than
-    key/value indexes.
   - 数据集API中的有状态操作使用简化的内存/内核外数据结构，而不是
 键/值索引。
 
-  - The DataSet API introduces special synchronized () iterations, which are only possible on
-    bounded streams. For details, check out the [iteration docs]({{ site.baseurl }}/dev/batch/iterations.html).
   - 数据集API引入了特殊的同步(superstep-based)迭代，这只有在有界流。有关详细信息，请查看[迭代文档]({{ site.baseurl }}/dev/batch/iterations.html).
 
 {% top %}
