@@ -1,7 +1,7 @@
 ---
-title: "Flink DataSet API Programming Guide"
+title: Flink DataSet API数据集API编程指南
 nav-id: batch
-nav-title: Batch (DataSet API)
+nav-title: 批处理(DataSet 数据集API)
 nav-parent_id: dev
 nav-pos: 30
 nav-show_overview: true

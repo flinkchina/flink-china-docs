@@ -1,7 +1,7 @@
 ---
-title: "Application Development"
+title: 应用程序开发
 nav-id: dev
-nav-title: '<i class="fa fa-code title maindish" aria-hidden="true"></i> Application Development'
+nav-title: '<i class="fa fa-code title maindish" aria-hidden="true"></i> 应用程序开发'
 nav-parent_id: root
 nav-pos: 5
 section-break: true

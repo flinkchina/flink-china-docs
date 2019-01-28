@@ -1,6 +1,6 @@
 ---
-title:  "Batch Examples"
-nav-title: Batch Examples
+title:  批处理案例
+nav-title: 批处理案例
 nav-parent_id: examples
 nav-pos: 20
 ---
@@ -23,44 +23,33 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The following example programs showcase different applications of Flink
-from simple word counting to graph algorithms. The code samples illustrate the
-use of [Flink's DataSet API]({{ site.baseurl }}/dev/batch/index.html).
-
-The full source code of the following and more examples can be found in the {% gh_link flink-examples/flink-examples-batch "flink-examples-batch" %} module of the Flink source repository.
-
+下面的示例程序展示了Flink的不同应用程序，从简单的单词计数到图形算法。代码示例演示了[Flink的数据集API]({{ site.baseurl }}/dev/batch/index.html).
+在Flink源代码仓库的{% gh_link flink-examples/flink-examples-batch "flink-examples-batch" %}模块中可以找到以下示例的完整源代码和更多示例。
 * This will be replaced by the TOC
 {:toc}
 
 
-## Running an example
+## 运行一个案例
 
-In order to run a Flink example, we assume you have a running Flink instance available. The "Quickstart" and "Setup" tabs in the navigation describe various ways of starting Flink.
-
-The easiest way is running the `./bin/start-cluster.sh`, which by default starts a local cluster with one JobManager and one TaskManager.
-
-Each binary release of Flink contains an `examples` directory with jar files for each of the examples on this page.
-
-To run the WordCount example, issue the following command:
-
+为了运行Flink示例，我们假设您有一个正在运行的Flink实例可用。导航中的"Quickstart"和"Setup" 选项卡描述了启动Flink的各种方法。  
+最简单的方法是运行`./bin/start-cluster.sh`集群。默认情况下，它使用一个JobManager和一个TaskManager启动本地集群。
+Flink的每个二进制版本都包含一个`examples`目录，其中包含用于该页上每个示例的jar文件。  
+要运行WordCount示例，发出以下命令:   
 {% highlight bash %}
 ./bin/flink run ./examples/batch/WordCount.jar
 {% endhighlight %}
 
-The other examples can be started in a similar way.
+其他示例也可以以类似的方式开始。
 
 Note that many examples run without passing any arguments for them, by using build-in data. To run WordCount with real data, you have to pass the path to the data:
-
+注意，通过使用内置数据，许多示例在运行时不传递任何参数。要使用真实数据运行WordCount，必须将路径传递给数据:  
 {% highlight bash %}
 ./bin/flink run ./examples/batch/WordCount.jar --input /path/to/some/text/data --output /path/to/result
 {% endhighlight %}
 
-Note that non-local file systems require a schema prefix, such as `hdfs://`.
-
-
-## Word Count
-WordCount is the "Hello World" of Big Data processing systems. It computes the frequency of words in a text collection. The algorithm works in two steps: First, the texts are splits the text to individual words. Second, the words are grouped and counted.
-
+注意，非本地文件系统需要一个模式前缀，如`hdfs://`。
+## Word Count 单词统计
+WordCount是大数据处理系统的"Hello World"。它计算文本集合中单词的频率。该算法分为两个步骤:首先，将文本拆分为单个单词。其次，对单词进行分组和计数。  
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
@@ -95,9 +84,7 @@ public static class Tokenizer implements FlatMapFunction<String, Tuple2<String, 
     }
 }
 {% endhighlight %}
-
-The {% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/wordcount/WordCount.java  "WordCount example" %} implements the above described algorithm with input parameters: `--input <path> --output <path>`. As test data, any text file will do.
-
+{% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/wordcount/WordCount.java  "WordCount example" %}使用输入参数实现上述算法:`--input <path> --output <path>`。作为测试数据，任何文本文件都可以。
 </div>
 <div data-lang="scala" markdown="1">
 
@@ -115,18 +102,14 @@ val counts = text.flatMap { _.toLowerCase.split("\\W+") filter { _.nonEmpty } }
 counts.writeAsCsv(outputPath, "\n", " ")
 {% endhighlight %}
 
-The {% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/wordcount/WordCount.scala  "WordCount example" %} implements the above described algorithm with input parameters: `--input <path> --output <path>`. As test data, any text file will do.
-
+{% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/wordcount/WordCount.scala  "WordCount example" %}使用输入参数实现上述算法: `--input <path> --output <path>`。作为测试数据，任何文本文件都可以。
 
 </div>
 </div>
 
-## Page Rank
-
-The PageRank algorithm computes the "importance" of pages in a graph defined by links, which point from one pages to another page. It is an iterative graph algorithm, which means that it repeatedly applies the same computation. In each iteration, each page distributes its current rank over all its neighbors, and compute its new rank as a taxed sum of the ranks it received from its neighbors. The PageRank algorithm was popularized by the Google search engine which uses the importance of webpages to rank the results of search queries.
-
-In this simple example, PageRank is implemented with a [bulk iteration](iterations.html) and a fixed number of iterations.
-
+## Page Rank 网页排名  
+PageRank算法计算链接定义的图中页面的"重要性"，链接从一个页面指向另一个页面。它是一种迭代图算法，即重复应用相同的计算。在每次迭代中，每个页面都将其当前的秩分布到所有相邻的页面上，并将其新秩计算为从相邻页面获得的秩的累加和。PageRank算法是由谷歌搜索引擎推广的，它利用网页的重要性对搜索查询结果进行排序。    
+在这个简单的例子中，PageRank是通过[bulk iteration](iterations.html)和固定数量的迭代来实现的。
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
@@ -203,9 +186,8 @@ public static final class EpsilonFilter
 }
 {% endhighlight %}
 
-The {% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/graph/PageRank.java "PageRank program" %} implements the above example.
-It requires the following parameters to run: `--pages <path> --links <path> --output <path> --numPages <n> --iterations <n>`.
-
+{% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/graph/PageRank.java "PageRank program" %}实现了上面的示例。
+它需要以下参数来运行:`--pages <path> --links <path> --output <path> --numPages <n> --iterations <n>`。
 </div>
 <div data-lang="scala" markdown="1">
 
