@@ -1,5 +1,5 @@
 ---
-title: "Tutorials"
+title: 教程
 nav-id: tutorials
 nav-title: '<i class="fa fa-power-off title appetizer" aria-hidden="true"></i> Tutorials'
 nav-parent_id: root

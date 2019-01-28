@@ -1,5 +1,5 @@
 ---
-title:  "Running Flink on Windows"
+title:  Windows上运行Flink
 nav-parent_id: setuptutorials
 nav-pos: 30
 ---
@@ -22,13 +22,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-If you want to run Flink locally on a Windows machine you need to [download](http://flink.apache.org/downloads.html) and unpack the binary Flink distribution. After that you can either use the **Windows Batch** file (`.bat`), or use **Cygwin** to run the Flink Jobmanager.
+如果您想在Windows机器上本地运行Flink，您需要[下载](http://flink.apache.org/downloads.html)并解包二进制Flink发行版。之后，您可以使用**Windows批处理**文件(`.bat`)，或者使用**Cygwin**来运行Flink Jobmanager。  
 
-## Starting with Windows Batch Files
+## 从Windows批处理文件开始  
 
-To start Flink in from the *Windows Command Line*, open the command window, navigate to the `bin/` directory of Flink and run `start-cluster.bat`.
-
-Note: The ``bin`` folder of your Java Runtime Environment must be included in Window's ``%PATH%`` variable. Follow this [guide](http://www.java.com/en/download/help/path.xml) to add Java to the ``%PATH%`` variable.
+要从*Windows命令行*启动Flink，打开命令窗口，导航到Flink的`bin/` 目录并运行`start-cluster.bat`。
+注意:Java运行时环境的``bin``文件夹必须包含在窗口的``%PATH%`` 变量中。按照这个[指南](http://www.java.com/en/download/help/path.xml)将Java添加到``%PATH%`` 变量中。  
 
 {% highlight bash %}
 $ cd flink
@@ -39,14 +38,12 @@ You can terminate the processes via CTRL-C in the spawned shell windows.
 Web interface by default on http://localhost:8081/.
 {% endhighlight %}
 
-After that, you need to open a second terminal to run jobs using `flink.bat`.
-
+之后，需要打开第二个终端，使用`flink.bat`运行job作业。
 {% top %}
 
-## Starting with Cygwin and Unix Scripts
+## 从Cygwin和Unix脚本开始
 
-With *Cygwin* you need to start the Cygwin Terminal, navigate to your Flink directory and run the `start-cluster.sh` script:
-
+使用*Cygwin*您需要启动Cygwin终端，导航到Flink目录并运行`start-cluster.sh`。sh脚本:  
 {% highlight bash %}
 $ cd flink
 $ bin/start-cluster.sh
@@ -55,33 +52,30 @@ Starting cluster.
 
 {% top %}
 
-## Installing Flink from Git
+## 从Git仓库安装Flink
 
-If you are installing Flink from the git repository and you are using the Windows git shell, Cygwin can produce a failure similar to this one:
-
+如果您正在从git仓库中安装Flink，并且正在使用Windows git shell, Cygwin可能会产生类似于下面这样的故障:
 {% highlight bash %}
 c:/flink/bin/start-cluster.sh: line 30: $'\r': command not found
 {% endhighlight %}
 
-This error occurs because git is automatically transforming UNIX line endings to Windows style line endings when running in Windows. The problem is that Cygwin can only deal with UNIX style line endings. The solution is to adjust the Cygwin settings to deal with the correct line endings by following these three steps:
+发生此错误是因为git在Windows中运行时自动将UNIX行结束符转换为Windows样式的行结束符。问题是Cygwin只能处理UNIX样式的行尾。解决方案是调整Cygwin设置来处理正确的行尾，方法如下三个步骤:
+1. 启动一个Cygwin shell。
 
-1. Start a Cygwin shell.
-
-2. Determine your home directory by entering
+2. 通过输入确定主目录
 
     {% highlight bash %}
     cd; pwd
     {% endhighlight %}
 
-    This will return a path under the Cygwin root path.
+    这将返回Cygwin根路径下的路径。
 
-3. Using NotePad, WordPad or a different text editor open the file `.bash_profile` in the home directory and append the following: (If the file does not exist you will have to create it)
-
+3. 使用记事本，写字板或不同的文本编辑器打开文件。在主目录中添加`.bash_profile`并附加以下内容:(如果文件不存在，则必须创建它)
 {% highlight bash %}
 export SHELLOPTS
 set -o igncr
 {% endhighlight %}
 
-Save the file and open a new bash shell.
+保存文件并打开一个新的bash shell。
 
 {% top %}
