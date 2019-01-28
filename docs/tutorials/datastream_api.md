@@ -1,6 +1,6 @@
 ---
 title: DataStream 流式API教程
-nav-title: DataStream API
+nav-title: DataStream 流式API
 nav-parent_id: apitutorials
 nav-pos: 10
 ---

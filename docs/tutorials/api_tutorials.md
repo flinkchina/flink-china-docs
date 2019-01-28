@@ -1,7 +1,7 @@
 ---
-title: "API Tutorials"
+title: API教程
 nav-id: apitutorials
-nav-title: 'API Tutorials'
+nav-title: 'API教程'
 nav-parent_id: tutorials
 nav-pos: 10
 ---
