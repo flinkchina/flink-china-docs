@@ -254,6 +254,8 @@ result.writeAsCsv(outputPath, "\n", " ")
 
 he {% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/graph/PageRankBasic.scala "PageRank program" %} implements the above example.
 It requires the following parameters to run: `--pages <path> --links <path> --output <path> --numPages <n> --iterations <n>`.
+{% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/graph/PageRankBasic.scala "PageRank program" %}实现上面的示例。
+它需要以下参数来运行: `--pages <path> --links <path> --output <path> --numPages <n> --iterations <n>`.
 </div>
 </div>
 
