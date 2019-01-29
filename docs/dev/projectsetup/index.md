@@ -1,7 +1,7 @@
 ---
-title: "Project Build Setup"
+title: 项目构建安装
 nav-id: projectsetup
-nav-title: 'Project Build Setup'
+nav-title: 项目构建安装
 nav-parent_id: dev
 nav-pos: 0
 ---
