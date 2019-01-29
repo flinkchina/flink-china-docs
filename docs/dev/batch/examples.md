@@ -41,7 +41,7 @@ Flink的每个二进制版本都包含一个`examples`目录，其中包含用�
 
 其他示例也可以以类似的方式开始。
 
-Note that many examples run without passing any arguments for them, by using build-in data. To run WordCount with real data, you have to pass the path to the data:
+
 注意，通过使用内置数据，许多示例在运行时不传递任何参数。要使用真实数据运行WordCount，必须将路径传递给数据:  
 {% highlight bash %}
 ./bin/flink run ./examples/batch/WordCount.jar --input /path/to/some/text/data --output /path/to/result
@@ -252,26 +252,25 @@ val result = finalRanks
 result.writeAsCsv(outputPath, "\n", " ")
 {% endhighlight %}
 
-The {% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/graph/PageRankBasic.scala "PageRank program" %} implements the above example.
-It requires the following parameters to run: `--pages <path> --links <path> --output <path> --numPages <n> --iterations <n>`.
+
 {% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/graph/PageRankBasic.scala "PageRank program" %}实现上面的示例。
 它需要以下参数来运行: `--pages <path> --links <path> --output <path> --numPages <n> --iterations <n>`.
 </div>
 </div>
 
-Input files are plain text files and must be formatted as follows:
-- Pages represented as an (long) ID separated by new-line characters.
-    * For example `"1\n2\n12\n42\n63\n"` gives five pages with IDs 1, 2, 12, 42, and 63.
-- Links are represented as pairs of page IDs which are separated by space characters. Links are separated by new-line characters:
-    * For example `"1 2\n2 12\n1 12\n42 63\n"` gives four (directed) links (1)->(2), (2)->(12), (1)->(12), and (42)->(63).
+输入文件是纯文本文件，必须格式化如下:  
+- 页面表示为由新行字符分隔的(长)ID。
+  * 例如`"1\n2\n12\n42\n63\n"`给出了5页的IDs 1、2、12、42和63。
+- 链接表示为由空格字符分隔的页面id对。链接用换行符分隔:
+    * 例如 `"1 2\n2 12\n1 12\n42 63\n"` 给四(直接)链接(1)->(2),(2)->(12),(1)->(12)和(42)->(63)。
 
-For this simple implementation it is required that each page has at least one incoming and one outgoing link (a page can point to itself).
+对于这个简单的实现，要求每个页面至少有一个传入和一个传出链接(页面可以指向自己)。
 
-## Connected Components
+## 连接组件
 
-The Connected Components algorithm identifies parts of a larger graph which are connected by assigning all vertices in the same connected part the same component ID. Similar to PageRank, Connected Components is an iterative algorithm. In each step, each vertex propagates its current component ID to all its neighbors. A vertex accepts the component ID from a neighbor, if it is smaller than its own component ID.
+连通分量算法通过将同一连通部分中的所有顶点分配给相同的分量ID来识别一个较大图中的连通部分。与PageRank类似，连通分量是一种迭代算法。在每一步中，每个顶点将其当前的组件ID传播到它的所有邻居。如果一个顶点的组件ID小于它自己的组件ID，那么它接受来自邻居的组件ID。
 
-This implementation uses a [delta iteration](iterations.html): Vertices that have not changed their component ID do not participate in the next step. This yields much better performance, because the later iterations typically deal only with a few outlier vertices.
+此实现使用[delta iteration](iterations.html):没有更改其组件ID的顶点不参与下一步。这将产生更好的性能，因为后面的迭代通常只处理少数离群点。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -350,7 +349,8 @@ public static final class ComponentIdFilter
 }
 {% endhighlight %}
 
-The {% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/graph/ConnectedComponents.java "ConnectedComponents program" %} implements the above example. It requires the following parameters to run: `--vertices <path> --edges <path> --output <path> --iterations <n>`.
+
+{% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/graph/ConnectedComponents.java "ConnectedComponents program" %}实现了上述示例。它需要以下参数来运行:`--vertices <path> --edges <path> --output <path> --iterations <n>`  
 
 </div>
 <div data-lang="scala" markdown="1">
@@ -393,14 +393,15 @@ verticesWithComponents.writeAsCsv(outputPath, "\n", " ")
 
 {% endhighlight %}
 
-The {% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/graph/ConnectedComponents.scala "ConnectedComponents program" %} implements the above example. It requires the following parameters to run: `--vertices <path> --edges <path> --output <path> --iterations <n>`.
+
+{% gh_link /flink-examples/flink-examples-batch/src/main/scala/org/apache/flink/examples/scala/graph/ConnectedComponents.scala "ConnectedComponents program" %} 实现了上述示例。它需要以下参数来运行:`--vertices <path> --edges <path> --output <path> --iterations <n>`.
 </div>
 </div>
 
-Input files are plain text files and must be formatted as follows:
-- Vertices represented as IDs and separated by new-line characters.
-    * For example `"1\n2\n12\n42\n63\n"` gives five vertices with (1), (2), (12), (42), and (63).
-- Edges are represented as pairs for vertex IDs which are separated by space characters. Edges are separated by new-line characters:
-    * For example `"1 2\n2 12\n1 12\n42 63\n"` gives four (undirected) links (1)-(2), (2)-(12), (1)-(12), and (42)-(63).
+输入文件是纯文本文件，必须格式化如下:
+- 顶点表示为id，用换行符分隔。
+    * 例如`"1\n2\n12\n42\n63\n"`给了5个顶点(1)，(2)，(12)，(42)和(63)。
+- 边缘表示为顶点id的对，顶点id由空间字符分隔。边缘用换行符分隔:
+    * 例如`"1 2\n2 12\n1 12\n42 63\n"`给出4个(无向)链路(1)-(2)，(2)-(12)，(1)-(12)，和(42)-(63)。
 
 {% top %}
