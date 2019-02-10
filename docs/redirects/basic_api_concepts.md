@@ -1,5 +1,5 @@
 ---
-title: "Basic API Concepts"
+title: "基础API概念"
 layout: redirect
 redirect: /dev/api_concepts.html
 permalink: /apis/common/index.html

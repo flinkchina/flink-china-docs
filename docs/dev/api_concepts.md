@@ -1,5 +1,5 @@
 ---
-title: "Basic API Concepts"
+title: "API基础概念"
 nav-parent_id: dev
 nav-pos: 1
 nav-show_overview: true
@@ -24,68 +24,57 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink programs are regular programs that implement transformations on distributed collections
-(e.g., filtering, mapping, updating state, joining, grouping, defining windows, aggregating).
-Collections are initially created from sources (e.g., by reading from files, kafka topics, or from local, in-memory
-collections). Results are returned via sinks, which may for example write the data to
-(distributed) files, or to standard output (for example, the command line terminal).
-Flink programs run in a variety of contexts, standalone, or embedded in other programs.
-The execution can happen in a local JVM, or on clusters of many machines.
+Flink程序是在分布式集合上实现转换的常规程序(例如，过滤、映射、更新状态、连接、分组、定义窗口、聚合)。
+集合最初是从源(例如，通过从文件、kafka主题或本地内存集合中读取)创建的。结果通过接收器返回，接收器可以将数据写入(分布式)文件或标准输出(例如，命令行终端)。
+Flink程序可以在各种上下文中运行、独立运行或嵌入到其他程序中。执行可以在本地JVM中进行，也可以在许多机器的集群中进行。  
 
-Depending on the type of data sources, i.e. bounded or unbounded sources, you would either
-write a batch program or a streaming program where the DataSet API is used for batch
-and the DataStream API is used for streaming. This guide will introduce the basic concepts
-that are common to both APIs but please see our
-[Streaming Guide]({{ site.baseurl }}/dev/datastream_api.html) and
-[Batch Guide]({{ site.baseurl }}/dev/batch/index.html) for concrete information about
-writing programs with each API.
+根据数据源的类型，即有界或无界数据源，您可以编写批处理程序或流程序，其中数据集API用于批处理，DataStream API用于流。
+本指南将介绍两个API共同的基本概念，但有关使用每个API编写程序的具体信息，请参阅我们的[Streaming指南]({{ site.baseurl }}/dev/datastream_api.html)和[批处理指南]({{ site.baseurl }}/dev/batch/index.html) 。
 
-**NOTE:** When showing actual examples of how the APIs can be used  we will use
-`StreamingExecutionEnvironment` and the `DataStream` API. The concepts are exactly the same
-in the `DataSet` API, just replace by `ExecutionEnvironment` and `DataSet`.
+**注意:** 在展示如何使用api的实际示例时，我们将使用`StreamingExecutionEnvironment`和`DataStream`API。`DataSet`API中的概念完全相同，只是替换为`ExecutionEnvironment`和`DataSet`。
 
 * This will be replaced by the TOC
 {:toc}
 
-DataSet and DataStream
+DataSet与DataStream
 ----------------------
 
-Flink has the special classes `DataSet` and `DataStream` to represent data in a program. You
+Flink has the special classes `DataSet` and `DataStream` to represent data in a program.Flink有特殊的类' DataSet '和' DataStream '来表示程序中的数据。 You
 can think of them as immutable collections of data that can contain duplicates. In the case
 of `DataSet` the data is finite while for a `DataStream` the number of elements can be unbounded.
+您可以将它们看作是可以包含重复的不可变数据集合。对于`DataSet`，数据是有限的，而对于`DataStream`，元素的数量可以是无界的。
 
 These collections differ from regular Java collections in some key ways. First, they
 are immutable, meaning that once they are created you cannot add or remove elements. You can also
 not simply inspect the elements inside.
+这些集合在一些关键方面与常规Java集合不同。首先，它们是不可变的，这意味着一旦创建了它们，就不能添加或删除元素。您还可以不只是检查内部的元素。
 
 A collection is initially created by adding a source in a Flink program and new collections are
 derived from these by transforming them using API methods such as `map`, `filter` and so on.
+一个集合最初是通过在Flink程序中添加一个源来创建的，通过使用API方法(如`map`, `filter` 等)对这些源进行转换而派生出新的集合。
 
-Anatomy of a Flink Program
+剖析一个Flink程序
 --------------------------
 
-Flink programs look like regular programs that transform collections of data.
-Each program consists of the same basic parts:
-
-1. Obtain an `execution environment`,
-2. Load/create the initial data,
-3. Specify transformations on this data,
-4. Specify where to put the results of your computations,
-5. Trigger the program execution
+Flink程序看起来像转换数据集合的常规程序。
+每个程序由相同的基本部分组成:  
+1. 获取`执行环境execution environment`,
+2. 加载/创建初始数据,
+3. 指定此数据上的转换,
+4. 指定将计算结果放在何处,
+5. 触发程序执行
 
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
 
-We will now give an overview of each of those steps, please refer to the respective sections for
-more details. Note that all core classes of the Java DataSet API are found in the package
+现在我们将概述这些步骤的每个步骤，请参阅各个部分以获得更多详细信息。 注意，Java数据集API的所有核心类都在包中找到
 {% gh_link /flink-java/src/main/java/org/apache/flink/api/java "org.apache.flink.api.java" %}
-while the classes of the Java DataStream API can be found in
-{% gh_link /flink-streaming-java/src/main/java/org/apache/flink/streaming/api "org.apache.flink.streaming.api" %}.
+而Java DataStream API的类可以在
+{% gh_link /flink-streaming-java/src/main/java/org/apache/flink/streaming/api "org.apache.flink.streaming.api" %}找到。
 
-The `StreamExecutionEnvironment` is the basis for all Flink programs. You can
-obtain one using these static methods on `StreamExecutionEnvironment`:
+`StreamExecutionEnvironment`是所有Flink程序的基础. 你可以在`StreamExecutionEnvironment`上使用以下静态方法获得一个:  
 
 {% highlight java %}
 getExecutionEnvironment()
@@ -95,19 +84,13 @@ createLocalEnvironment()
 createRemoteEnvironment(String host, int port, String... jarFiles)
 {% endhighlight %}
 
-Typically, you only need to use `getExecutionEnvironment()`, since this
-will do the right thing depending on the context: if you are executing
-your program inside an IDE or as a regular Java program it will create
-a local environment that will execute your program on your local machine. If
-you created a JAR file from your program, and invoke it through the
-[command line]({{ site.baseurl }}/ops/cli.html), the Flink cluster manager
-will execute your main method and `getExecutionEnvironment()` will return
-an execution environment for executing your program on a cluster.
+通常，您只需要使用`getExecutionEnvironment()`，因为这将根据上下文做正确的事情:如果您在IDE中或作为常规Java程序执行您的程序，那么它将创建一个本地环境，该环境将在您的本地机器上执行您的程序。
+如果您从程序中创建了一个JAR文件，并通过
+[命令行]({{ site.baseurl }}/ops/cli.html)，Flink集群管理器将执行您的主方法，`getExecutionEnvironment()`将返回用于在集群上执行程序的执行环境。
 
-For specifying data sources the execution environment has several methods
-to read from files using various methods: you can just read them line by line,
-as CSV files, or using completely custom data input formats. To just read
-a text file as a sequence of lines, you can use:
+对于指定数据源，执行环境有几个方法可以使用不同的方法从文件中读取:
+如CSV文件，或使用完全自定义的数据输入格式。只是阅读
+一个文本文件作为一个序列的行，你可以使用:  
 
 {% highlight java %}
 final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -132,12 +115,10 @@ DataStream<Integer> parsed = input.map(new MapFunction<String, Integer>() {
 });
 {% endhighlight %}
 
-This will create a new DataStream by converting every String in the original
-collection to an Integer.
 
-Once you have a DataStream containing your final results, you can write it to an outside system
-by creating a sink. These are just some example methods for creating a sink:
+这将通过将原始集合中的每个字符串转换为整数来创建一个新的DataStream。
 
+一旦有了包含最终结果的DataStream，就可以通过创建接收器将其写入外部系统。下面是一些创建接收器sink的示例方法:  
 {% highlight java %}
 writeAsText(String path)
 
@@ -147,14 +128,13 @@ print()
 </div>
 <div data-lang="scala" markdown="1">
 
-We will now give an overview of each of those steps, please refer to the respective sections for
-more details. Note that all core classes of the Scala DataSet API are found in the package
+现在我们将概述这些步骤的每个步骤，请参阅各个部分以获得更多详细信息。 注意，Scala数据集API的所有核心类都在包中找到
 {% gh_link /flink-scala/src/main/scala/org/apache/flink/api/scala "org.apache.flink.api.scala" %}
-while the classes of the Scala DataStream API can be found in
+而Scala DataStream API的类可以在其中找到
 {% gh_link /flink-streaming-scala/src/main/scala/org/apache/flink/streaming/api/scala "org.apache.flink.streaming.api.scala" %}.
 
-The `StreamExecutionEnvironment` is the basis for all Flink programs. You can
-obtain one using these static methods on `StreamExecutionEnvironment`:
+
+`StreamExecutionEnvironment`是所有Flink程序的基础。你可以在`StreamExecutionEnvironment`上使用以下静态方法获得一个:  
 
 {% highlight scala %}
 getExecutionEnvironment()
@@ -164,20 +144,15 @@ createLocalEnvironment()
 createRemoteEnvironment(host: String, port: Int, jarFiles: String*)
 {% endhighlight %}
 
-Typically, you only need to use `getExecutionEnvironment()`, since this
-will do the right thing depending on the context: if you are executing
-your program inside an IDE or as a regular Java program it will create
-a local environment that will execute your program on your local machine. If
-you created a JAR file from your program, and invoke it through the
-[command line]({{ site.baseurl }}/ops/cli.html), the Flink cluster manager
-will execute your main method and `getExecutionEnvironment()` will return
-an execution environment for executing your program on a cluster.
 
-For specifying data sources the execution environment has several methods
-to read from files using various methods: you can just read them line by line,
-as CSV files, or using completely custom data input formats. To just read
-a text file as a sequence of lines, you can use:
+通常，您只需要使用`getExecutionEnvironment()`，因为这将根据上下文做正确的事情:如果您在IDE中或作为常规Java程序执行您的程序，那么它将创建一个本地环境，该环境将在您的本地机器上执行您的程序。
+如果您从程序中创建了一个JAR文件，并通过
+[命令行]({{ site.baseurl }}/ops/cli.html)，Flink集群管理器将执行您的主方法，`getExecutionEnvironment()`将返回用于在集群上执行程序的执行环境。
 
+
+对于指定数据源，执行环境有几个方法可以使用不同的方法从文件中读取:
+如CSV文件，或使用完全自定义的数据输入格式。只是阅读
+一个文本文件作为一个序列的行，你可以使用:  
 {% highlight scala %}
 val env = StreamExecutionEnvironment.getExecutionEnvironment()
 
@@ -196,12 +171,9 @@ val input: DataSet[String] = ...
 val mapped = input.map { x => x.toInt }
 {% endhighlight %}
 
-This will create a new DataStream by converting every String in the original
-collection to an Integer.
+这将通过将原始集合中的每个字符串转换为整数来创建一个新的DataStream。
 
-Once you have a DataStream containing your final results, you can write it to an outside system
-by creating a sink. These are just some example methods for creating a sink:
-
+一旦有了包含最终结果的DataStream，就可以通过创建接收器将其写入外部系统。下面是一些创建接收器的示例方法:  
 {% highlight scala %}
 writeAsText(path: String)
 
@@ -211,26 +183,20 @@ print()
 </div>
 </div>
 
-Once you specified the complete program you need to **trigger the program execution** by calling
-`execute()` on the `StreamExecutionEnvironment`.
+一旦您指定了完整的程序，您需要**trigger the program execution** 通过`StreamExecutionEnvironment`调用`execute()` 
+
 Depending on the type of the `ExecutionEnvironment` the execution will be triggered on your local
 machine or submit your program for execution on a cluster.
-
+根据`ExecutionEnvironment`的类型，执行将在本地机器上触发，或者提交程序在集群上执行。 
 The `execute()` method is returning a `JobExecutionResult`, this contains execution
 times and accumulator results.
+ `execute()`方法返回一个`JobExecutionResult`，它包含执行次数和累加器结果。  
 
-Please see the [Streaming Guide]({{ site.baseurl }}/dev/datastream_api.html)
-for information about streaming data sources and sink and for more in-depths information
-about the supported transformations on DataStream.
-
-Check out the [Batch Guide]({{ site.baseurl }}/dev/batch/index.html)
-for information about batch data sources and sink and for more in-depths information
-about the supported transformations on DataSet.
-
-
+请参见[Streaming指南]({{ site.baseurl }}/dev/datastream_api.html)获取关于流数据源和接收器的信息，以及关于DataStream上支持的转换的更深入的信息。
+查看[批处理指南]({{ site.baseurl }}/dev/batch/index.html)获取关于批处理数据源和接收器的信息，以及关于数据集上支持的转换的更深入的信息。
 {% top %}
 
-Lazy Evaluation
+延迟计算
 ---------------
 
 All Flink programs are executed lazily: When the program's main method is executed, the data loading
@@ -238,21 +204,19 @@ and transformations do not happen directly. Rather, each operation is created an
 program's plan. The operations are actually executed when the execution is explicitly triggered by
 an `execute()` call on the execution environment. Whether the program is executed locally
 or on a cluster depends on the type of execution environment
+所有Flink程序都是延迟执行的:当程序的主方法执行时，数据加载和转换不会直接发生。相反，每个操作都被创建并添加到程序的计划中。当执行环境上的`execute()`调用显式地触发执行时，实际上会执行操作。程序是在本地执行还是在集群上执行取决于执行环境的类型
 
-The lazy evaluation lets you construct sophisticated programs that Flink executes as one
-holistically planned unit.
+延迟计算允许您构建复杂的程序，Flink作为一个整体规划的单元执行这些程序。
 
 {% top %}
 
-Specifying Keys
+指定的键key
 ---------------
 
-Some transformations (join, coGroup, keyBy, groupBy) require that a key be defined on
-a collection of elements. Other transformations (Reduce, GroupReduce,
-Aggregate, Windows) allow data being grouped on a key before they are
-applied.
+一些转换(join、coGroup、keyBy、groupBy)要求在元素集合上定义一个键。
+其他转换(Reduce、GroupReduce、Aggregate、Windows)允许在应用数据之前对它们进行分组。
 
-A DataSet is grouped as
+数据集DataSet分组
 {% highlight java %}
 DataSet<...> input = // [...]
 DataSet<...> reduced = input
@@ -261,6 +225,7 @@ DataSet<...> reduced = input
 {% endhighlight %}
 
 while a key can be specified on a DataStream using
+而键可以在DataStream上使用指定
 {% highlight java %}
 DataStream<...> input = // [...]
 DataStream<...> windowed = input
@@ -268,19 +233,17 @@ DataStream<...> windowed = input
   .window(/*window specification*/);
 {% endhighlight %}
 
-The data model of Flink is not based on key-value pairs. Therefore,
-you do not need to physically pack the data set types into keys and
-values. Keys are "virtual": they are defined as functions over the
-actual data to guide the grouping operator.
+Flink的数据模型不是基于键值对的。因此，不需要将数据集类型物理地打包为键和值。键是"虚拟的":它们被定义为实际数据上的函数，以指导分组操作符。
 
-**NOTE:** In the following discussion we will use the `DataStream` API and `keyBy`.
+**注意:** In the following discussion we will use the `DataStream` API and `keyBy`.
 For the DataSet API you just have to replace by `DataSet` and `groupBy`.
+在接下来的讨论中，我们将使用`DataStream` API 和 `keyBy`。
+对于数据集DataSet API，您只需将其替换为"DataSet"和"groupBy"。
 
-### Define keys for Tuples
+### 为元组定义键
 {:.no_toc}
 
-The simplest case is grouping Tuples on one or more
-fields of the Tuple:
+最简单的情况是对元组的一个或多个字段进行分组:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -297,8 +260,7 @@ val keyed = input.keyBy(0)
 </div>
 </div>
 
-The tuples are grouped on the first field (the one of
-Integer type).
+元组按第一个字段(整数类型的字段)分组。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -315,18 +277,19 @@ val grouped = input.groupBy(0,1)
 </div>
 </div>
 
-Here, we group the tuples on a composite key consisting of the first and the
-second field.
+在这里，我们将元组分组到由第一个字段和第二个字段组成的组合键上。
 
 A note on nested Tuples: If you have a DataStream with a nested tuple, such as:
+关于嵌套元组的注意事项:如果您有一个带有嵌套元组的DataStream，例如: 
 
 {% highlight java %}
 DataStream<Tuple3<Tuple2<Integer, Float>,String,Long>> ds;
 {% endhighlight %}
 
 Specifying `keyBy(0)` will cause the system to use the full `Tuple2` as a key (with the Integer and Float being the key). If you want to "navigate" into the nested `Tuple2`, you have to use field expression keys which are explained below.
+指定`keyBy(0)`将导致系统使用完整的 `Tuple2`作为键(以整数和浮点数作为键)。如果您想"navigate"到嵌套的`Tuple2`，您必须使用字段表达式键，如下所示。  
 
-### Define keys using Field Expressions
+### 使用字段表达式定义键
 {:.no_toc}
 
 You can use String-based field expressions to reference nested fields and define keys for grouping, sorting, joining, or coGrouping.
