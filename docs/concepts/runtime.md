@@ -1,7 +1,7 @@
 ---
 title: 分布式运行时环境
 nav-pos: 2
-nav-title: Distributed Runtime
+nav-title: 分布式运行时环境
 nav-parent_id: concepts
 ---
 <!--

@@ -1,5 +1,5 @@
 ---
-title: "Configuring Dependencies, Connectors, Libraries"
+title: "配置依赖，连接器，类库"
 layout: redirect
 redirect: /dev/projectsetup/dependencies.html
 permalink: /start/dependencies.html
