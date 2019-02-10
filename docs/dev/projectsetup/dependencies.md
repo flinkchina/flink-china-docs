@@ -41,8 +41,6 @@ under the License.
 
     用户应用程序通常被打包到一个*应用程序jar*中，其中包含应用程序代码以及所需的连接器和库依赖项。
 
-    The user application dependencies explicitly do not include the Flink DataSet / DataStream APIs and runtime dependencies,
-    because those are already part of Flink's Core Dependencies.
 	用户应用程序依赖项显式不包括Flink DataSet/DataStream APIs和运行时依赖项，
 	因为这些已经是Flink的核心依赖项的一部分。
 
