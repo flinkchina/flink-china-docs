@@ -1,7 +1,7 @@
 ---
-title: "Setup Tutorials"
+title: "安装教程"
 nav-id: setuptutorials
-nav-title: 'Setup Tutorials'
+nav-title: '安装教程'
 nav-parent_id: tutorials
 nav-pos: 20
 ---

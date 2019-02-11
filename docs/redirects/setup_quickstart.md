@@ -1,5 +1,5 @@
 ---
-title: "Local Setup Tutorial"
+title: "Local安装教程"
 layout: redirect
 redirect: /tutorials/local_setup.html
 permalink: /quickstart/setup_quickstart.html
