@@ -39,18 +39,10 @@ Flink程序可以在各种上下文中运行、独立运行或嵌入到其他程
 DataSet与DataStream
 ----------------------
 
-Flink has the special classes `DataSet` and `DataStream` to represent data in a program.Flink有特殊的类' DataSet '和' DataStream '来表示程序中的数据。 You
-can think of them as immutable collections of data that can contain duplicates. In the case
-of `DataSet` the data is finite while for a `DataStream` the number of elements can be unbounded.
-您可以将它们看作是可以包含重复的不可变数据集合。对于`DataSet`，数据是有限的，而对于`DataStream`，元素的数量可以是无界的。
+Flink有特殊的类`DataSet`和`DataStream`来表示程序中的数据。 您可以将它们看作是可以包含重复的不可变数据集合。对于`DataSet`，数据是有限的，而对于`DataStream`，元素的数量可以是无界的。
 
-These collections differ from regular Java collections in some key ways. First, they
-are immutable, meaning that once they are created you cannot add or remove elements. You can also
-not simply inspect the elements inside.
 这些集合在一些关键方面与常规Java集合不同。首先，它们是不可变的，这意味着一旦创建了它们，就不能添加或删除元素。您还可以不只是检查内部的元素。
 
-A collection is initially created by adding a source in a Flink program and new collections are
-derived from these by transforming them using API methods such as `map`, `filter` and so on.
 一个集合最初是通过在Flink程序中添加一个源来创建的，通过使用API方法(如`map`, `filter` 等)对这些源进行转换而派生出新的集合。
 
 剖析一个Flink程序
@@ -196,11 +188,6 @@ print()
 延迟计算
 ---------------
 
-All Flink programs are executed lazily: When the program's main method is executed, the data loading
-and transformations do not happen directly. Rather, each operation is created and added to the
-program's plan. The operations are actually executed when the execution is explicitly triggered by
-an `execute()` call on the execution environment. Whether the program is executed locally
-or on a cluster depends on the type of execution environment
 所有Flink程序都是延迟执行的:当程序的主方法执行时，数据加载和转换不会直接发生。相反，每个操作都被创建并添加到程序的计划中。当执行环境上的`execute()`调用显式地触发执行时，实际上会执行操作。程序是在本地执行还是在集群上执行取决于执行环境的类型
 
 延迟计算允许您构建复杂的程序，Flink作为一个整体规划的单元执行这些程序。
@@ -285,13 +272,13 @@ DataStream<Tuple3<Tuple2<Integer, Float>,String,Long>> ds;
 ### 使用字段表达式定义键
 {:.no_toc}
 
-You can use String-based field expressions to reference nested fields and define keys for grouping, sorting, joining, or coGrouping.
+
 您可以使用基于字符串的字段表达式来引用嵌套字段，并为分组group、排序sort、连接join或共同分组cogroup定义键。
 字段表达式使得在(嵌套的)复合类型中选择字段变得非常容易，例如[Tuple](#tuples-and-case-classes)和[POJO](#pojos)类型。   
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
-In the example below, we have a `WC` POJO with two fields "word" and "count". To group by the field `word`, we just pass its name to the `keyBy()` function.
+
 在下面的示例中，我们有一个带有两个字段"word" and "count"的`WC`POJO。要按字段`word`分组，只需将其名称传递给`keyBy()`函数。  
 
 {% highlight java %}
@@ -472,8 +459,7 @@ data.reduce((i1,i2) -> i1 + i2);
 
 #### Rich functions 富函数
 
-All transformations that require a user-defined function can
-instead take as argument a *rich* function. For example, instead of
+
 所有需要用户定义函数的转换都可以将*rich function*作为参数。例如, 替换
 {% highlight java %}
 class MyMapFunction implements MapFunction<String, Integer> {
@@ -580,12 +566,10 @@ Flink对数据集中或数据流中的元素类型进行了一些限制。这样
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
-Tuples are composite types that contain a fixed number of fields with various types.
-The Java API provides classes from `Tuple1` up to `Tuple25`. Every field of a tuple
-can be an arbitrary Flink type including further tuples, resulting in nested tuples. Fields of a
-tuple can be accessed directly using the field's name as `tuple.f4`, or using the generic getter method
-`tuple.getField(int position)`. The field indices start at 0. Note that this stands in contrast
-to the Scala tuples, but it is more consistent with Java's general indexing.
+元组是包含固定数量的具有各种类型的字段的复合类型。
+Java API提供从`Tuple1`到`Tuple25`的类。 元组的每个字段都可以是任意的Flink类型，包括更多的元组，从而产生嵌套的元组。 一个元组的字段可以使用该字段的名称`tuple.f4`直接访问。或者使用通用getter方法`tuple.getField(int position)`.字段索引从0开始。请注意，这与Scala元组相反，但它更符合Java的通用索引。
+
+
 
 {% highlight java %}
 DataStream<Tuple2<String, Integer>> wordCounts = env.fromElements(
@@ -607,8 +591,7 @@ wordCounts.keyBy(0); // also valid .keyBy("f0")
 </div>
 <div data-lang="scala" markdown="1">
 
-Scala case classes (and Scala tuples which are a special case of case classes), are composite types that contain a fixed number of fields with various types. Tuple fields are addressed by their 1-offset names such as `_1` for the first field. Case class fields are accessed by their name.
-
+Scala case类(以及Scala元组，它是case类的一个特例)是复合类型，包含固定数量的具有各种类型的字段。元组字段由它们的1个偏移量名称寻址，例如第一个字段的“_1”。用它们的名称访问Case类字段。    
 {% highlight scala %}
 case class WordCount(word: String, count: Int)
 val input = env.fromElements(
@@ -627,19 +610,17 @@ input2.keyBy(0, 1) // key by field positions 0 and 1
 
 #### POJOs
 
-Java and Scala classes are treated by Flink as a special POJO data type if they fulfill the following requirements:
+如果Java和Scala类满足以下要求，Flink将它们视为特殊的POJO数据类型:  
+- 类必须是公共的(public)
 
-- The class must be public.
+- 它必须有一个没有参数的公共构造函数(默认构造函数)。
 
-- It must have a public constructor without arguments (default constructor).
+- 所有字段要么是公共的，要么必须通过getter和setter函数来访问。对于一个名为`foo`的字段，getter和setter方法必须命名为`getFoo()` and `setFoo()`
 
-- All fields are either public or must be accessible through getter and setter functions. For a field called `foo` the getter and setter methods must be named `getFoo()` and `setFoo()`.
+- 字段的类型必须由Flink支持。目前，Flink使用[Avro](http://avro.apache.org)序列化任意对象(如`Date`)。
 
-- The type of a field must be supported by Flink. At the moment, Flink uses [Avro](http://avro.apache.org) to serialize arbitrary objects (such as `Date`).
-
-Flink analyzes the structure of POJO types, i.e., it learns about the fields of a POJO. As a result POJO types are easier to use than general types. Moreover, Flink can process POJOs more efficiently than general types.
-
-The following example shows a simple POJO with two public fields.
+Flink分析pojo类型的结构，即，它了解pojo的字段。因此，POJO类型比常规类型更易于使用。此外，Flink可以比一般类型更有效地处理pojos。
+下面的示例显示了一个具有两个公共字段的简单POJO。  
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -683,156 +664,114 @@ input.keyBy("word")// key by field expression "word"
 </div>
 </div>
 
-#### Primitive Types
+#### Primitive Types 原始类型
 
-Flink supports all Java and Scala primitive types such as `Integer`, `String`, and `Double`.
+Flink支持所有Java和Scala原语类型，例如`Integer`，`String`和`Double`。
 
-#### General Class Types
+#### General Class Types 一般Class类型
 
-Flink supports most Java and Scala classes (API and custom).
-Restrictions apply to classes containing fields that cannot be serialized, like file pointers, I/O streams, or other native
-resources. Classes that follow the Java Beans conventions work well in general.
+Flink支持大多数Java和Scala类(API和自定义)。限制适用于包含不能序列化的字段的类，如文件指针、I/O流或其他本机资源。通常，遵循Java bean约定的类工作得很好。
 
-All classes that are not identified as POJO types (see POJO requirements above) are handled by Flink as general class types.
-Flink treats these data types as black boxes and is not able to access their content (i.e., for efficient sorting). General types are de/serialized using the serialization framework [Kryo](https://github.com/EsotericSoftware/kryo).
+所有未标识为POJO类型的类（参见上面的POJO需求）都由Flink作为常规类类型处理。
+Flink将这些数据类型视为黑盒，无法访问其内容（即，为了高效排序）。使用序列化框架对常规类型进行反/序列化[Kryo](https://github.com/EsotericSoftware/kryo)
 
 #### Values
 
-*Value* types describe their serialization and deserialization manually. Instead of going through a
-general purpose serialization framework, they provide custom code for those operations by means of
-implementing the `org.apache.flinktypes.Value` interface with the methods `read` and `write`. Using
-a Value type is reasonable when general purpose serialization would be highly inefficient. An
-example would be a data type that implements a sparse vector of elements as an array. Knowing that
-the array is mostly zero, one can use a special encoding for the non-zero elements, while the
-general purpose serialization would simply write all array elements.
+*Value*类型手动描述它们的序列化和反序列化。
+它们不是通过通用序列化框架，而是通过使用`read`和`write`方法实现`org.apache.flinktypes.Value`接口来为这些操作提供自定义代码。
+当通用序列化效率非常低时，使用值类型是合理的。一个例子是将元素的稀疏向量实现为数组的数据类型。由于知道数组大部分为零，因此可以对非零元素使用特殊编码，而一般的序列化只编写所有数组元素。
 
-The `org.apache.flinktypes.CopyableValue` interface supports manual internal cloning logic in a
-similar way.
+`org.apache.flinktypes.CopyableValue`接口以类似的方式支持手动内部克隆逻辑。
 
-Flink comes with pre-defined Value types that correspond to basic data types. (`ByteValue`,
+Flink附带了对应于基本数据类型的预定义值类型。（`ByteValue`,
 `ShortValue`, `IntValue`, `LongValue`, `FloatValue`, `DoubleValue`, `StringValue`, `CharValue`,
-`BooleanValue`). These Value types act as mutable variants of the basic data types: Their value can
-be altered, allowing programmers to reuse objects and take pressure off the garbage collector.
-
+`BooleanValue`）。这些值类型充当基本数据类型的可变变量：它们的值可以被修改，允许程序员重用对象并减少或释放垃圾收集器的压力。
 
 #### Hadoop Writables
 
-You can use types that implement the `org.apache.hadoop.Writable` interface. The serialization logic
-defined in the `write()`and `readFields()` methods will be used for serialization.
+您可以使用实现`org.apache.hadoop.Writable`接口的类型。`write()`and `readFields()`方法中定义的序列化逻辑将用于序列化。
 
-#### Special Types
+#### Special Types 特殊类型
 
-You can use special types, including Scala's `Either`, `Option`, and `Try`.
-The Java API has its own custom implementation of `Either`.
-Similarly to Scala's `Either`, it represents a value of one two possible types, *Left* or *Right*.
-`Either` can be useful for error handling or operators that need to output two different types of records.
+您可以使用特殊类型，包括Scala的`Either`, `Option`, and `Try`。Java API有自己的自定义`Either`实现。与Scala的`Either`类似，它表示一个值，有两种可能的类型，*Left*或*Right*。
+对于错误处理或需要输出两种不同类型记录的操作符，`Either`都很有用。  
 
-#### Type Erasure & Type Inference
+#### 类型擦除和类型推断
 
-*Note: This Section is only relevant for Java.*
+*注意: 本节只与Java相关*
 
-The Java compiler throws away much of the generic type information after compilation. This is
-known as *type erasure* in Java. It means that at runtime, an instance of an object does not know
-its generic type any more. For example, instances of `DataStream<String>` and `DataStream<Long>` look the
-same to the JVM.
+Java编译器在编译之后会丢弃很多泛型类型信息。这在Java中称为*type erasure*(类型擦除)。这意味着在运行时，对象的实例不再知道其泛型类型。例如，`DataStream<String>` 和 `DataStream<Long>`的实例在JVM中看起来是相同的。
 
-Flink requires type information at the time when it prepares the program for execution (when the
-main method of the program is called). The Flink Java API tries to reconstruct the type information
-that was thrown away in various ways and store it explicitly in the data sets and operators. You can
-retrieve the type via `DataStream.getType()`. The method returns an instance of `TypeInformation`,
-which is Flink's internal way of representing types.
+Flink在准备程序执行时(调用程序的主方法时)需要类型信息。Flink Java API试图重建以各种方式丢弃的类型信息，并将其显式地存储在数据集和操作符中。您可以通过`DataStream.getType()`检索类型。该方法返回一个`TypeInformation`实例，这是Flink表示类型的内部方法。
 
-The type inference has its limits and needs the "cooperation" of the programmer in some cases.
-Examples for that are methods that create data sets from collections, such as
-`ExecutionEnvironment.fromCollection(),` where you can pass an argument that describes the type. But
-also generic functions like `MapFunction<I, O>` may need extra type information.
 
-The
-{% gh_link /flink-core/src/main/java/org/apache/flink/api/java/typeutils/ResultTypeQueryable.java "ResultTypeQueryable" %}
-interface can be implemented by input formats and functions to tell the API
-explicitly about their return type. The *input types* that the functions are invoked with can
-usually be inferred by the result types of the previous operations.
+类型推断有其局限性，在某些情况下需要程序员的"cooperation"。例如，从集合中创建数据集的方法，例如`ExecutionEnvironment.fromCollection(),`，您可以在其中传递描述类型的参数。但是像`MapFunction<I, O>`这样的泛型函数可能需要额外的类型信息。
+
+{% gh_link /flink-core/src/main/java/org/apache/flink/api/java/typeutils/ResultTypeQueryable.java "ResultTypeQueryable" %}接口可以通过输入格式和函数实现，以显式地告诉API它们的返回类型。调用函数时使用的*input types*通常可以通过前面操作的结果类型进行推断。
 
 {% top %}
 
-Accumulators & Counters
+累加器Accumulators &和计数器Counters
+
 ---------------------------
 
-Accumulators are simple constructs with an **add operation** and a **final accumulated result**,
-which is available after the job ended.
+累加器是一种简单的构造，具有**add operation**和**final accumulated result**，可在作业结束后使用。
 
-The most straightforward accumulator is a **counter**: You can increment it using the
-```Accumulator.add(V value)``` method. At the end of the job Flink will sum up (merge) all partial
-results and send the result to the client. Accumulators are useful during debugging or if you
-quickly want to find out more about your data.
+最直接的累加器是一个**counter计数器**: 你可以使用方法```Accumulator.add(V value)```来增加它。在作业结束时，Flink将汇总(合并)所有部分结果并将结果发送给客户端。累加器在调试期间非常有用，如果您想快速了解更多关于数据的信息，也可以使用累加器。
 
-Flink currently has the following **built-in accumulators**. Each of them implements the
-{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/Accumulator.java "Accumulator" %}
-interface.
+
+Flink目前有以下**built-in accumulators**。它们都实现了{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/Accumulator.java "Accumulator" %}
+接口。
 
 - {% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/IntCounter.java "__IntCounter__" %},
   {% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/LongCounter.java "__LongCounter__" %}
   and {% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/DoubleCounter.java "__DoubleCounter__" %}:
-  See below for an example using a counter.
+  下面是使用计数器的示例.
 - {% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/Histogram.java "__Histogram__" %}:
-  A histogram implementation for a discrete number of bins. Internally it is just a map from Integer
-  to Integer. You can use this to compute distributions of values, e.g. the distribution of
-  words-per-line for a word count program.
+用于离散数量的容器的直方图实现。在内部，它只是一个从整数到整数的映射。您可以使用它来计算值的分布，例如单词计数程序的每行单词的分布。
 
-__How to use accumulators:__
+__如何使用累加器:__
 
-First you have to create an accumulator object (here a counter) in the user-defined transformation
-function where you want to use it.
+
+首先，您必须在您想要使用它的用户定义的转换函数中创建一个accumulator对象(这里是一个计数器)。
 
 {% highlight java %}
 private IntCounter numLines = new IntCounter();
 {% endhighlight %}
 
-Second you have to register the accumulator object, typically in the ```open()``` method of the
-*rich* function. Here you also define the name.
+其次，必须注册accumulator对象，通常是在*rich*函数的```open()```方法中。这里还定义了名称。  
 
 {% highlight java %}
 getRuntimeContext().addAccumulator("num-lines", this.numLines);
 {% endhighlight %}
 
-You can now use the accumulator anywhere in the operator function, including in the ```open()``` and
-```close()``` methods.
+
+现在可以在operator函数的任何地方使用累加器，包括在 ```open()``` 和```close()```的方法。
 
 {% highlight java %}
 this.numLines.add(1);
 {% endhighlight %}
 
-The overall result will be stored in the ```JobExecutionResult``` object which is
-returned from the `execute()` method of the execution environment
-(currently this only works if the execution waits for the
-completion of the job).
+
+整个结果将存储在从执行环境的`execute()`方法返回的```JobExecutionResult```对象中(目前，这只在执行等待作业完成时有效)。  
 
 {% highlight java %}
 myJobExecutionResult.getAccumulatorResult("num-lines")
 {% endhighlight %}
 
-All accumulators share a single namespace per job. Thus you can use the same accumulator in
-different operator functions of your job. Flink will internally merge all accumulators with the same
-name.
+所有累加器对每个作业共享一个名称空间。因此，可以在作业的不同运算符函数中使用相同的累加器。Flink将内部合并所有具有相同名称的累加器。
 
-A note on accumulators and iterations: Currently the result of accumulators is only available after
-the overall job has ended. We plan to also make the result of the previous iteration available in the
-next iteration. You can use
-{% gh_link /flink-java/src/main/java/org/apache/flink/api/java/operators/IterativeDataSet.java#L98 "Aggregators" %}
-to compute per-iteration statistics and base the termination of iterations on such statistics.
+关于累加器和迭代的说明:目前，累加器的结果只有在整个作业结束后才可用。我们还计划在下一个迭代中提供上一个迭代的结果。您可以使用{% gh_link /flink-java/src/main/java/org/apache/flink/api/java/operators/IterativeDataSet.java#L98 "Aggregators" %}来计算每个迭代的统计信息，并将迭代的终止基于这些统计信息。
 
-__Custom accumulators:__
+__自定义累加器:__
 
-To implement your own accumulator you simply have to write your implementation of the Accumulator
-interface. Feel free to create a pull request if you think your custom accumulator should be shipped
-with Flink.
+要实现自己的accumulator，只需编写accumulator接口的实现即可。如果您认为您的自定义累加器应该与Flink一起提供，请随意创建一个pull请求。
 
 You have the choice to implement either
+您可以选择实现其中之一
 {% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/Accumulator.java "Accumulator" %}
-or {% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/SimpleAccumulator.java "SimpleAccumulator" %}.
+或者 {% gh_link /flink-core/src/main/java/org/apache/flink/api/common/accumulators/SimpleAccumulator.java "SimpleAccumulator" %}.
 
-```Accumulator<V,R>``` is most flexible: It defines a type ```V``` for the value to add, and a
-result type ```R``` for the final result. E.g. for a histogram, ```V``` is a number and ```R``` is
- a histogram. ```SimpleAccumulator``` is for the cases where both types are the same, e.g. for counters.
-
+```Accumulator<V,R>``` 是最灵活的: 它为要添加的值定义了类型```V```，为最终结果定义了结果类型```R```. 
+例如，对于直方图，```V```是一个数字，```R```是一个直方图。```SimpleAccumulator```是针对两种类型相同的情况，例如用于计数器。
 {% top %}
