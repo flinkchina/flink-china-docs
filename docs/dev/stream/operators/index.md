@@ -1,5 +1,5 @@
 ---
-title: "Operators"
+title: "Operators操作符(算子)"
 nav-id: streaming_operators
 nav-show_overview: true
 nav-parent_id: streaming
@@ -24,16 +24,14 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Operators transform one or more DataStreams into a new DataStream. Programs can combine
-multiple transformations into sophisticated dataflow topologies.
 
-This section gives a description of the basic transformations, the effective physical
-partitioning after applying those as well as insights into Flink's operator chaining.
+操作符将一个或多个数据流转换为新的数据流。程序可以将多个转换组合成复杂的数据流拓扑。
 
+本节描述了基本转换、应用这些转换后的有效物理分区以及对Flink的操作符链接的理解。
 * toc
 {:toc}
 
-# DataStream Transformations
+# DataStream 数据转换
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -43,15 +41,15 @@ partitioning after applying those as well as insights into Flink's operator chai
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th class="text-left" style="width: 25%">Transformation</th>
-      <th class="text-center">Description</th>
+      <th class="text-left" style="width: 25%">Transformation转换</th>
+      <th class="text-center">描述</th>
     </tr>
   </thead>
   <tbody>
     <tr>
           <td><strong>Map</strong><br>DataStream &rarr; DataStream</td>
           <td>
-            <p>Takes one element and produces one element. A map function that doubles the values of the input stream:</p>
+            <p>取一个元素并生成一个元素。将输入流的值加倍的map函数:</p>
     {% highlight java %}
 DataStream<Integer> dataStream = //...
 dataStream.map(new MapFunction<Integer, Integer>() {
@@ -67,7 +65,7 @@ dataStream.map(new MapFunction<Integer, Integer>() {
         <tr>
           <td><strong>FlatMap</strong><br>DataStream &rarr; DataStream</td>
           <td>
-            <p>Takes one element and produces zero, one, or more elements. A flatmap function that splits sentences to words:</p>
+            <p>取一个元素并生成0个、1个或多个元素。将句子分割成单词的flatmap函数:</p>
     {% highlight java %}
 dataStream.flatMap(new FlatMapFunction<String, String>() {
     @Override
@@ -84,8 +82,7 @@ dataStream.flatMap(new FlatMapFunction<String, String>() {
         <tr>
           <td><strong>Filter</strong><br>DataStream &rarr; DataStream</td>
           <td>
-            <p>Evaluates a boolean function for each element and retains those for which the function returns true.
-            A filter that filters out zero values:
+            <p>为每个元素计算布尔函数，并保留该函数返回true的元素。过滤掉零值的filter:
             </p>
     {% highlight java %}
 dataStream.filter(new FilterFunction<Integer>() {
@@ -100,20 +97,19 @@ dataStream.filter(new FilterFunction<Integer>() {
         <tr>
           <td><strong>KeyBy</strong><br>DataStream &rarr; KeyedStream</td>
           <td>
-            <p>Logically partitions a stream into disjoint partitions. All records with the same key are assigned to the same partition. Internally, <em>keyBy()</em> is implemented with hash partitioning. There are different ways to <a href="{{ site.baseurl }}/dev/api_concepts.html#specifying-keys">specify keys</a>.</p>
+            <p>逻辑上将流划分为不相交的分区。具有相同键的所有记录被分配到相同的分区。 在内部, <em>keyBy()</em> 它是通过哈希分区实现的. 有不同的方法来<a href="{{ site.baseurl }}/dev/api_concepts.html#specifying-keys">指定键</a>.</p>
             <p>
-            This transformation returns a <em>KeyedStream</em>, which is, among other things, required to use <a href="{{ site.baseurl }}/dev/stream/state/state.html#keyed-state">keyed state</a>. </p>
+这个转换返回一个<em>KeyedStream</em>，这是使用<a href="{{ site.baseurl }}/dev/stream/state/state.html#keyed-state">键状态 key state</a>所必需的</p>
     {% highlight java %}
 dataStream.keyBy("someKey") // Key by field "someKey"
 dataStream.keyBy(0) // Key by the first element of a Tuple
     {% endhighlight %}
             <p>
-            <span class="label label-danger">Attention</span>
+            <span class="label label-danger">注意</span>
             A type <strong>cannot be a key</strong> if:
-    	    <ol>
-    	    <li> it is a POJO type but does not override the <em>hashCode()</em> method and
-    	    relies on the <em>Object.hashCode()</em> implementation.</li>
-    	    <li> it is an array of any type.</li>
+           <ol>
+          <li>它是一种POJO类型，但不覆盖<em>hashCode()</em>方法，并且依赖于<em>Object.hashCode()</em> 实现。</li>
+          <li>它是任意类型的数组。</li>
     	    </ol>
     	    </p>
           </td>
@@ -121,11 +117,10 @@ dataStream.keyBy(0) // Key by the first element of a Tuple
         <tr>
           <td><strong>Reduce</strong><br>KeyedStream &rarr; DataStream</td>
           <td>
-            <p>A "rolling" reduce on a keyed data stream. Combines the current element with the last reduced value and
-            emits the new value.
+            <p>键控数据流上的"滚动rolling"减少。将当前元素与最后一个缩减值组合，并发出新值。
               <br/>
             	<br/>
-            <p>A reduce function that creates a stream of partial sums:</p>
+            <p>生成流数据的部分和的reduce函数:</p>
             {% highlight java %}
 keyedStream.reduce(new ReduceFunction<Integer>() {
     @Override
@@ -141,9 +136,7 @@ keyedStream.reduce(new ReduceFunction<Integer>() {
         <tr>
           <td><strong>Fold</strong><br>KeyedStream &rarr; DataStream</td>
           <td>
-          <p>A "rolling" fold on a keyed data stream with an initial value.
-          Combines the current element with the last folded value and
-          emits the new value.
+          <p>具有初始值的键控数据流上的"rolling滚动"折叠。将当前元素与最后一个折叠值组合并发出新值。
           <br/>
           <br/>
           <p>A fold function that, when applied on the sequence (1,2,3,4,5),
@@ -1051,22 +1044,19 @@ dataStream.broadcast()
 </div>
 </div>
 
-# Task chaining and resource groups
+# 任务链接(task chaining)和资源组
 
 Chaining two subsequent transformations means co-locating them within the same thread for better
 performance. Flink by default chains operators if this is possible (e.g., two subsequent map
 transformations). The API gives fine-grained control over chaining if desired:
+链接Chaining两个后续转换意味着将它们放在同一个线程中以获得更好的性能。如果可能的话，Flink默认情况下是链操作符(例如，两个后续的映射转换)。如果需要，该API提供了对链接的细粒度控制:
 
-Use `StreamExecutionEnvironment.disableOperatorChaining()` if you want to disable chaining in
-the whole job. For more fine grained control, the following functions are available. Note that
-these functions can only be used right after a DataStream transformation as they refer to the
-previous transformation. For example, you can use `someStream.map(...).startNewChain()`, but
-you cannot use `someStream.startNewChain()`.
 
+如果您想在整个作业中禁用链接，请使用`StreamExecutionEnvironment.disableOperatorChaining()`。对于更细粒度的控制，可以使用以下函数。请注意，这些函数只能在DataStream转换之后使用，因为它们引用前一个转换。例如，您可以使用`someStream.map(...).startNewChain()`，但不能使用`someStream.startNewChain()`。
 A resource group is a slot in Flink, see
 [slots]({{site.baseurl}}/ops/config.html#configuring-taskmanager-processing-slots). You can
 manually isolate operators in separate slots if desired.
-
+资源组是Flink中的一个插槽，参见[slots]({{site.baseurl}}/ops/config.html#configuring-taskmanager-processing-slots)。如果需要，可以手动将操作符隔离在不同的插槽中。
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
@@ -1158,15 +1148,10 @@ someStream.map(...).disableChaining()
       </td>
     </tr>
   <tr>
-      <td>Set slot sharing group</td>
+      <td>设置插槽共享组</td>
       <td>
-        <p>Set the slot sharing group of an operation. Flink will put operations with the same
-        slot sharing group into the same slot while keeping operations that don't have the
-        slot sharing group in other slots. This can be used to isolate slots. The slot sharing
-        group is inherited from input operations if all input operations are in the same slot
-        sharing group.
-        The name of the default slot sharing group is "default", operations can explicitly
-        be put into this group by calling slotSharingGroup("default").
+        <p>
+        设置操作的槽共享组。Flink会将具有相同槽共享组的操作放到同一个槽中，同时将没有槽共享组的操作保留在其他槽中。这可以用来隔离槽。如果所有输入操作都在同一个槽共享组中，则从输入操作继承槽共享组。默认槽共享组的名称为"default"，可以通过调用slotSharingGroup("default")显式地将操作放入这个组中。
 {% highlight java %}
 someStream.filter(...).slotSharingGroup("name")
 {% endhighlight %}
