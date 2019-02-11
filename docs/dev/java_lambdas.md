@@ -1,5 +1,5 @@
 ---
-title: "Java Lambda Expressions"
+title: "Java Lambda表达式"
 nav-parent_id: api-concepts
 nav-pos: 20
 ---
@@ -22,19 +22,16 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Java 8 introduced several new language features designed for faster and clearer coding. With the most important feature,
-the so-called "Lambda Expressions", it opened the door to functional programming. Lambda expressions allow for implementing and
-passing functions in a straightforward way without having to declare additional (anonymous) classes.
+Java 8 引入了一些新的语言特性，这些特性是为更快更清晰的编码而设计的。最重要的特性是所谓的"Lambda表达式"，它为函数式编程打开了大门。Lambda表达式允许以一种简单的方式实现和传递函数，而无需声明其他(匿名)类。  
 
-<span class="label label-danger">Attention</span> Flink supports the usage of lambda expressions for all operators of the Java API, however, whenever a lambda expression uses Java generics you need to declare type information *explicitly*. 
+<span class="label label-danger">注意</span> Flink支持为Java API的所有操作符使用lambda表达式，但是，无论何时lambda表达式使用Java泛型，您都需要*explicitly*显式地声明类型信息。
 
-This document shows how to use lambda expressions and describes current limitations. For a general introduction to the
-Flink API, please refer to the [Programming Guide]({{ site.baseurl }}/dev/api_concepts.html)
+本文档展示了如何使用lambda表达式，并描述了当前的限制。有关Flink API的一般介绍，请参阅[编程指南]({{ site.baseurl }}/dev/api_concepts.html)
 
-### Examples and Limitations
+### 示例和限制
 
-The following example illustrates how to implement a simple, inline `map()` function that squares its input using a lambda expression.
-The types of input `i` and output parameters of the `map()` function need not to be declared as they are inferred by the Java compiler.
+下面的示例演示如何实现一个简单的内联`map()`函数，该函数使用lambda表达式对输入进行平方。
+函数的输入`i`和输出参数的类型不需要声明，因为它们是由Java编译器推断出来的。  
 
 {% highlight java %}
 env.fromElements(1, 2, 3)
@@ -43,11 +40,11 @@ env.fromElements(1, 2, 3)
 .print();
 {% endhighlight %}
 
-Flink can automatically extract the result type information from the implementation of the method signature `OUT map(IN value)` because `OUT` is not generic but `Integer`.
+Flink可以从方法签名`OUT map(IN value)`的实现中自动提取结果类型信息，因为 `OUT` 不是泛型，而是`Integer`。
 
-Unfortunately, functions such as `flatMap()` with a signature `void flatMap(IN value, Collector<OUT> out)` are compiled into `void flatMap(IN value, Collector out)` by the Java compiler. This makes it impossible for Flink to infer the type information for the output type automatically.
+不幸的是，像`flatMap()`这样带有签名`void flatMap(IN value, Collector<OUT> OUT)`的函数被Java编译器编译成`void flatMap(IN value, Collector OUT)`。这使得Flink无法自动推断输出类型的类型信息。  
 
-Flink will most likely throw an exception similar to the following:
+Flink很可能会抛出类似如下的异常:  
 
 {% highlight plain%}
 org.apache.flink.api.common.functions.InvalidTypesException: The generic type parameters of 'Collector' are missing.
@@ -56,7 +53,7 @@ org.apache.flink.api.common.functions.InvalidTypesException: The generic type pa
     Otherwise the type has to be specified explicitly using type information.
 {% endhighlight %}
 
-In this case, the type information needs to be *specified explicitly*, otherwise the output will be treated as type `Object` which leads to unefficient serialization.
+在这种情况下，需要显式地*specified explicitly指定类型信息*，否则输出将被视为类型`Object`，这将导致低效的序列化。  
 
 {% highlight java %}
 import org.apache.flink.api.common.typeinfo.Types;
@@ -80,6 +77,7 @@ input.flatMap((Integer number, Collector<String> out) -> {
 {% endhighlight %}
 
 Similar problems occur when using a `map()` function with a generic return type. A method signature `Tuple2<Integer, Integer> map(Integer value)` is erasured to `Tuple2 map(Integer value)` in the example below.
+使用具有泛型返回类型的`map()`函数时也会出现类似的问题。在下面的示例中，方法签名`Tuple2<Integer, Integer> map(Integer value)`被擦除为`Tuple2 map(Integer value)`。  
 
 {% highlight java %}
 import org.apache.flink.api.common.functions.MapFunction;
@@ -90,7 +88,8 @@ env.fromElements(1, 2, 3)
     .print();
 {% endhighlight %}
 
-In general, those problems can be solved in multiple ways:
+
+一般来说，这些问题可以通过多种方式解决:  
 
 {% highlight java %}
 import org.apache.flink.api.common.typeinfo.Types;
