@@ -185,11 +185,8 @@ print()
 
 一旦您指定了完整的程序，您需要**trigger the program execution** 通过`StreamExecutionEnvironment`调用`execute()` 
 
-Depending on the type of the `ExecutionEnvironment` the execution will be triggered on your local
-machine or submit your program for execution on a cluster.
+
 根据`ExecutionEnvironment`的类型，执行将在本地机器上触发，或者提交程序在集群上执行。 
-The `execute()` method is returning a `JobExecutionResult`, this contains execution
-times and accumulator results.
  `execute()`方法返回一个`JobExecutionResult`，它包含执行次数和累加器结果。  
 
 请参见[Streaming指南]({{ site.baseurl }}/dev/datastream_api.html)获取关于流数据源和接收器的信息，以及关于DataStream上支持的转换的更深入的信息。
@@ -235,9 +232,7 @@ DataStream<...> windowed = input
 
 Flink的数据模型不是基于键值对的。因此，不需要将数据集类型物理地打包为键和值。键是"虚拟的":它们被定义为实际数据上的函数，以指导分组操作符。
 
-**注意:** In the following discussion we will use the `DataStream` API and `keyBy`.
-For the DataSet API you just have to replace by `DataSet` and `groupBy`.
-在接下来的讨论中，我们将使用`DataStream` API 和 `keyBy`。
+**注意:** 在接下来的讨论中，我们将使用`DataStream` API 和 `keyBy`。
 对于数据集DataSet API，您只需将其替换为"DataSet"和"groupBy"。
 
 ### 为元组定义键
@@ -279,27 +274,26 @@ val grouped = input.groupBy(0,1)
 
 在这里，我们将元组分组到由第一个字段和第二个字段组成的组合键上。
 
-A note on nested Tuples: If you have a DataStream with a nested tuple, such as:
 关于嵌套元组的注意事项:如果您有一个带有嵌套元组的DataStream，例如: 
 
 {% highlight java %}
 DataStream<Tuple3<Tuple2<Integer, Float>,String,Long>> ds;
 {% endhighlight %}
 
-Specifying `keyBy(0)` will cause the system to use the full `Tuple2` as a key (with the Integer and Float being the key). If you want to "navigate" into the nested `Tuple2`, you have to use field expression keys which are explained below.
 指定`keyBy(0)`将导致系统使用完整的 `Tuple2`作为键(以整数和浮点数作为键)。如果您想"navigate"到嵌套的`Tuple2`，您必须使用字段表达式键，如下所示。  
 
 ### 使用字段表达式定义键
 {:.no_toc}
 
 You can use String-based field expressions to reference nested fields and define keys for grouping, sorting, joining, or coGrouping.
-
-Field expressions make it very easy to select fields in (nested) composite types such as [Tuple](#tuples-and-case-classes) and [POJO](#pojos) types.
-
+您可以使用基于字符串的字段表达式来引用嵌套字段，并为分组group、排序sort、连接join或共同分组cogroup定义键。
+字段表达式使得在(嵌套的)复合类型中选择字段变得非常容易，例如[Tuple](#tuples-and-case-classes)和[POJO](#pojos)类型。   
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
 In the example below, we have a `WC` POJO with two fields "word" and "count". To group by the field `word`, we just pass its name to the `keyBy()` function.
+在下面的示例中，我们有一个带有两个字段"word" and "count"的`WC`POJO。要按字段`word`分组，只需将其名称传递给`keyBy()`函数。  
+
 {% highlight java %}
 // some ordinary POJO (Plain old Java Object)
 public class WC {
@@ -310,17 +304,15 @@ DataStream<WC> words = // [...]
 DataStream<WC> wordCounts = words.keyBy("word").window(/*window specification*/);
 {% endhighlight %}
 
-**Field Expression Syntax**:
+**字段表达式语法**:
 
-- Select POJO fields by their field name. For example `"user"` refers to the "user" field of a POJO type.
+- 根据字段名选择POJO字段。例如，`"user"`指的是POJO类型的"user"字段。
+- 按字段名称或0偏移量字段索引选择Tuple字段。例如，`"f0"`和`"5"`分别表示Java元组类型的第1个字段和第6个字段。
+- 可以在POJOs和元组中选择嵌套字段。例如`"user.zip"应用的zip字段就存储在了POJO类型"user"中。支持POJOs和元组的任意嵌套和混合，如"f1.user.zip"` or `"user.f3.1.zip"`。    
+- 您可以使用`"*"`通配符表达式选择完整类型。这也适用于非Tuple或POJO类型的类型。    
 
-- Select Tuple fields by their field name or 0-offset field index. For example `"f0"` and `"5"` refer to the first and sixth field of a Java Tuple type, respectively.
 
-- You can select nested fields in POJOs and Tuples. For example `"user.zip"` refers to the "zip" field of a POJO which is stored in the "user" field of a POJO type. Arbitrary nesting and mixing of POJOs and Tuples is supported such as `"f1.user.zip"` or `"user.f3.1.zip"`.
-
-- You can select the full type using the `"*"` wildcard expressions. This does also work for types which are not Tuple or POJO types.
-
-**Field Expression Example**:
+**字段表达式例子**:
 
 {% highlight java %}
 public static class WC {
@@ -342,20 +334,21 @@ public static class ComplexNestedClass {
 }
 {% endhighlight %}
 
-These are valid field expressions for the example code above:
+这些是上面示例代码的有效字段表达式:
 
-- `"count"`: The count field in the `WC` class.
+- `"count"`: `WC`类中的count字段。
 
-- `"complex"`: Recursively selects all fields of the field complex of POJO type `ComplexNestedClass`.
+- `"complex"`: 递归选择POJO类型`ComplexNestedClass`字段复合体中的所有字段。
 
-- `"complex.word.f2"`: Selects the last field of the nested `Tuple3`.
+- `"complex.word.f2"`: 选择嵌套的`Tuple3`的最后一个字段。
 
-- `"complex.hadoopCitizen"`: Selects the Hadoop `IntWritable` type.
+- `"complex.hadoopCitizen"`: 选择Hadoop的`IntWritable`类型。
 
 </div>
 <div data-lang="scala" markdown="1">
 
-In the example below, we have a `WC` POJO with two fields "word" and "count". To group by the field `word`, we just pass its name to the `keyBy()` function.
+在下面的示例中，我们有一个带有两个字段"word" and "count"的`WC`POJO。要按字段`word`分组，只需将其名称传递给`keyBy()`函数。  
+
 {% highlight java %}
 // some ordinary POJO (Plain old Java Object)
 class WC(var word: String, var count: Int) {
@@ -370,17 +363,15 @@ val words: DataStream[WC] = // [...]
 val wordCounts = words.keyBy("word").window(/*window specification*/)
 {% endhighlight %}
 
-**Field Expression Syntax**:
+**字段表达式语法**:
 
-- Select POJO fields by their field name. For example `"user"` refers to the "user" field of a POJO type.
+- 根据字段名选择POJO字段。例如，`user`指的是POJO类型的`user`字段。
 
-- Select Tuple fields by their 1-offset field name or 0-offset field index. For example `"_1"` and `"5"` refer to the first and sixth field of a Scala Tuple type, respectively.
+- 按1偏移量字段名或0偏移量字段索引选择Tuple字段。例如，`"_1"` and `"5"`分别表示Scala元组类型的第一个字段和第6个字段。
+- 可以在pojo和元组中选择嵌套字段。例如 `"user.zip"`中的"zip"字段就存储在POJO类型"user"中。 支持pojo和元组的任意嵌套和混合，例如`"_2.user.zip"` or `"user._4.1.zip"`。
+- 您可以使用`"_"`通配符表达式选择完整类型。这也适用于非Tuple或POJO类型的类型。
 
-- You can select nested fields in POJOs and Tuples. For example `"user.zip"` refers to the "zip" field of a POJO which is stored in the "user" field of a POJO type. Arbitrary nesting and mixing of POJOs and Tuples is supported such as `"_2.user.zip"` or `"user._4.1.zip"`.
-
-- You can select the full type using the `"_"` wildcard expressions. This does also work for types which are not Tuple or POJO types.
-
-**Field Expression Example**:
+**字段表达式例子**:
 
 {% highlight scala %}
 class WC(var complex: ComplexNestedClass, var count: Int) {
@@ -396,27 +387,23 @@ class ComplexNestedClass(
 }
 {% endhighlight %}
 
-These are valid field expressions for the example code above:
+这些是上面示例代码的有效字段表达式:  
+- `"count"`: `WC`类中的count字段.
 
-- `"count"`: The count field in the `WC` class.
+- `"complex"`: 递归地选择POJO类型`ComplexNestedClass`的字段复合体中的所有字段。
 
-- `"complex"`: Recursively selects all fields of the field complex of POJO type `ComplexNestedClass`.
+- `"complex.word._3"`: 选择嵌套的`Tuple3`的最后一个字段。
 
-- `"complex.word._3"`: Selects the last field of the nested `Tuple3`.
-
-- `"complex.hadoopCitizen"`: Selects the Hadoop `IntWritable` type.
+- `"complex.hadoopCitizen"`: 选择Hadoop的`IntWritable`类型。 
 
 </div>
 </div>
 
-### Define keys using Key Selector Functions
+### 使用键选择器函数定义键   
 {:.no_toc}
 
-An additional way to define keys are "key selector" functions. A key selector function
-takes a single element as input and returns the key for the element. The key can be of any type and be derived from deterministic computations.
-
-The following example shows a key selector function that simply returns the field of an object:
-
+定义键的另一种方法是"键选择器"("key selector")函数。键选择器函数接受单个元素作为输入，并返回该元素的键。键可以是任何类型的，可以从确定性计算中派生。
+下面的例子显示了一个键选择器函数，它只返回一个对象的字段:
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -442,18 +429,17 @@ val keyed = words.keyBy( _.word )
 
 {% top %}
 
-Specifying Transformation Functions
+指定转换函数
 --------------------------
 
-Most transformations require user-defined functions. This section lists different ways
-of how they can be specified
+大多数转换都需要用户定义的函数。本节列出了如何指定它们的不同方法
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
-#### Implementing an interface
+#### 实现一个接口
 
-The most basic way is to implement one of the provided interfaces:
+最基本的方法是实现其中一个提供的接口:  
 
 {% highlight java %}
 class MyMapFunction implements MapFunction<String, Integer> {
@@ -462,9 +448,10 @@ class MyMapFunction implements MapFunction<String, Integer> {
 data.map(new MyMapFunction());
 {% endhighlight %}
 
-#### Anonymous classes
+#### 匿名类
 
-You can pass a function as an anonymous class:
+你可以传递一个函数作为一个匿名类:   
+
 {% highlight java %}
 data.map(new MapFunction<String, Integer> () {
   public Integer map(String value) { return Integer.parseInt(value); }
@@ -473,7 +460,7 @@ data.map(new MapFunction<String, Integer> () {
 
 #### Java 8 Lambdas
 
-Flink also supports Java 8 Lambdas in the Java API.
+Flink还支持Java API中的Java 8 Lambdas。  
 
 {% highlight java %}
 data.filter(s -> s.startsWith("http://"));
@@ -483,18 +470,18 @@ data.filter(s -> s.startsWith("http://"));
 data.reduce((i1,i2) -> i1 + i2);
 {% endhighlight %}
 
-#### Rich functions
+#### Rich functions 富函数
 
 All transformations that require a user-defined function can
 instead take as argument a *rich* function. For example, instead of
-
+所有需要用户定义函数的转换都可以将*rich function*作为参数。例如, 替换
 {% highlight java %}
 class MyMapFunction implements MapFunction<String, Integer> {
   public Integer map(String value) { return Integer.parseInt(value); }
 };
 {% endhighlight %}
 
-you can write
+你可以写成  
 
 {% highlight java %}
 class MyMapFunction extends RichMapFunction<String, Integer> {
@@ -502,13 +489,13 @@ class MyMapFunction extends RichMapFunction<String, Integer> {
 };
 {% endhighlight %}
 
-and pass the function as usual to a `map` transformation:
+并像通常一样传入函数到`map`转换中  
 
 {% highlight java %}
 data.map(new MyMapFunction());
 {% endhighlight %}
 
-Rich functions can also be defined as an anonymous class:
+Rich functions也可以定义为匿名类:  
 {% highlight java %}
 data.map (new RichMapFunction<String, Integer>() {
   public Integer map(String value) { return Integer.parseInt(value); }
@@ -519,10 +506,9 @@ data.map (new RichMapFunction<String, Integer>() {
 <div data-lang="scala" markdown="1">
 
 
-#### Lambda Functions
+#### Lambda functions lambda函数
 
-As already seen in previous examples all operations accept lambda functions for describing
-the operation:
+正如在前面的示例中所看到的，所有操作都接受lambda函数来描述操作:
 {% highlight scala %}
 val data: DataSet[String] = // [...]
 data.filter { _.startsWith("http://") }
@@ -535,16 +521,15 @@ data.reduce { (i1,i2) => i1 + i2 }
 data.reduce { _ + _ }
 {% endhighlight %}
 
-#### Rich functions
+#### Rich functions 富函数
 
-All transformations that take as argument a lambda function can
-instead take as argument a *rich* function. For example, instead of
+所有需要用户定义函数的转换都可以将*rich function*作为参数。例如, 替换
 
 {% highlight scala %}
 data.map { x => x.toInt }
 {% endhighlight %}
 
-you can write
+你可以写成
 
 {% highlight scala %}
 class MyMapFunction extends RichMapFunction[String, Int] {
@@ -552,13 +537,12 @@ class MyMapFunction extends RichMapFunction[String, Int] {
 };
 {% endhighlight %}
 
-and pass the function to a `map` transformation:
-
+并传入函数到`map`转换中: 
 {% highlight scala %}
 data.map(new MyMapFunction())
 {% endhighlight %}
 
-Rich functions can also be defined as an anonymous class:
+Rich functions 也可以被定义为匿名类: 
 {% highlight scala %}
 data.map (new RichMapFunction[String, Int] {
   def map(in: String):Int = { in.toInt }
@@ -568,27 +552,21 @@ data.map (new RichMapFunction[String, Int] {
 
 </div>
 
-Rich functions provide, in addition to the user-defined function (map,
-reduce, etc), four methods: `open`, `close`, `getRuntimeContext`, and
-`setRuntimeContext`. These are useful for parameterizing the function
-(see [Passing Parameters to Functions]({{ site.baseurl }}/dev/batch/index.html#passing-parameters-to-functions)),
-creating and finalizing local state, accessing broadcast variables (see
-[Broadcast Variables]({{ site.baseurl }}/dev/batch/index.html#broadcast-variables)), and for accessing runtime
-information such as accumulators and counters (see
-[Accumulators and Counters](#accumulators--counters)), and information
-on iterations (see [Iterations]({{ site.baseurl }}/dev/batch/iterations.html)).
+
+除了用户定义的函数(map、reduce等)外，富函数还提供四种方法:`open`, `close`, `getRuntimeContext`, and
+`setRuntimeContext`。
+
+这对于参数化函数(参见[Passing Parameters to Functions]({{ site.baseurl }}/dev/batch/index.html#passing-parameters-to-functions))、创建和结束本地状态、访问广播变量(参见
+[Broadcast Variables]({{ site.baseurl }}/dev/batch/index.html#broadcast-variables))以及访问运行时信息(如累加器和计数器)(see
+[Accumulators and Counters](#accumulators--counters))和关于迭代的信息(参见[Iterations]({{ site.baseurl }}/dev/batch/iterations.html))非常有用。  
 
 {% top %}
 
-Supported Data Types
+支持的数据类型
 --------------------
 
-Flink places some restrictions on the type of elements that can be in a DataSet or DataStream.
-The reason for this is that the system analyzes the types to determine
-efficient execution strategies.
-
-There are six different categories of data types:
-
+Flink对数据集中或数据流中的元素类型进行了一些限制。这样做的原因是系统分析类型以确定有效的执行策略。  
+有六种不同的数据类型:
 1. **Java Tuples** and **Scala Case Classes**
 2. **Java POJOs**
 3. **Primitive Types**
