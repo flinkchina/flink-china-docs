@@ -46,13 +46,20 @@ By default, this server binds to `localhost` and listens at port `8082`.
 
 Currently, you can only run it as a standalone process.
 
-## Configuration
+
+默认情况下，此服务器绑定到`localhost`并在端口`8082`侦听。
+
+目前，您只能作为独立standalone进程运行它。  
+
+## 配置
 
 The configuration keys `jobmanager.archive.fs.dir` and `historyserver.archive.fs.refresh-interval` need to be adjusted for archiving and displaying archived jobs.
 
+配置键的`jobmanager.archive.fs.dir`和`historyserver.archive.fs.refresh-interval`需要调整以存档和显示存档的jobs作业。 
+
 **JobManager**
 
-The archiving of completed jobs happens on the JobManager, which uploads the archived job information to a file system directory. You can configure the directory to archive completed jobs in `flink-conf.yaml` by setting a directory via `jobmanager.archive.fs.dir`.
+已完成job作业的归档发生在JobManager上，它将归档的作业信息上传到文件系统目录中。您可以将目录配置为在`flink-conf.yaml`中归档完成的作业。通过`jobmanager.archive.fs.dir`设置一个目录。
 
 {% highlight yaml %}
 # Directory to upload completed job information
@@ -61,26 +68,25 @@ jobmanager.archive.fs.dir: hdfs:///completed-jobs
 
 **HistoryServer**
 
-The HistoryServer can be configured to monitor a comma-separated list of directories in via `historyserver.archive.fs.dir`. The configured directories are regularly polled for new archives; the polling interval can be configured via `historyserver.archive.fs.refresh-interval`.
+可以将HistoryServer配置为通过`historyserver.archive.fs.dir`监视以逗号分隔的目录列表。配置的目录定期轮询新存档;轮询间隔可以通过`historyserver.archive.fs.refresh-interval`配置。   
 
 {% highlight yaml %}
-# Monitor the following directories for completed jobs
+# 为完成的作业监视以下目录  
 historyserver.archive.fs.dir: hdfs:///completed-jobs
 
-# Refresh every 10 seconds
+# 每10秒刷新一次  
 historyserver.archive.fs.refresh-interval: 10000
 {% endhighlight %}
 
-The contained archives are downloaded and cached in the local filesystem. The local directory for this is configured via `historyserver.web.tmpdir`.
+所包含的归档文件被下载并缓存在本地文件系统中。本地目录通过`historyserver.web.tmpdir`配置。
+在配置页面中可以找到[配置选项的完整列表]({{ site.baseurl }}/ops/config.html#history-server)。
 
-Check out the configuration page for a [complete list of configuration options]({{ site.baseurl }}/ops/config.html#history-server).
+## 可用的请求
 
-## Available Requests
+下面是可用请求的列表，其中有一个JSON响应示例。所有请求都是示例形式`http://hostname:8082/jobs`，下面我们只列出url的*path*部分。
 
-Below is a list of available requests, with a sample JSON response. All requests are of the sample form `http://hostname:8082/jobs`, below we list only the *path* part of the URLs.
-
-Values in angle brackets are variables, for example `http://hostname:port/jobs/<jobid>/exceptions` will have to requested for example as `http://hostname:port/jobs/7684be6004e4e955c2a558a9bc463f65/exceptions`.
-
+尖括号中的值是变量，例如`http://hostname:port/jobs/<jobid>/exceptions`必须作为`http://hostname:port/jobs/7684be6004e4e955c2a558a9bc463f65/exceptions`来请求。 
+  
   - `/config`
   - `/jobs/overview`
   - `/jobs/<jobid>`
