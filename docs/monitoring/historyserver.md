@@ -1,5 +1,5 @@
 ---
-title: "History Server"
+title: "历史服务器"
 nav-parent_id: monitoring
 nav-pos: 3
 ---
@@ -23,18 +23,18 @@ under the License.
 -->
 
 Flink has a history server that can be used to query the statistics of completed jobs after the corresponding Flink cluster has been shut down.
+Flink有一个历史服务器，可以用于在相应的Flink集群关闭后查询已完成作业的统计信息。
 
-Furthermore, it exposes a REST API that accepts HTTP requests and responds with JSON data.
+此外，它还公开了一个REST API，该API接受HTTP请求并使用JSON数据进行响应。  
 
 * This will be replaced by the TOC
 {:toc}
 
-## Overview
+## 概述
 
-The HistoryServer allows you to query the status and statistics of completed jobs that have been archived by a JobManager.
+HistoryServer允许查询JobManager存档的已完成jobs作业的状态和统计信息。
 
-After you have configured the HistoryServer *and* JobManager, you start and stop the HistoryServer via its corresponding startup script:
-
+配置好*HistoryServer*和*JobManager*后，通过其对应的启动脚本启动和停止HistoryServer:
 {% highlight shell %}
 # Start or stop the HistoryServer
 bin/historyserver.sh (start|start-foreground|stop)
