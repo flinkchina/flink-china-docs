@@ -1,7 +1,7 @@
 ---
-title: "Deployment & Operations"
+title: "部署&运维"
 nav-id: ops
-nav-title: '<i class="fa fa-sliders title maindish" aria-hidden="true"></i> Deployment & Operations'
+nav-title: '<i class="fa fa-sliders title maindish" aria-hidden="true"></i> 部署&运维'
 nav-parent_id: root
 nav-pos: 6
 ---

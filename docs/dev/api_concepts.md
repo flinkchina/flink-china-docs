@@ -90,11 +90,9 @@ final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEn
 DataStream<String> text = env.readTextFile("file:///path/to/file");
 {% endhighlight %}
 
-This will give you a DataStream on which you can then apply transformations to create new
-derived DataStreams.
+这将为您提供一个数据流，然后您可以在其上应用转换来创建新的派生数据流。
 
-You apply transformations by calling methods on DataStream with a transformation
-functions. For example, a map transformation looks like this:
+通过使用转换函数调用DataStream上的方法来应用转换。例如，映射转换如下所示:
 
 {% highlight java %}
 DataStream<String> input = ...;
@@ -711,8 +709,8 @@ Flink在准备程序执行时(调用程序的主方法时)需要类型信息。F
 
 {% top %}
 
-累加器Accumulators &和计数器Counters
 
+累加器Accumulators &和计数器Counters
 ---------------------------
 
 累加器是一种简单的构造，具有**add operation**和**final accumulated result**，可在作业结束后使用。

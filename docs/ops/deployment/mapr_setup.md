@@ -1,5 +1,5 @@
 ---
-title:  "MapR Setup"
+title:  "MapR部署"
 nav-title: MapR
 nav-parent_id: deployment
 nav-pos: 7

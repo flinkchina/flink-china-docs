@@ -1,5 +1,5 @@
 ---
-title:  "YARN Setup"
+title:  "YARN部署"
 nav-title: YARN
 nav-parent_id: deployment
 nav-pos: 2

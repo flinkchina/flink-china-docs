@@ -1,5 +1,5 @@
 ---
-title:  "Mesos Setup"
+title:  "Mesos部署"
 nav-title: Mesos
 nav-parent_id: deployment
 nav-pos: 3

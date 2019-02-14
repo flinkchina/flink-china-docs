@@ -1,6 +1,6 @@
 ---
-title:  "Hadoop Integration"
-nav-title: Hadoop Integration
+title:  "Hadoop集成"
+nav-title: Hadoop集成 
 nav-parent_id: deployment
 nav-pos: 8
 ---

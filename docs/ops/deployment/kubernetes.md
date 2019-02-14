@@ -1,5 +1,5 @@
 ---
-title:  "Kubernetes Setup"
+title:  "Kubernetes部署"
 nav-title: Kubernetes
 nav-parent_id: deployment
 nav-pos: 4

@@ -1,5 +1,5 @@
 ---
-title:  "Google Compute Engine Setup"
+title:  "Google Compute Engine 部署"
 nav-title: Google Compute Engine
 nav-parent_id: deployment
 nav-pos: 6

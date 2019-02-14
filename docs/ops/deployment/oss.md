@@ -1,6 +1,6 @@
 ---
-title: "Aliyun Object Storage Service (OSS)"
-nav-title: Aliyun OSS
+title: "阿里云 Object Storage Service (OSS)"
+nav-title: 阿里云OSS
 nav-parent_id: deployment
 nav-pos: 9
 ---

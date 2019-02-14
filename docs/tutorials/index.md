@@ -1,10 +1,11 @@
 ---
-title: 教程
+title: "教程"
 nav-id: tutorials
-nav-title: '<i class="fa fa-power-off title appetizer" aria-hidden="true"></i> Tutorials'
+nav-title: '<i class="fa fa-power-off title appetizer" aria-hidden="true"></i> 教程'
 nav-parent_id: root
 nav-pos: 2
 ---
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file

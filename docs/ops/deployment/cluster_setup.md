@@ -1,5 +1,5 @@
 ---
-title: "Standalone Cluster"
+title: "Standalone集群"
 nav-parent_id: deployment
 nav-pos: 1
 ---
