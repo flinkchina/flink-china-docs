@@ -1,5 +1,5 @@
 ---
-title: "How to use logging"
+title: "如何使用日志"
 nav-title: Logging
 nav-parent_id: monitoring
 nav-pos: 2
@@ -23,28 +23,28 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The logging in Flink is implemented using the slf4j logging interface. As underlying logging framework, log4j is used. We also provide logback configuration files and pass them to the JVM's as properties. Users willing to use logback instead of log4j can just exclude log4j (or delete it from the lib/ folder).
+Flink中的日志记录是使用slf4j日志记录接口实现的。作为底层日志框架，使用log4j。我们还提供了logback配置文件，并将它们作为属性传递给JVM。愿意使用logback而不是log4j的用户可以排除log4j(或者从lib/文件夹中删除它)。
 
 * This will be replaced by the TOC
 {:toc}
 
-## Configuring Log4j
+## 配置Log4j
 
-Log4j is controlled using property files. In Flink's case, the file is usually called `log4j.properties`. We pass the filename and location of this file using the `-Dlog4j.configuration=` parameter to the JVM.
+Log4j是使用属性文件控制的。在Flink的情况下，该文件通常称为`log4j.properties`。我们使用`-Dlog4j.configuration=`传递该文件的文件名和位置的参数给JVM。
+Flink附带以下默认属性文件:    
 
-Flink ships with the following default properties files:
+- `log4j-cli.properties`:  由Flink命令行客户端使用(即`flink run`)(不是在集群上执行的代码)
+- `log4j-yarn-session.properties`: Flink命令行客户端在开始YARN会话(`yarn-session.sh`)时使用
+- `log4j.properties`: JobManager/Taskmanager日志(standalone和YARN模式都可)
 
-- `log4j-cli.properties`: Used by the Flink command line client (e.g. `flink run`) (not code executed on the cluster)
-- `log4j-yarn-session.properties`: Used by the Flink command line client when starting a YARN session (`yarn-session.sh`)
-- `log4j.properties`: JobManager/Taskmanager logs (both standalone and YARN)
+## 配置logback
 
-## Configuring logback
 
-For users and developers alike it is important to control the logging framework.
-The configuration of the logging framework is exclusively done by configuration files.
-The configuration file either has to be specified by setting the environment property `-Dlogback.configurationFile=<file>` or by putting `logback.xml` in the classpath.
-The `conf` directory contains a `logback.xml` file which can be modified and is used if Flink is started outside of an IDE and with the provided starting scripts.
-The provided `logback.xml` has the following form:
+对于用户和开发人员来说，控制日志框架非常重要。
+日志框架的配置完全由配置文件完成。
+配置文件必须通过设置环境属性`-Dlogback.configurationFile=<file>`或通过classpath类路径中的xml `logback.xml`。
+`conf`目录包含一个`logback.xml`。如果Flink是在IDE外部启动的，并且带有提供的启动脚本，那么可以修改并使用该xml 文件。
+提供的`logback.xml` 的形式如下:
 
 {% highlight xml %}
 <configuration>
@@ -62,17 +62,16 @@ The provided `logback.xml` has the following form:
 </configuration>
 {% endhighlight %}
 
-In order to control the logging level of `org.apache.flink.runtime.jobgraph.JobGraph`, for example, one would have to add the following line to the configuration file.
-
+例如，为了控制org.apache.flink.runtime.jobgraph.JobGraph`的日志级别，必须向配置文件中添加以下行。
 {% highlight xml %}
 <logger name="org.apache.flink.runtime.jobgraph.JobGraph" level="DEBUG"/>
 {% endhighlight %}
 
-For further information on configuring logback see [LOGback's manual](http://logback.qos.ch/manual/configuration.html).
+有关配置logback的详细信息，请参阅[logback手册](http://logback.qos.ch/manual/configuration.html)。  
 
-## Best practices for developers
+## 开发人员的最佳实践
 
-The loggers using slf4j are created by calling
+使用slf4j的日志记录器是通过以下配置调用创建的  
 
 {% highlight java %}
 import org.slf4j.LoggerFactory
@@ -81,9 +80,9 @@ import org.slf4j.Logger
 Logger LOG = LoggerFactory.getLogger(Foobar.class)
 {% endhighlight %}
 
-In order to benefit most from slf4j, it is recommended to use its placeholder mechanism.
-Using placeholders allows to avoid unnecessary string constructions in case that the logging level is set so high that the message would not be logged.
-The syntax of placeholders is the following:
+为了从slf4j中获益最多，建议使用它的占位符机制。
+使用占位符可以避免不必要的字符串构造，以防日志记录级别设置得太高而无法记录消息。
+占位符的语法如下:  
 
 {% highlight java %}
 LOG.info("This message contains {} placeholders. {}", 2, "Yippie");
