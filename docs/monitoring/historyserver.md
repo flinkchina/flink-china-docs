@@ -34,7 +34,9 @@ Flink有一个历史服务器，可以用于在相应的Flink集群关闭后查�
 
 HistoryServer允许查询JobManager存档的已完成jobs作业的状态和统计信息。
 
+After you have configured the HistoryServer *and* JobManager, you start and stop the HistoryServer via its corresponding startup script:
 配置好*HistoryServer*和*JobManager*后，通过其对应的启动脚本启动和停止HistoryServer:
+
 {% highlight shell %}
 # Start or stop the HistoryServer
 bin/historyserver.sh (start|start-foreground|stop)
