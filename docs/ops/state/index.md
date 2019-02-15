@@ -1,5 +1,5 @@
 ---
-nav-title: 'State & Fault Tolerance'
+nav-title: '状态&容错'
 nav-id: ops_state
 nav-parent_id: ops
 nav-pos: 3
