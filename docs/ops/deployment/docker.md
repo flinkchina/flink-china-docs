@@ -23,83 +23,84 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-[Docker](https://www.docker.com) is a popular container runtime. 
-There are Docker images for Apache Flink available on Docker Hub which can be used to deploy a session cluster.
-The Flink repository also contains tooling to create container images to deploy a job cluster.
+[Docker](https://www.docker.com)是一种流行的容器运行时。
 
+在Docker Hub上有Apache Flink的Docker映像，可以用来部署会话集群。
+Flink repository还包含用于创建用于部署作业集群的容器映像的工具。
 * This will be replaced by the TOC
 {:toc}
 
-## Flink session cluster
+## Flink session cluster 会话集群
 
-A Flink session cluster can be used to run multiple jobs. 
-Each job needs to be submitted to the cluster after it has been deployed. 
+Flink会话集群可用于运行多个Job作业。
+每个Job作业需要在部署后提交给集群。
 
-### Docker images
+### Docker images镜像
 
-The [Flink Docker repository](https://hub.docker.com/_/flink/) is hosted on
-Docker Hub and serves images of Flink version 1.2.1 and later.
+[Flink Docker仓库](https://hub.docker.com/_/flink/) 托管在Docker Hub上，提供Flink 1.2.1及更高版本的映像。
 
 Images for each supported combination of Hadoop and Scala are available, and tag aliases are provided for convenience.
+Hadoop和Scala支持的每个组合的映像都是可用的，并且为了方便提供了标记别名。 
 
 Beginning with Flink 1.5, image tags that omit a Hadoop version (e.g.
 `-hadoop28`) correspond to Hadoop-free releases of Flink that do not include a
 bundled Hadoop distribution.
+从Flink 1.5开始，省略Hadoop版本的镜像标签(例如。-hadoop28`)对应于不包含捆绑的Hadoop发行版的Flink的无Hadoop(Hadoop-free)版本。
 
-For example, the following aliases can be used: *(`1.5.y` indicates the latest
-release of Flink 1.5)*
+例如，可以使用以下别名：*（`1.5.y`表示Flink 1.5的最新版本）*
 
 * `flink:latest` → `flink:<latest-flink>-scala_<latest-scala>`
 * `flink:1.5` → `flink:1.5.y-scala_2.11`
 * `flink:1.5-hadoop27` → `flink:1.5.y-hadoop27-scala_2.11`
 
-**Note:** The Docker images are provided as a community project by individuals
-on a best-effort basis. They are not official releases by the Apache Flink PMC.
+**注意:** Docker映像作为一个社区项目由个人以最佳方式提供。它们不是Apache Flink PMC的官方版本。
 
-## Flink job cluster
+## Flink job集群
 
-A Flink job cluster is a dedicated cluster which runs a single job. 
-The job is part of the image and, thus, there is no extra job submission needed. 
+Flink作业集群是运行单个作业的专用集群。
+job作业是image镜像的一部分，因此不需要额外的作业提交。
 
-### Docker images
+### Docker images镜像
 
-The Flink job cluster image needs to contain the user code jars of the job for which the cluster is started.
-Therefore, one needs to build a dedicated container image for every job.
-The `flink-container` module contains a `build.sh` script which can be used to create such an image.
+Flink作业集群映像需要包含启动集群的作业的用户代码jar。
+因此，需要为每个作业构建专用的容器映像。
+`flink-container`模块包含一个`build.sh`可以用来创建这样一个镜像的脚本。
 Please see the [instructions](https://github.com/apache/flink/blob/{{ site.github_branch }}/flink-container/docker/README.md) for more details. 
+请参见[使用说明](https://github.com/apache/flink/blob/{{ site.github_branch }}/flink-container/docker/README.md)获取更多详细信息
 
-## Flink with Docker Compose
+## Flink和Docker Compose集成
 
-[Docker Compose](https://docs.docker.com/compose/) is a convenient way to run a
-group of Docker containers locally.
+[Docker Compose](https://docs.docker.com/compose/)是本地运行一组Docker容器的方便方法。
 
 Example config files for a [session cluster](https://github.com/docker-flink/examples/blob/master/docker-compose.yml) and a [job cluster](https://github.com/apache/flink/blob/{{ site.github_branch }}/flink-container/docker/docker-compose.yml)
 are available on GitHub.
 
-### Usage
+[会话集群](https://github.com/docker.flink/examples/blob/master/docker.compose.yml)和[作业集群](https://github.com/apache/flink/blob/{{ site.github_branch }}/flink-container/docker/docker-compose.yml)的配置文件示例可在GitHub上找到。
 
-* Launch a cluster in the foreground
+
+
+### 用法
+
+* 在前台启动一个集群
 
         docker-compose up
 
-* Launch a cluster in the background
+* 在后台启动一个集群
 
         docker-compose up -d
 
-* Scale the cluster up or down to *N* TaskManagers
+* 将集群扩展或缩容到*N* taskmanager
 
         docker-compose scale taskmanager=<N>
 
-* Kill the cluster
+* 关闭集群
 
         docker-compose kill
 
-When the cluster is running, you can visit the web UI at [http://localhost:8081](http://localhost:8081). 
-You can also use the web UI to submit a job to a session cluster.
+当集群运行时，您可以通过[http://localhost:8081](http://localhost:8081)访问web UI。
+您还可以使用web UI向会话集群提交作业。
 
-To submit a job to a session cluster via the command line, you must copy the JAR to the JobManager
-container and submit the job from there.
-
+要通过命令行向会话集群提交作业，必须将JAR复制到JobManager容器并从那里提交作业。
 For example:
 
 {% raw %}
