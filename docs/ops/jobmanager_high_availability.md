@@ -1,6 +1,6 @@
 ---
-title: "JobManager High Availability (HA)"
-nav-title: High Availability (HA)
+title: "JobManager 高可用(HA)"
+nav-title: JobManager 高可用(HA)
 nav-parent_id: ops
 nav-pos: 2
 ---
@@ -23,34 +23,37 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The JobManager coordinates every Flink deployment. It is responsible for both *scheduling* and *resource management*.
+JobManager协调每一次Flink部署。 它负责*调度*和*资源管理*。
 
-By default, there is a single JobManager instance per Flink cluster. This creates a *single point of failure* (SPOF): if the JobManager crashes, no new programs can be submitted and running programs fail.
+默认情况下，每个Flink群集都有一个JobManager实例。 这会产生*单点故障single point of failure*（SPOF）：如果JobManager崩溃，则无法提交新程序并且运行程序失败。
 
-With JobManager High Availability, you can recover from JobManager failures and thereby eliminate the *SPOF*. You can configure high availability for both **standalone** and **YARN clusters**.
+使用JobManager高可用性，您可以从JobManager故障中恢复，从而消除*SPOF *。 您可以为**standalone独立**和**YARN clusters**配置高可用性。
+
 
 * Toc
 {:toc}
 
-## Standalone Cluster High Availability
+## Standalone Cluster HA
 
-The general idea of JobManager high availability for standalone clusters is that there is a **single leading JobManager** at any time and **multiple standby JobManagers** to take over leadership in case the leader fails. This guarantees that there is **no single point of failure** and programs can make progress as soon as a standby JobManager has taken leadership. There is no explicit distinction between standby and master JobManager instances. Each JobManager can take the role of master or standby.
+对于独立集群来说，JobManager高可用性的一般思想是，在任何时候都有一个**单领导JobManager**和**多个备用JobManager**来接管领导层主节点，以防leader失败。这就保证了**没有单点故障**，并且只要有一个备用JobManager领导，程序就可以取得进展。备用和主JobManager实例之间没有明确的区别。 每个JobManager都可以充当主服务器或备用服务器。
 
-As an example, consider the following setup with three JobManager instances:
+
+
+例如，考虑以下三个JobManager实例的设置：
 
 <img src="{{ site.baseurl }}/fig/jobmanager_ha_overview.png" class="center" />
 
-### Configuration
+### 配置
 
-To enable JobManager High Availability you have to set the **high-availability mode** to *zookeeper*, configure a **ZooKeeper quorum** and set up a **masters file** with all JobManagers hosts and their web UI ports.
+要启用JobManager高可用性，您必须将**高可用性模式 high-availability mode**设置为*zookeeper*，配置**ZooKeeper quorum**并设置**masters file主文件**以及所有JobManagers主机及其Web UI端口。
 
-Flink leverages **[ZooKeeper](http://zookeeper.apache.org)** for *distributed coordination* between all running JobManager instances. ZooKeeper is a separate service from Flink, which provides highly reliable distributed coordination via leader election and light-weight consistent state storage. Check out [ZooKeeper's Getting Started Guide](http://zookeeper.apache.org/doc/current/zookeeperStarted.html) for more information about ZooKeeper. Flink includes scripts to [bootstrap a simple ZooKeeper](#bootstrap-zookeeper) installation.
+Flink在所有正在运行的JobManager实例之间利用**[ZooKeeper](http://zookeeper.apache.org)**进行分布式协调*。 ZooKeeper是Flink的独立服务，通过领导者选举和轻量级一致状态存储提供高度可靠的分布式协调。 有关ZooKeeper的更多信息，请查看[ZooKeeper的入门指南](http://zookeeper.apache.org/doc/current/zookeeperStarted.html)。 Flink包含[引导简单的ZooKeeper bootstrap a simple ZooKeeper](#bootstrap-zookeeper)安装的脚本。
 
-#### Masters File (masters)
+#### Masters文件(masters)
 
-In order to start an HA-cluster configure the *masters* file in `conf/masters`:
+要启动HA-cluster，请在`conf/masters`中配置*masters*文件：
 
-- **masters file**: The *masters file* contains all hosts, on which JobManagers are started, and the ports to which the web user interface binds.
+- **masters file**: *masters文件*包含启动JobManagers的所有主机以及Web用户界面绑定的端口。
 
   <pre>
 jobManagerAddress1:webUIPort1
@@ -58,52 +61,48 @@ jobManagerAddress1:webUIPort1
 jobManagerAddressX:webUIPortX
   </pre>
 
-By default, the job manager will pick a *random port* for inter process communication. You can change this via the **`high-availability.jobmanager.port`** key. This key accepts single ports (e.g. `50010`), ranges (`50000-50025`), or a combination of both (`50010,50011,50020-50025,50050-50075`).
+默认情况下，作业管理器将为进程间通信选择*随机端口*。 您可以通过**`high-availability.jobmanager.port`**键更改此设置。 该key接受单个端口（例如`50010`），范围（`50000-50025`）或两者的组合（`50010,50011,50020-50025,50050-50075`）。
 
-#### Config File (flink-conf.yaml)
+#### Config文件 (flink-conf.yaml)
 
-In order to start an HA-cluster add the following configuration keys to `conf/flink-conf.yaml`:
+要启动HA群集，请将以下配置键添加到`conf/flink-conf.yaml`：
 
-- **high-availability mode** (required): The *high-availability mode* has to be set in `conf/flink-conf.yaml` to *zookeeper* in order to enable high availability mode.
-Alternatively this option can be set to FQN of factory class Flink should use to create HighAvailabilityServices instance. 
+- **high-availability mode** (必须的): *高可用性模式*必须在`conf/flink-conf.yaml`中设置为*zookeeper*才能启用高可用性模式。或者，此选项可以设置为Flink应用于创建HighAvailabilityServices实例的工厂类的FQN。
 
   <pre>high-availability: zookeeper</pre>
 
-- **ZooKeeper quorum** (required): A *ZooKeeper quorum* is a replicated group of ZooKeeper servers, which provide the distributed coordination service.
+- **ZooKeeper quorum** (必须的): *ZooKeeper quorum*是ZooKeeper服务器的复制组，它提供分布式协调服务。
+
 
   <pre>high-availability.zookeeper.quorum: address1:2181[,...],addressX:2181</pre>
 
-  Each *addressX:port* refers to a ZooKeeper server, which is reachable by Flink at the given address and port.
+ 每个*addressX:port*指的是一个ZooKeeper服务器，Flink可以在给定的地址和端口访问它。
 
-- **ZooKeeper root** (recommended): The *root ZooKeeper node*, under which all cluster nodes are placed.
+
+- **ZooKeeper root** (建议的): *root ZooKeeper node*，在其下放置所有集群节点。
 
   <pre>high-availability.zookeeper.path.root: /flink
 
-- **ZooKeeper cluster-id** (recommended): The *cluster-id ZooKeeper node*, under which all required coordination data for a cluster is placed.
+- **ZooKeeper cluster-id** (建议的): *cluster-id ZooKeeper node*，在该节点下放置集群的所有必需协调数据。
+
 
   <pre>high-availability.cluster-id: /default_ns # important: customize per cluster</pre>
 
-  **Important**: You should not set this value manually when running a YARN
-  cluster, a per-job YARN session, or on another cluster manager. In those
-  cases a cluster-id is automatically being generated based on the application
-  id. Manually setting a cluster-id overrides this behaviour in YARN.
-  Specifying a cluster-id with the -z CLI option, in turn, overrides manual
-  configuration. If you are running multiple Flink HA clusters on bare metal,
-  you have to manually configure separate cluster-ids for each cluster.
+  **重要的**: 在运行一个YARN集群、每个作业的纱线会话或在另一个集群管理器上运行时，不应手动设置此值。在这些情况下，将根据应用程序ID自动生成集群ID(cluster-id)。手动设置集群ID将覆盖yarn中的这一行为。反过来，使用-z cli选项指定集群ID将覆盖手动配置。如果您在裸机上运行多个Flink HA集群，则必须为每个集群手动配置单独的集群ID。
 
-- **Storage directory** (required): JobManager metadata is persisted in the file system *storageDir* and only a pointer to this state is stored in ZooKeeper.
+- **Storage directory** (必须的): JobManager元数据保存在文件系统*storagedir*中，只有一个指向该状态的指针存储在ZooKeeper中
 
     <pre>
 high-availability.storageDir: hdfs:///flink/recovery
     </pre>
 
-    The `storageDir` stores all metadata needed to recover a JobManager failure.
+    `storageDir`存储恢复JobManager故障所需的所有元数据。
 
-After configuring the masters and the ZooKeeper quorum, you can use the provided cluster startup scripts as usual. They will start an HA-cluster. Keep in mind that the **ZooKeeper quorum has to be running** when you call the scripts and make sure to **configure a separate ZooKeeper root path** for each HA cluster you are starting.
+在配置了主服务器和ZooKeeper quorum之后，您可以像往常一样使用提供的集群启动脚本。 他们将启动HA群集。 请记住，当您调用脚本时，**ZooKeeper quorum必须运行**并确保为您正在启动的每个HA群集**配置单独的ZooKeeper根路径**。
 
-#### Example: Standalone Cluster with 2 JobManagers
+#### 示例: 拥有两个JobManager的Standalone集群
 
-1. **Configure high availability mode and ZooKeeper quorum** in `conf/flink-conf.yaml`:
+1. **配置高可用模式和ZooKeeper quorum** in `conf/flink-conf.yaml`:
 
    <pre>
 high-availability: zookeeper
@@ -112,23 +111,23 @@ high-availability.zookeeper.path.root: /flink
 high-availability.cluster-id: /cluster_one # important: customize per cluster
 high-availability.storageDir: hdfs:///flink/recovery</pre>
 
-2. **Configure masters** in `conf/masters`:
+2. **配置masters** in `conf/masters`:
 
    <pre>
 localhost:8081
 localhost:8082</pre>
 
-3. **Configure ZooKeeper server** in `conf/zoo.cfg` (currently it's only possible to run a single ZooKeeper server per machine):
+3. **配置ZooKeeper服务器** in `conf/zoo.cfg` (currently it's only possible to run a single ZooKeeper server per machine):
 
    <pre>server.0=localhost:2888:3888</pre>
 
-4. **Start ZooKeeper quorum**:
+4. **启动 ZooKeeper quorum**:
 
    <pre>
 $ bin/start-zookeeper-quorum.sh
 Starting zookeeper daemon on host localhost.</pre>
 
-5. **Start an HA-cluster**:
+5. **启动HA-cluster集群**:
 
    <pre>
 $ bin/start-cluster.sh
@@ -137,7 +136,7 @@ Starting jobmanager daemon on host localhost.
 Starting jobmanager daemon on host localhost.
 Starting taskmanager daemon on host localhost.</pre>
 
-6. **Stop ZooKeeper quorum and cluster**:
+6. **停止ZooKeeper quorum 和 flink集群**:
 
    <pre>
 $ bin/stop-cluster.sh
@@ -147,15 +146,16 @@ Stopping jobmanager daemon (pid: 7349) on host localhost.
 $ bin/stop-zookeeper-quorum.sh
 Stopping zookeeper daemon (pid: 7101) on host localhost.</pre>
 
-## YARN Cluster High Availability
+## Flink on Yarn集群高可用
 
-When running a highly available YARN cluster, **we don't run multiple JobManager (ApplicationMaster) instances**, but only one, which is restarted by YARN on failures. The exact behaviour depends on on the specific YARN version you are using.
+运行高可用性YARN集群时，**我们不运行多个JobManager（ApplicationMaster）实例**，而只运行一个实例，由YARN在失败时重新启动。 确切的行为取决于您使用的特定YARN版本。
 
-### Configuration
+### 配置
 
-#### Maximum Application Master Attempts (yarn-site.xml)
+#### Application Master最大尝试次数 (yarn-site.xml)
 
-You have to configure the maximum number of attempts for the application masters for **your** YARN setup in `yarn-site.xml`:
+
+您必须在`yarn-site.xml`中为**您的** YARN配置应用程序管理器(application masters)的最大尝试次数：
 
 {% highlight xml %}
 <property>
@@ -167,15 +167,14 @@ You have to configure the maximum number of attempts for the application masters
 </property>
 {% endhighlight %}
 
-The default for current YARN versions is 2 (meaning a single JobManager failure is tolerated).
+当前YARN版本的默认值是2(这意味着可以容忍单个JobManager失败)。
 
-#### Application Attempts (flink-conf.yaml)
+#### Application尝试次数 (flink-conf.yaml)
 
-In addition to the HA configuration ([see above](#configuration)), you have to configure the maximum attempts in `conf/flink-conf.yaml`:
-
+除了HA配置([见上面](#configuration))之外，您还必须在`conf/flink-conf.yaml`中配置最大尝试次数:
 <pre>yarn.application-attempts: 10</pre>
 
-This means that the application can be restarted 9 times for failed attempts before YARN fails the application (9 retries + 1 initial attempt). Additional restarts can be performed by YARN if required by YARN operations: Preemption, node hardware failures or reboots, or NodeManager resyncs. These restarts are not counted against `yarn.application-attempts`, see <a href="http://johnjianfang.blogspot.de/2015/04/the-number-of-maximum-attempts-of-yarn.html">Jian Fang's blog post</a>. It's important to note that `yarn.resourcemanager.am.max-attempts` is an upper bound for the application restarts. Therefore, the number of application attempts set within Flink cannot exceed the YARN cluster setting with which YARN was started.
+这意味着在YARN应用失败之前，应用程序可以重新启动9次失败的尝试（9次重试+1次初始尝试）。如果YARN操作运维需要，可以通过YARN执行额外的重新启动：抢占、节点硬件故障或重新启动，或节点管理器(NodeManager)重新同步。这些重启不计入`yarn.application-attempts`（yarn.application attempts），请参见<a href="http://johnjianfang.blogspot.de/2015/04/the number of maximum attempts of yarn.html">jian fang's blog post</a>。需要注意的是，`yarn.resourcemanager.am.max-attempts`是应用程序重新启动的上限。因此，在Flink中设置的应用尝试次数不能超过启动YARN的YARN集群设置。
 
 #### Container Shutdown Behaviour
 
@@ -185,7 +184,7 @@ This means that the application can be restarted 9 times for failed attempts bef
 
 <p style="border-radius: 5px; padding: 5px" class="bg-danger"><b>Note</b>: Hadoop YARN 2.4.0 has a major bug (fixed in 2.5.0) preventing container restarts from a restarted Application Master/Job Manager container. See <a href="https://issues.apache.org/jira/browse/FLINK-4142">FLINK-4142</a> for details. We recommend using at least Hadoop 2.5.0 for high availability setups on YARN.</p>
 
-#### Example: Highly Available YARN Session
+#### 示例: Highly Available YARN Session
 
 1. **Configure HA mode and ZooKeeper quorum** in `conf/flink-conf.yaml`:
 
