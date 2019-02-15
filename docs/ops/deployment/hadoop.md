@@ -26,24 +26,17 @@ under the License.
 * This will be replaced by the TOC
 {:toc}
 
-## Configuring Flink with Hadoop Classpaths
+## 使用Hadoop类路径配置Flink
 
-Flink will use the environment variable `HADOOP_CLASSPATH` to augment the
-classpath that is used when starting Flink components such as the Client,
-JobManager, or TaskManager. Most Hadoop distributions and cloud environments
-will not set this variable by default so if the Hadoop classpath should be
-picked up by Flink the environment variable must be exported on all machines
-that are running Flink components.
+Flink将使用环境变量`HADOOP_CLASSPATH`来增加启动Flink组件（如Client，JobManager或TaskManager）时使用的类路径。 默认情况下，大多数Hadoop发行版和云环境都不会设置此变量，因此如果Flink选择Hadoop类路径，则必须在运行Flink组件的所有计算机上导出环境变量。
 
-When running on YARN, this is usually not a problem because the components
-running inside YARN will be started with the Hadoop classpaths, but it can
-happen that the Hadoop dependencies must be in the classpath when submitting a
-job to YARN. For this, it's usually enough to do a
+在YARN上运行时，这通常不是问题，因为在YARN中运行的组件将使用Hadoop类路径启动，但是在向YARN提交作业时，Hadoop依赖项必须位于类路径中。
 
+对于这个，通常在shell中做如下操作就够了
 {% highlight bash %}
 export HADOOP_CLASSPATH=`hadoop classpath`
 {% endhighlight %}
 
-in the shell. Note that `hadoop` is the hadoop binary and that `classpath` is an argument that will make it print the configured Hadoop classpath.
+请注意，`hadoop`是hadoop二进制文件，`classpath`是一个参数，它将打印已配置的Hadoop类路径。
 
 {% top %}
