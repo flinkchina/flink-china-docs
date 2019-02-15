@@ -178,15 +178,18 @@ Stopping zookeeper daemon (pid: 7101) on host localhost.</pre>
 
 #### Container Shutdown Behaviour
 
-- **YARN 2.3.0 < version < 2.4.0**. All containers are restarted if the application master fails.
-- **YARN 2.4.0 < version < 2.6.0**. TaskManager containers are kept alive across application master failures. This has the advantage that the startup time is faster and that the user does not have to wait for obtaining the container resources again.
-- **YARN 2.6.0 <= version**: Sets the attempt failure validity interval to the Flinks' Akka timeout value. The attempt failure validity interval says that an application is only killed after the system has seen the maximum number of application attempts during one interval. This avoids that a long lasting job will deplete it's application attempts.
+- **YARN 2.3.0 < version < 2.4.0**. 如果application master失败，则重新启动所有容器。
+- **YARN 2.4.0 < version < 2.6.0**. TaskManager容器在application master失败时保持活动状态。这样做的优点是启动时间更快，而且用户不必等待再次获得容器资源。
+- **YARN 2.6.0 <= version**: 将尝试失败有效性间隔设置为Flink的Akka超时值。 尝试失败有效性间隔表示仅在系统在一个间隔期间看到最大应用程序尝试次数后才会终止应用程序。 这避免了持久的工作会耗尽它的应用程序尝试。
 
-<p style="border-radius: 5px; padding: 5px" class="bg-danger"><b>Note</b>: Hadoop YARN 2.4.0 has a major bug (fixed in 2.5.0) preventing container restarts from a restarted Application Master/Job Manager container. See <a href="https://issues.apache.org/jira/browse/FLINK-4142">FLINK-4142</a> for details. We recommend using at least Hadoop 2.5.0 for high availability setups on YARN.</p>
 
-#### 示例: Highly Available YARN Session
 
-1. **Configure HA mode and ZooKeeper quorum** in `conf/flink-conf.yaml`:
+<p style="border-radius: 5px; padding: 5px" class="bg-danger"><b>注意</b>: Hadoop YARN 2.4.0 有一个重大的bug (2.5.0修复了)，它阻止容器从重新启动的Application Master/Job Manager容器重新启动
+. 查看 <a href="https://issues.apache.org/jira/browse/FLINK-4142">FLINK-4142</a> 获取更多细节.我们建议Flink on YARN至少使用Hadoop 2.5.0进行高可用性设置。</p>
+
+#### 示例: 高可用YARN Session
+
+1. **配置HA模式与ZooKeeper quorum** 在`conf/flink-conf.yaml`中:
 
    <pre>
 high-availability: zookeeper
@@ -195,24 +198,24 @@ high-availability.storageDir: hdfs:///flink/recovery
 high-availability.zookeeper.path.root: /flink
 yarn.application-attempts: 10</pre>
 
-3. **Configure ZooKeeper server** in `conf/zoo.cfg` (currently it's only possible to run a single ZooKeeper server per machine):
+3. **配置ZooKeeper server** 在`conf/zoo.cfg`中 (目前，每台机器只能运行一个ZooKeeper服务器):
 
    <pre>server.0=localhost:2888:3888</pre>
 
-4. **Start ZooKeeper quorum**:
+4. **启动 ZooKeeper quorum**:
 
    <pre>
 $ bin/start-zookeeper-quorum.sh
 Starting zookeeper daemon on host localhost.</pre>
 
-5. **Start an HA-cluster**:
+5. **启动HA-cluster集群**:
 
    <pre>
 $ bin/yarn-session.sh -n 2</pre>
 
-## Configuring for Zookeeper Security
+## 配置Zookeeper安全性
 
-If ZooKeeper is running in secure mode with Kerberos, you can override the following configurations in `flink-conf.yaml` as necessary:
+如果ZooKeeper使用Kerberos以安全模式运行，则可以根据需要覆盖`flink-conf.yaml`中的以下配置
 
 <pre>
 zookeeper.sasl.service-name: zookeeper     # default is "zookeeper". If the ZooKeeper quorum is configured
@@ -221,14 +224,14 @@ zookeeper.sasl.login-context-name: Client  # default is "Client". The value need
                                            # configured in "security.kerberos.login.contexts".
 </pre>
 
-For more information on Flink configuration for Kerberos security, please see [here]({{ site.baseurl}}/ops/config.html).
-You can also find [here]({{ site.baseurl}}/ops/security-kerberos.html) further details on how Flink internally setups Kerberos-based security.
+有关Kerberos安全性的Flink配置的更多信息，请参阅[here]({{ site.baseurl}}/ops/config.html)。
+您还可以在[here]({{ site.baseurl}}/ops/security-kerberos.html)中找到有关Flink内部如何设置基于Kerberos的安全性的更多详细信息。
 
 ## Bootstrap ZooKeeper
 
-If you don't have a running ZooKeeper installation, you can use the helper scripts, which ship with Flink.
+如果您没有正在运行的ZooKeeper安装，则可以使用Flink附带的帮助程序脚本。
 
-There is a ZooKeeper configuration template in `conf/zoo.cfg`. You can configure the hosts to run ZooKeeper on with the `server.X` entries, where X is a unique ID of each server:
+在flink的目录`conf/zoo.cfg`中有一个ZooKeeper配置模板。 您可以使用`server.X`条目配置主机以运行ZooKeeper，其中X是每个服务器的唯一ID：
 
 <pre>
 server.X=addressX:peerPort:leaderPort
@@ -236,6 +239,6 @@ server.X=addressX:peerPort:leaderPort
 server.Y=addressY:peerPort:leaderPort
 </pre>
 
-The script `bin/start-zookeeper-quorum.sh` will start a ZooKeeper server on each of the configured hosts. The started processes start ZooKeeper servers via a Flink wrapper, which reads the configuration from `conf/zoo.cfg` and makes sure to set some required configuration values for convenience. In production setups, it is recommended to manage your own ZooKeeper installation.
+脚本`bin/start-zookeeper-quorum.sh`将在每个配置的主机上启动ZooKeeper服务器。 启动的进程通过Flink包装器启动ZooKeeper服务器，该包装器从`conf/zoo.cfg`读取配置，并确保为方便起见设置一些必需的配置值。 在生产设置中，建议您管理自己的ZooKeeper安装。
 
 {% top %}
