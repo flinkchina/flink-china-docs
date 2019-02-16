@@ -27,13 +27,7 @@ under the License.
 
 ## 什么是保存点?保存点与检查点有什么不同?
 
-A Savepoint is a consistent image of the execution state of a streaming job, created via Flink's [checkpointing mechanism]({{ site.baseurl }}/internals/stream_checkpointing.html). You can use Savepoints to stop-and-resume, fork,
-or update your Flink jobs. Savepoints consist of two parts: a directory with (typically large) binary files on stable storage (e.g. HDFS, S3, ...) and a (relatively small) meta data file. The files on stable storage represent the net data of the job's execution state
-image. The meta data file of a Savepoint contains (primarily) pointers to all files on stable storage that are part of the Savepoint, in form of absolute paths.
-
 保存点是通过Flink的[检查点机制checkpointing mechanism]({{ site.baseurl }}/internals/stream_checkpointing.html)创建的流式作业执行状态的一致映像。您可以使用保存点来停止和恢复、分叉或更新Flink作业。保存点由两部分组成：具有稳定存储（例如HDFS，S3，...）上的（通常是大的）二进制文件的目录和（相对较小的）元数据文件。稳定存储上的文件表示作业执行状态映像的网络数据。保存点的元数据文件包含（主要）指向稳定存储中作为保存点一部分的所有文件的指针（以绝对路径的形式）。
-
-
 
 <div class="alert alert-warning">
 <strong>注意:</strong> 为了允许程序和Flink版本之间的升级，请务必查看以下有关
@@ -132,115 +126,117 @@ Note that if you use the `MemoryStateBackend`, metadata *and* savepoint state wi
   <strong>注意:</strong> 不鼓励移动或删除正在运行的作业的最后一个保存点，因为这可能会干扰故障恢复。 保存点对exactly-once的接收器有副作用，因此为了exactly-once语义，如果在最后一个保存点之后没有检查点，则保存点将用于恢复。
 </div>
 
-#### Trigger a Savepoint
+#### 触发保存点
 
 {% highlight shell %}
 $ bin/flink savepoint :jobId [:targetDirectory]
 {% endhighlight %}
+这将触发ID为 `:jobId`的作业的保存点，并返回创建的保存点的路径。您需要此路径来还原和释放保存点。
 
-This will trigger a savepoint for the job with ID `:jobId`, and returns the path of the created savepoint. You need this path to restore and dispose savepoints.
-
-#### Trigger a Savepoint with YARN
+#### Trigger a Savepoint with YARN 在YARN上触发保存点
 
 {% highlight shell %}
 $ bin/flink savepoint :jobId [:targetDirectory] -yid :yarnAppId
 {% endhighlight %}
 
-This will trigger a savepoint for the job with ID `:jobId` and YARN application ID `:yarnAppId`, and returns the path of the created savepoint.
+这将触发ID为`：jobId`和YARN应用程序ID：yarnAppId`的作业的保存点，并返回创建的保存点的路径。
 
-#### Cancel Job with Savepoint
+#### 取消Job作业时触发保存点
+
 
 {% highlight shell %}
 $ bin/flink cancel -s [:targetDirectory] :jobId
 {% endhighlight %}
 
-This will atomically trigger a savepoint for the job with ID `:jobid` and cancel the job. Furthermore, you can specify a target file system directory to store the savepoint in.  The directory needs to be accessible by the JobManager(s) and TaskManager(s).
+这将自动触发ID为`：jobid`的Job作业的保存点并取消作业。 此外，您可以指定目标文件系统目录以存储保存点。该目录需要可由JobManager和TaskManager访问。
 
-### Resuming from Savepoints
+### 从保存点恢复
 
 {% highlight shell %}
 $ bin/flink run -s :savepointPath [:runArgs]
 {% endhighlight %}
 
-This submits a job and specifies a savepoint to resume from. You may give a path to either the savepoint's directory or the `_metadata` file.
+这将提交Job作业并指定要从中恢复的保存点savepoint。 您可以为保存点的目录或`_metadata`文件提供路径。
 
-#### Allowing Non-Restored State
+#### 允许Non-Restored(非还原的)状态
 
-By default the resume operation will try to map all state of the savepoint back to the program you are restoring with. If you dropped an operator, you can allow to skip state that cannot be mapped to the new program via `--allowNonRestoredState` (short: `-n`) option:
+
+默认情况下，resume操作将尝试将保存点的所有状态映射回您要还原的程序。 如果删除了operator运算符，则可以通过`--allowNonRestoredState`（short：`-n`）选项跳过无法映射到新程序的状态：
 
 {% highlight shell %}
 $ bin/flink run -s :savepointPath -n [:runArgs]
 {% endhighlight %}
 
-### Disposing Savepoints
+### 释放保存点
 
 {% highlight shell %}
 $ bin/flink savepoint -d :savepointPath
 {% endhighlight %}
 
-This disposes the savepoint stored in `:savepointPath`.
+这将释放存储在`:savepointPath`中的保存点。
 
-Note that it is possible to also manually delete a savepoint via regular file system operations without affecting other savepoints or checkpoints (recall that each savepoint is self-contained). Up to Flink 1.2, this was a more tedious task which was performed with the savepoint command above.
+请注意，也可以通过常规文件系统操作手动删除保存点，而不影响其他保存点或检查点（请回想一下，每个保存点都是独立的）。
+在Flink 1.2之前，使用上面的savepoint命令执行这个任务比较繁琐乏味。
 
-### Configuration
+### 配置
 
 You can configure a default savepoint target directory via the `state.savepoints.dir` key. When triggering savepoints, this directory will be used to store the savepoint. You can overwrite the default by specifying a custom target directory with the trigger commands (see the [`:targetDirectory` argument](#trigger-a-savepoint)).
 
+您可以通过键`state.savepoints.dir`配置默认保存点目标目录。 触发保存点时，此目录将用于存储保存点。 您可以通过使用trigger命令指定自定义目标目录来覆盖默认目录值（请参阅[`:targetDirectory` argument](#trigger-a-savepoint)）。
+
 {% highlight yaml %}
-# Default savepoint target directory
+
+# 默认保存点目标目录
+
 state.savepoints.dir: hdfs:///flink/savepoints
 {% endhighlight %}
 
-If you neither configure a default nor specify a custom target directory, triggering the savepoint will fail.
+如果既未配置缺省值也未指定自定义目标目录，则触发保存点将失败。
 
 <div class="alert alert-warning">
-<strong>Attention:</strong> The target directory has to be a location accessible by both the JobManager(s) and TaskManager(s) e.g. a location on a distributed file-system.
+<strong>注意:</strong> 目标目录必须是JobManager和TaskManager可访问的位置，例如， 分布式文件系统上的位置。
 </div>
 
-## F.A.Q
+## F.A.Q 常见问题解答
 
-### Should I assign IDs to all operators in my job?
+### 我应该为我Job中的所有operator分配ID ?
 
-As a rule of thumb, yes. Strictly speaking, it is sufficient to only assign IDs via the `uid` method to the stateful operators in your job. The savepoint only contains state for these operators and stateless operator are not part of the savepoint.
+根据经验，是的。 严格来说，仅通过`uid`方法将ID分配给Job作业中的有状态operator运算符就足够了。 保存点仅包含这些运算符的状态，无状态运算符不是保存点的一部分(即不属于保存点)。
 
-In practice, it is recommended to assign it to all operators, because some of Flink's built-in operators like the Window operator are also stateful and it is not obvious which built-in operators are actually stateful and which are not. If you are absolutely certain that an operator is stateless, you can skip the `uid` method.
+在实践中，建议将其分配给所有运算符，因为Flink的一些内置运算符（如Window运算符）也是有状态的，并且不清楚哪些内置运算符实际上是有状态的，哪些不是有状态的。 如果您完全确定某个运算符是无状态的，则可以跳过`uid`方法。
 
-### What happens if I add a new operator that requires state to my job?
+### 如果我在job中添加一个需要状态的新operator运算符，会发生什么情况？
 
-When you add a new operator to your job it will be initialized without any state. Savepoints contain the state of each stateful operator. Stateless operators are simply not part of the savepoint. The new operator behaves similar to a stateless operator.
+当您向Job作业添加operator新操作符时，它将在没有任何状态的情况下进行初始化。保存点包含每个有状态运算符的状态。 无状态运算符根本不是保存点的一部分。 新运算符的行为类似于无状态运算符。
 
-### What happens if I delete an operator that has state from my job?
+### 如果我删除一个有我Job状态的operator运算符会怎么样？
 
-By default, a savepoint restore will try to match all state back to the restored job. If you restore from a savepoint that contains state for an operator that has been deleted, this will therefore fail. 
+默认情况下，保存点还原将尝试将所有状态匹配回还原的作业。如果从包含已删除操作员状态的保存点还原，则此操作将失败。
 
-You can allow non restored state by setting the `--allowNonRestoredState` (short: `-n`) with the run command:
+通过使用run命令设置`--allowNonRestoredState` (short: `-n`)，可以允许非还原状态：
 
 {% highlight shell %}
 $ bin/flink run -s :savepointPath -n [:runArgs]
 {% endhighlight %}
 
-### What happens if I reorder stateful operators in my job?
+### 如果我在Job作业中重新排序有状态operators运算符，会发生什么
 
-If you assigned IDs to these operators, they will be restored as usual.
+如果您为这些运算符分配了ID，它们将照常恢复。
+如果您未分配ID，则重新排序后，有状态运算符的自动生成ID很可能会更改。 这将导致您无法从以前的保存点恢复。
 
-If you did not assign IDs, the auto generated IDs of the stateful operators will most likely change after the reordering. This would result in you not being able to restore from a previous savepoint.
+### 如果添加、删除或重新排序Job作业中没有状态的运算符，会发生什么情况？
 
-### What happens if I add or delete or reorder operators that have no state in my job?
+如果为有状态运算符分配了ID，则无状态运算符不会影响保存点还原。
+如果您未分配ID，则重新排序后，有状态运算符的自动生成ID很可能会更改。 这将导致您无法从以前的保存点恢复。
 
-If you assigned IDs to your stateful operators, the stateless operators will not influence the savepoint restore.
+### 当Job恢复还原时我更改程序的并行性时会发生什么？
 
-If you did not assign IDs, the auto generated IDs of the stateful operators will most likely change after the reordering. This would result in you not being able to restore from a previous savepoint.
+如果保存点是用flink>=1.2.0触发的，并且没有使用不推荐使用的状态(弃用的)API（如`checkpointed`），则只需从保存点还原程序并指定新的并行度即可。
 
-### What happens when I change the parallelism of my program when restoring?
+如果要从Flink<1.2.0触发的保存点恢复，或者使用现在已弃用的API，则必须首先将作业和保存点迁移到Flink>=1.2.0，然后才能更改并行度。请参阅[升级作业和Flink版本指南]({{ site.baseurl }}/ops/upgrading.html)。
 
-If the savepoint was triggered with Flink >= 1.2.0 and using no deprecated state API like `Checkpointed`, you can simply restore the program from a savepoint and specify a new parallelism.
+### 我可以在稳定存储上移动保存点文件吗？
 
-If you are resuming from a savepoint triggered with Flink < 1.2.0 or using now deprecated APIs you first have to migrate your job and savepoint to Flink >= 1.2.0 before being able to change the parallelism. See the [upgrading jobs and Flink versions guide]({{ site.baseurl }}/ops/upgrading.html).
-
-### Can I move the Savepoint files on stable storage?
-
-The quick answer to this question is currently "no" because the meta data file references the files on stable storage as absolute paths for technical reasons. The longer answer is: if you MUST move the files for some reason there are two
-potential approaches as workaround. First, simpler but potentially more dangerous, you can use an editor to find the old path in the meta data file and replace them with the new path. Second, you can use the class
-SavepointV2Serializer as starting point to programmatically read, manipulate, and rewrite the meta data file with the new paths.
+这个问题的快速答案目前是"否"，因为元数据文件由于技术原因将稳定存储上的文件作为绝对路径引用。 更长的答案是：如果由于某种原因必须移动文件，有两种可能的方法作为解决方法。 首先，更简单但可能更危险，您可以使用编辑器在元数据文件中查找旧路径并将其替换为新路径。 其次，您可以使用SavepointV2Serializer类作为起始点，以编程方式使用新路径读取，操作和重写元数据文件。
 
 {% top %}
