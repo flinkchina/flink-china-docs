@@ -1,5 +1,5 @@
 ---
-title: "Tuning Checkpoints and Large State"
+title: "调优检查点和大状态"
 nav-parent_id: ops_state
 nav-pos: 12
 ---
@@ -22,111 +22,85 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-This page gives a guide how to configure and tune applications that use large state.
+该页面提供了如何配置和优化使用大状态的应用程序的指南。
 
 * ToC
 {:toc}
 
-## Overview
+## 概览
 
-For Flink applications to run reliably at large scale, two conditions must be fulfilled:
+要使Flink应用程序在大规模可靠地运行，必须满足两个条件:
+ - 应用程序需要能够可靠地获取检查点
+ - 在发生故障后，资源需要足以赶上输入数据流
 
-  - The application needs to be able to take checkpoints reliably
+第一部分讨论如何在规模上获得性能良好的检查点。
+最后一节解释了一些关于规划使用多少资源的最佳实践
 
-  - The resources need to be sufficient catch up with the input data streams after a failure
+## 监控状态和检查点
 
-The first sections discuss how to get well performing checkpoints at scale.
-The last section explains some best practices concerning planning how many resources to use.
-
-
-## Monitoring State and Checkpoints
-
-The easiest way to monitor checkpoint behavior is via the UI's checkpoint section. The documentation
-for [checkpoint monitoring](../../monitoring/checkpoint_monitoring.html) shows how to access the available checkpoint
-metrics.
+监视检查点行为的最简单方法是通过UI的检查点部分。 [checkpoint monitoring](../../monitoring/checkpoint_monitoring.html)的文档显示了如何访问可用的检查点指标。
 
 The two numbers that are of particular interest when scaling up checkpoints are:
 
-  - The time until operators start their checkpoint: This time is currently not exposed directly, but corresponds
-    to:
-    
-    `checkpoint_start_delay = end_to_end_duration - synchronous_duration - asynchronous_duration`
+在扩大检查点时，特别值得注意的两个数字是:
 
-    When the time to trigger the checkpoint is constantly very high, it means that the *checkpoint barriers* need a long
-    time to travel from the source to the operators. That typically indicates that the system is operating under a
-    constant backpressure.
 
-  - The amount of data buffered during alignments. For exactly-once semantics, Flink *aligns* the streams at
+  - Operator运算符启动检查点之前的时间：此时间目前尚未直接暴露，但对应于：
+  `checkpoint_start_delay = end_to_end_duration - synchronous_duration - asynchronous_duration`当触发检查点的时间持续很长时，这意味着*检查点障碍 checkpoint barriers* 需要很长一段时间从source到operator运算符。这通常表明系统在恒定的背压(反压力)下运行。
+
+ 
+  - (这里先保留)The amount of data buffered during alignments. For exactly-once semantics, Flink *aligns* the streams at
     operators that receive multiple input streams, buffering some data for that alignment.
     The buffered data volume is ideally low - higher amounts means that checkpoint barriers are received at
     very different times from the different input streams.
 
-Note that when the here indicated numbers can be occasionally high in the presence of transient backpressure, data skew,
-or network issues. However, if the numbers are constantly very high, it means that Flink puts many resources into checkpointing.
+在对齐期间缓冲的数据量。对于exactly-once的语义，Flink *在接收多个输入流的运算符处*对齐*流，为该对齐缓冲一些数据。缓冲的数据量理想情况下是低的—高的数量意味着检查点屏障在非常不同的时间从不同的输入流接收。
+
+请注意，当存在瞬态背压，数据倾斜或网络问题时，此处指示的数字偶尔会很高。 但是，如果数字一直很高，则意味着Flink将许多资源投入到检查点中。
+
+## 调优检查点
+
+检查点按应用程序可以的配置定期触发。 检查点的完成时间超过检查点间隔时，在进行中的检查点完成之前不会触发下一个检查点。 默认情况下，一旦正在进行的检查点完成，将立即触发下一个检查点(译者注:即下一个检查点将在当前检查点完成后立即触发)。
+
+当检查点经常花费比基本间隔更长的时间时（例如，由于状态增长大于计划的，或者存储检查点的存储暂时变慢），系统会不断地使用检查点（一旦完成，就会立即启动新的检查点）。这可能意味着太多的资源总是被检查点占用，Operator运算符处理进展太少。此行为对使用异步检查点状态的流式应用程序的影响较小，但仍可能对整个应用程序性能产生影响。
+
+为了防止这种情况，应用程序可以在检查点之间定义*检查点最小持续时间*：`StreamExecutionEnvironment.getCheckpointConfig().setMinPauseBetweenCheckpoints(milliseconds)`。 此持续时间是在最新检查点结束和下一个检查点开始之间必须经过的最小时间间隔。 下图说明了这是如何影响检查点的。
+
+<img src="../../fig/checkpoint_tuning.svg" class="center" width="80%" alt="说明检查点之间的最小时间参数如何影响检查点行为."/>
+
+*注意:* 可以配置应用程序（通过`CheckpointConfig`）以允许多个检查点同时进行。 对于Flink中具有大状态的应用程序，这通常会将太多资源绑定到检查点。
+当手动触发保存点时，它可能正在与正在进行的检查点同时进行。
+
+## 调优网络Buffer缓冲区
+
+在Flink 1.3之前，网络缓冲区的增加也导致了检查点时间的增加，因为保留更多的动态数据意味着检查点屏障被延迟。在Flink 1.3开始，每个传出/传入通道使用的网络缓冲区数量是有限的，因此可以在不影响检查点时间的情况下配置网络缓冲区（请参阅[网络缓冲区配置](../config.html#configuring-the-network-buffers)）。
 
 
-## Tuning Checkpointing
+## 尽可能使状态检查点异步化
 
-Checkpoints are triggered at regular intervals that applications can configure. When a checkpoint takes longer
-to complete than the checkpoint interval, the next checkpoint is not triggered before the in-progress checkpoint
-completes. By default the next checkpoint will then be triggered immediately once the ongoing checkpoint completes.
+当状态为*异步*快照时，检查点的伸缩性比状态为*同步*快照时要好。
+尤其是在具有多个连接、协同功能或窗口的更复杂的流式应用程序中，这可能会产生深远的影响
 
-When checkpoints end up frequently taking longer than the base interval (for example because state
-grew larger than planned, or the storage where checkpoints are stored is temporarily slow),
-the system is constantly taking checkpoints (new ones are started immediately once ongoing once finish).
-That can mean that too many resources are constantly tied up in checkpointing and that the operators make too
-little progress. This behavior has less impact on streaming applications that use asynchronously checkpointed state,
-but may still have an impact on overall application performance.
+要异步创建状态，应用程序必须做两件事：
 
-To prevent such a situation, applications can define a *minimum duration between checkpoints*:
-
-`StreamExecutionEnvironment.getCheckpointConfig().setMinPauseBetweenCheckpoints(milliseconds)`
-
-This duration is the minimum time interval that must pass between the end of the latest checkpoint and the beginning
-of the next. The figure below illustrates how this impacts checkpointing.
-
-<img src="../../fig/checkpoint_tuning.svg" class="center" width="80%" alt="Illustration how the minimum-time-between-checkpoints parameter affects checkpointing behavior."/>
-
-*Note:* Applications can be configured (via the `CheckpointConfig`) to allow multiple checkpoints to be in progress at
-the same time. For applications with large state in Flink, this often ties up too many resources into the checkpointing.
-When a savepoint is manually triggered, it may be in process concurrently with an ongoing checkpoint.
+  1. 使用[由Flink管理]的状态(../../dev/stream/state/state.html)：
+  托管状态表示Flink提供存储state状态的数据结构。目前，这对于*keyed state 键控状态*来说是如此的，它是在`ValueState`，`ListState`，`ReducingState`等接口后面抽象出来的......
 
 
-## Tuning Network Buffers
+  2. 使用支持异步快照的状态后端。 在Flink1.2中，只有RocksDB状态后端使用完全异步快照。从Flink1.3开始，基于堆的状态后端也支持异步快照。
 
-Before Flink 1.3, an increased number of network buffers also caused increased checkpointing times since
-keeping more in-flight data meant that checkpoint barriers got delayed. Since Flink 1.3, the
-number of network buffers used per outgoing/incoming channel is limited and thus network buffers
-may be configured without affecting checkpoint times
-(see [network buffer configuration](../config.html#configuring-the-network-buffers)).
 
-## Make state checkpointing Asynchronous where possible
+上述两点表明，大状态一般应保持为键控keyed state状态，而不是operator state状态。
 
-When state is *asynchronously* snapshotted, the checkpoints scale better than when the state is *synchronously* snapshotted.
-Especially in more complex streaming applications with multiple joins, Co-functions, or windows, this may have a profound
-impact.
 
-To get state to be snapshotted asynchronously, applications have to do two things:
+## 调优RocksDB
 
-  1. Use state that is [managed by Flink](../../dev/stream/state/state.html): Managed state means that Flink provides the data
-     structure in which the state is stored. Currently, this is true for *keyed state*, which is abstracted behind the
-     interfaces like `ValueState`, `ListState`, `ReducingState`, ...
+许多大型Flink流应用程序的状态存储工作负载(存储主力)是*RocksDB状态后端*。
+后端的规模远远超出了主内存，并可靠地存储大型 [keyed state](../../dev/stream/state/state.html)。
 
-  2. Use a state backend that supports asynchronous snapshots. In Flink 1.2, only the RocksDB state backend uses
-     fully asynchronous snapshots. Starting from Flink 1.3, heap-based state backends also support asynchronous snapshots.
+不幸的是，RocksDB的性能可能随配置的不同而变化，而且关于如何正确调优rocksdb的文档很少。 例如，默认配置是针对SSD定制的，并且在旋转磁盘上执行不理想。
 
-The above two points imply that large state should generally be kept as keyed state, not as operator state.
-
-## Tuning RocksDB
-
-The state storage workhorse of many large scale Flink streaming applications is the *RocksDB State Backend*.
-The backend scales well beyond main memory and reliably stores large [keyed state](../../dev/stream/state/state.html).
-
-Unfortunately, RocksDB's performance can vary with configuration, and there is little documentation on how to tune
-RocksDB properly. For example, the default configuration is tailored towards SSDs and performs suboptimal
-on spinning disks.
-
-**Incremental Checkpoints**
+**增量检查点**
 
 Incremental checkpoints can dramatically reduce the checkpointing time in comparison to full checkpoints, at the cost of a (potentially) longer
 recovery time. The core idea is that incremental checkpoints only record all changes to the previous completed checkpoint, instead of
