@@ -36,12 +36,10 @@ under the License.
 
 ## 保留的检查点
 
-
 默认情况下，检查点不会保留，仅用于从失败中恢复job。 取消程序时会删除它们。
 但是，您可以配置要保留的定期检查点。
 根据配置，当job失败或取消时，*保留*检查点*不会*被自动清除。
 这样，如果你的job失败，你将有一个检查点来恢复。
-
 
 {% highlight java %}
 CheckpointConfig config = env.getCheckpointConfig();

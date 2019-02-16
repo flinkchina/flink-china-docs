@@ -1,5 +1,5 @@
 ---
-title: "Savepoints"
+title: "Savepoints 保存点"
 nav-parent_id: ops_state
 nav-pos: 8
 ---
@@ -25,32 +25,31 @@ under the License.
 * toc
 {:toc}
 
-## What is a Savepoint? How is a Savepoint different from a Checkpoint?
+## 什么是保存点?保存点与检查点有什么不同?
 
 A Savepoint is a consistent image of the execution state of a streaming job, created via Flink's [checkpointing mechanism]({{ site.baseurl }}/internals/stream_checkpointing.html). You can use Savepoints to stop-and-resume, fork,
 or update your Flink jobs. Savepoints consist of two parts: a directory with (typically large) binary files on stable storage (e.g. HDFS, S3, ...) and a (relatively small) meta data file. The files on stable storage represent the net data of the job's execution state
 image. The meta data file of a Savepoint contains (primarily) pointers to all files on stable storage that are part of the Savepoint, in form of absolute paths.
 
+保存点是通过Flink的[检查点机制checkpointing mechanism]({{ site.baseurl }}/internals/stream_checkpointing.html)创建的流式作业执行状态的一致映像。您可以使用保存点来停止和恢复、分叉或更新Flink作业。保存点由两部分组成：具有稳定存储（例如HDFS，S3，...）上的（通常是大的）二进制文件的目录和（相对较小的）元数据文件。稳定存储上的文件表示作业执行状态映像的网络数据。保存点的元数据文件包含（主要）指向稳定存储中作为保存点一部分的所有文件的指针（以绝对路径的形式）。
+
+
+
 <div class="alert alert-warning">
-<strong>Attention:</strong> In order to allow upgrades between programs and Flink versions, it is important to check out the following section about <a href="#assigning-operator-ids">assigning IDs to your operators</a>.
+<strong>注意:</strong> 为了允许程序和Flink版本之间的升级，请务必查看以下有关
+ <a href="#assigning-operator-ids">为operators分配ID</a>的部分.
 </div>
 
-Conceptually, Flink's Savepoints are different from Checkpoints in a similar way that backups are different from recovery logs in traditional database systems. The primary purpose of Checkpoints is to provide a recovery mechanism in case of
-unexpected job failures. A Checkpoint's lifecycle is managed by Flink, i.e. a Checkpoint is created, owned, and released by Flink - without user interaction. As a method of recovery and being periodically triggered, two main
-design goals for the Checkpoint implementation are i) being as lightweight to create and ii) being as fast to restore from as possible. Optimizations towards those goals can exploit certain properties, e.g. that the job code
-doesn't change between the execution attempts. Checkpoints are usually dropped after the job was terminated by the user (except if explicitly configured as retained Checkpoints).
+从概念上讲，Flink的Savepoints与Checkpoints的不同之处在于备份与传统数据库系统中的恢复日志不同。 检查点的主要目的是在意外的作业失败时提供恢复机制。 Checkpoint的生命周期由Flink管理，即Flink创建，拥有和发布Checkpoint  - 无需用户交互。 作为一种恢复和定期触发的方法，Checkpoint实现的两个主要设计目标是：i）创建轻量级，ii）尽可能快地恢复。 针对这些目标的优化可以利用某些属性，例如， 作业代码在执行尝试之间不会改变。 
+检查点通常在用户终止作业后删除（除非显式配置为保留的检查点
 
-In contrast to all this, Savepoints are created, owned, and deleted by the user. Their use-case is for planned, manual backup and resume. For example, this could be an update of your Flink version, changing your job graph,
-changing parallelism, forking a second job like for a red/blue deployment, and so on. Of course, Savepoints must survive job termination. Conceptually, Savepoints can be a bit more expensive to produce and restore and focus
-more on portability and support for the previously mentioned changes to the job.
+相比之下，保存点是由用户创建、拥有和删除的。他们的用例用于计划的、手动的备份和恢复。例如，这可能是对Flink版本的更新、更改作业图、更改并行性、分叉做(fork)第二个作业（如红蓝部署）等等。当然，保存点必须在job终止后继续存在。从概念上讲，保存点产生和恢复的成本可能会更高一些，并且更关注可移植性和对先前提到的job作业更改的支持。
 
-Those conceptual differences aside, the current implementations of Checkpoints and Savepoints are basically using the same code and produce the same „format". However, there is currently one exception from this, and we might
-introduce more differences in the future. The exception are incremental checkpoints with the RocksDB state backend. They are using some RocksDB internal format instead of Flink’s native savepoint format. This makes them the
-first instance of a more lightweight checkpointing mechanism, compared to Savepoints.
+抛开那些概念上的差异，检查点和保存点的当前实现基本上使用相同的代码并产生相同的“格式”。然而，目前有一个例外，我们可能会在未来引入更多的差异。 例外情况是使用RocksDB状态后端的增量检查点。他们使用一些RocksDB内部格式而不是Flink的原生保存点格式。这使得它们成为与Savepoints相比更轻量级检查点机制的第一个实例。
 
-## Assigning Operator IDs
+## Assigning Operator IDs 分配Operator ID
 
-It is **highly recommended** that you adjust your programs as described in this section in order to be able to upgrade your programs in the future. The main required change is to manually specify operator IDs via the **`uid(String)`** method. These IDs are used to scope the state of each operator.
+**强烈建议**按照本节所述调整程序，以便将来能够升级程序。所需的主要更改是通过**`uid（string）`**方法手动指定operator ID。这些ID用于确定每个operator的状态。
 
 {% highlight java %}
 DataStream<String> stream = env.
@@ -65,11 +64,13 @@ DataStream<String> stream = env.
   .print(); // Auto-generated ID
 {% endhighlight %}
 
-If you don't specify the IDs manually they will be generated automatically. You can automatically restore from the savepoint as long as these IDs do not change. The generated IDs depend on the structure of your program and are sensitive to program changes. Therefore, it is highly recommended to assign these IDs manually.
+如果不手动指定ID，它们将自动生成。只要这些ID不变，您就可以从保存点自动恢复。生成的ID取决于程序的结构，并且对程序更改很敏感。因此，强烈建议手动分配这些ID。
 
-### Savepoint State
+### Savepoint State 保存点状态
 
 You can think of a savepoint as holding a map of `Operator ID -> State` for each stateful operator:
+
+您可以将保存点视为保存每个有状态运算符的`Operator ID -> State`映射：
 
 {% highlight plain %}
 Operator ID | State
@@ -78,23 +79,24 @@ source-id   | State of StatefulSource
 mapper-id   | State of StatefulMapper
 {% endhighlight %}
 
-In the above example, the print sink is stateless and hence not part of the savepoint state. By default, we try to map each entry of the savepoint back to the new program.
+在上面的例子中，打印接收器( print sink)是无状态的，因此不是保存点状态的一部分。 默认情况下，我们尝试将保存点的每个条目映射回新程序。
 
-## Operations
+## Operations 操作
 
-You can use the [command line client]({{ site.baseurl }}/ops/cli.html#savepoints) to *trigger savepoints*, *cancel a job with a savepoint*, *resume from savepoints*, and *dispose savepoints*.
+您可以使用[命令行客户端]({{ site.baseurl }}/ops/cli.html#savepoints)来*触发保存点trigger savepoints*，*取消具有保存点的job作业*，*从保存点恢复*，以及*释放保存点*。
 
-With Flink >= 1.2.0 it is also possible to *resume from savepoints* using the webui.
+使用Flink>=1.2.0，也可以使用WebUI*从保存点恢复*。
 
-### Triggering Savepoints
+### Triggering Savepoints 触发保存点
 
-When triggering a savepoint, a new savepoint directory is created where the data as well as the meta data will be stored. The location of this directory can be controlled by [configuring a default target directory](#configuration) or by specifying a custom target directory with the trigger commands (see the [`:targetDirectory` argument](#trigger-a-savepoint)).
+触发保存点时，会创建一个新的保存点目录，其中将存储数据和元数据。
+此目录的位置可以通过[配置默认目标目录](#configuration)或通过使用触发器命令指定自定义目标目录来控制（请参阅[`:targetDirectory` argument](#trigger-a-savepoint)）。
 
 <div class="alert alert-warning">
-<strong>Attention:</strong> The target directory has to be a location accessible by both the JobManager(s) and TaskManager(s) e.g. a location on a distributed file-system.
+<strong>注意:</strong> 目标目录必须是JobManager和TaskManager可访问的位置，例如， 分布式文件系统上的位置。
 </div>
 
-For example with a `FsStateBackend` or `RocksDBStateBackend`:
+例如`FsStateBackend` 或 `RocksDBStateBackend`
 
 {% highlight shell %}
 # Savepoint target directory
@@ -111,16 +113,23 @@ For example with a `FsStateBackend` or `RocksDBStateBackend`:
 {% endhighlight %}
 
 <div class="alert alert-info">
-  <strong>Note:</strong>
-Although it looks as if the savepoints may be moved, it is currently not possible due to absolute paths in the <code>_metadata</code> file.
-Please follow <a href="https://issues.apache.org/jira/browse/FLINK-5778">FLINK-5778</a> for progress on lifting this restriction.
+  <strong>注意:</strong>
+虽然看起来好像可以移动保存点，但由于<code>_metadata</code>文件中的绝对路径，目前无法实现。
+请按照<a href="https://issues.apache.org/jira/browse/FLINK-5778">FLINK-5778</a>了解取消此限制的进度。
+
 </div>
 
+(译者注  typo bug)
 Note that if you use the `MemoryStateBackend`, metadata *and* savepoint state will be stored in the `_metadata` file. Since it is self-contained, you may move the file and restore from any location.
 
+请注意，如果使用`MemoryStateBackend`，则元数据*和*保存点状态将存储在`_metadata`文件中。因为它是独立的(self-contained)，所以您可以移动文件并从任何位置恢复还原。
+
+
+
+请注意，如果使用`MemoryStateBackend`，则元数据*和*保存点状态将存储在`_metadata`文件中。 由于它是自包含的，您可以移动文件并从任何位置恢复。
+
 <div class="alert alert-warning">
-  <strong>Attention:</strong> It is discouraged to move or delete the last savepoint of a running job, because this might interfere with failure-recovery. Savepoints have side-effects on exactly-once sinks, therefore 
-  to ensure exactly-once semantics, if there is no checkpoint after the last savepoint, the savepoint will be used for recovery. 
+  <strong>注意:</strong> 不鼓励移动或删除正在运行的作业的最后一个保存点，因为这可能会干扰故障恢复。 保存点对exactly-once的接收器有副作用，因此为了exactly-once语义，如果在最后一个保存点之后没有检查点，则保存点将用于恢复。
 </div>
 
 #### Trigger a Savepoint
