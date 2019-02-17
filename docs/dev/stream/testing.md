@@ -1,5 +1,5 @@
 ---
-title: "Testing"
+title: "测试"
 nav-parent_id: streaming
 nav-id: testing
 nav-pos: 99
@@ -23,16 +23,18 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-This page briefly discusses how to test a Flink application in your IDE or a local environment.
+本页面简要讨论如何在IDE或本地环境中测试Flink应用程序。
 
 * This will be replaced by the TOC
 {:toc}
 
-## Unit testing
+## 单元测试
 
-Usually, one can assume that Flink produces correct results outside of a user-defined `Function`. Therefore, it is recommended to test `Function` classes that contain the main business logic with unit tests as much as possible.
+通常，可以假设Flink在用户定义的`函数`之外生成正确的结果。因此，建议尽可能用(推荐)单元测试来测试包含主业务逻辑的`函数`类。
 
-For example if one implements the following `ReduceFunction`:
+
+
+例如，如果实现了以下`ReduceFunction`:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -59,8 +61,7 @@ class SumReduce extends ReduceFunction[Long] {
 </div>
 </div>
 
-It is very easy to unit test it with your favorite framework by passing suitable arguments and verify the output:
-
+通过传递适当的参数和验证输出，可以很容易地用您最喜欢的框架对其进行单元测试:
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -94,11 +95,11 @@ class SumReduceTest extends FlatSpec with Matchers {
 </div>
 </div>
 
-## Integration testing
+## 集成测试
 
-In order to end-to-end test Flink streaming pipelines, you can also write integration tests that are executed against a local Flink mini cluster.
+为了端到端测试Flink流管道，还可以编写针对本地Flink微型集群执行的集成测试。
 
-In order to do so add the test dependency `flink-test-utils`:
+为此，添加测试依赖项`flink-test-utils`:
 
 {% highlight xml %}
 <dependency>
@@ -108,7 +109,7 @@ In order to do so add the test dependency `flink-test-utils`:
 </dependency>
 {% endhighlight %}
 
-For example, if you want to test the following `MapFunction`:
+例如，如果您想测试以下`MapFunction`: 
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -135,7 +136,7 @@ class MultiplyByTwo extends MapFunction[Long, Long] {
 </div>
 </div>
 
-You could write the following integration test:
+您可以编写以下集成测试:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -226,16 +227,14 @@ object CollectSink {
 </div>
 </div>
 
-The static variable in `CollectSink` is used here because Flink serializes all operators before distributing them across a cluster.
-Communicating with operators instantiated by a local Flink mini cluster via static variables is one way around this issue.
-Alternatively, you could for example write the data to files in a temporary directory with your test sink.
-You can also implement your own custom sources for emitting watermarks.
+这里使用的是`CollectSink`中的静态变量，因为flink在将所有运算符分布到集群之前会对它们进行序列化。通过静态变量与本地Flink微型集群实例化的操作符通信是解决这个问题的一种方法。或者，您可以使用测试接收器将数据写入临时目录中的文件。您还可以实现自己的用于发送水印的自定义源。
 
-## Testing checkpointing and state handling
 
-One way to test state handling is to enable checkpointing in integration tests. 
+## 测试检查点和状态处理
 
-You can do that by configuring your `StreamExecutionEnvironment` in the test:
+测试状态处理的一种方法是在集成测试中启用检查点。
+
+您可以通过在测试中配置`StreamExecutionEnvironment`来实现：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -253,13 +252,12 @@ env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, 100))
 </div>
 </div>
 
-And for example adding to your Flink application an identity mapper operator that will throw an exception
-once every `1000ms`. However writing such test could be tricky because of time dependencies between the actions.
+例如，在Flink应用程序中添加一个标识映射器操作符，它将每隔“1000毫秒”引发一次异常。然而，由于操作之间的时间依赖性，编写这样的测试可能很困难。
 
-Another approach is to write a unit test using the Flink internal testing utility `AbstractStreamOperatorTestHarness` from the `flink-streaming-java` module.
+另一种方法是使用来自`flink-streaming-java`模块的Flink内部测试实用程序`AbstractStreamOperatorTestHarness`编写单元测试。
 
-For an example of how to do that please have a look at the `org.apache.flink.streaming.runtime.operators.windowing.WindowOperatorTest` also in the `flink-streaming-java` module.
+有关如何实现这一点的例子，，请查看`flink-streaming-java`模块中的`org.apache.flink.streaming.runtime.operators.windowing.WindowOperatorTest`
 
-Be aware that `AbstractStreamOperatorTestHarness` is currently not a part of public API and can be subject to change.
+请注意，`AbstractStreamOperatorTestHarness`当前不是公共API的一部分，可能会发生更改
 
 {% top %}
