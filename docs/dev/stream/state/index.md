@@ -1,7 +1,7 @@
 ---
-title: "State & Fault Tolerance"
+title: "状态&容错"
 nav-id: streaming_state
-nav-title: "State & Fault Tolerance"
+nav-title: "状态&容错"
 nav-parent_id: streaming
 nav-pos: 3
 nav-show_overview: true

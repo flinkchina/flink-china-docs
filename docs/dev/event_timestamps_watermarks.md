@@ -1,5 +1,5 @@
 ---
-title: "Generating Timestamps / Watermarks"
+title: "生成时间戳/水印"
 nav-parent_id: event_time
 nav-pos: 1
 ---
@@ -26,10 +26,10 @@ under the License.
 {:toc}
 
 
-This section is relevant for programs running on **event time**. For an introduction to *event time*,
-*processing time*, and *ingestion time*, please refer to the [introduction to event time]({{ site.baseurl }}/dev/event_time.html).
+本节与在**事件时间event time**上运行的程序相关(适用于)。有关*事件时间event time*、*处理时间processing time*和*摄取时间ingestion time*的介绍，请参阅[事件时间介绍]({{ site.baseurl }}/dev/event_time.html)。
 
 To work with *event time*, streaming programs need to set the *time characteristic* accordingly.
+要使用*事件时间event time*，流式程序需要相应地设置*时间特性time characteristic*。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -46,7 +46,7 @@ env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 </div>
 </div>
 
-## Assigning Timestamps
+## 分配时间戳
 
 In order to work with *event time*, Flink needs to know the events' *timestamps*, meaning each element in the
 stream needs to have its event timestamp *assigned*. This is usually done by accessing/extracting the

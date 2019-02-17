@@ -1,5 +1,5 @@
 ---
-title: "Configuration"
+title: "配置"
 nav-id: "config"
 nav-parent_id: ops
 nav-pos: 4
@@ -23,34 +23,38 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-**For single-node setups Flink is ready to go out of the box and you don't need to change the default configuration to get started.**
+**对于单节点设置，Flink已准备好，即开箱即用，您无需更改默认配置即可开始使用.**
 
-The out of the box configuration will use your default Java installation. You can manually set the environment variable `JAVA_HOME` or the configuration key `env.java.home` in `conf/flink-conf.yaml` if you want to manually override the Java runtime to use.
 
-This page lists the most common options that are typically needed to set up a well performing (distributed) installation. In addition a full list of all available configuration parameters is listed here.
 
-All configuration is done in `conf/flink-conf.yaml`, which is expected to be a flat collection of [YAML key value pairs](http://www.yaml.org/spec/1.2/spec.html) with format `key: value`.
+开箱即用的配置将使用您的默认Java安装。 如果要手动覆盖要使用的Java运行时，可以在`conf/flink-conf.yaml`中手动设置环境变量`JAVA_HOME`或配置键`env.java.home`。
 
-The system and run scripts parse the config at startup time. Changes to the configuration file require restarting the Flink JobManager and TaskManagers.
+此页面列出了设置性能良好(分布式)安装通常需要的最常见选项。此外，这里列出了所有可用配置参数的完整列表。
 
-The configuration files for the TaskManagers can be different, Flink does not assume uniform machines in the cluster.
+所有配置都在`conf/flink-conf.yaml`中完成，预计这将是[YAML键值对][YAML key value pairs](http://www.yaml.org/spec/1.2/spec.html)的平面集合，格式为`key：value`。
+
+系统和运行脚本在启动时解析配置。 对配置文件的更改需要重新启动Flink JobManager和TaskManagers。
+
+TaskManagers的配置文件可能不同，Flink不假设集群中有统一的机器。
 
 * This will be replaced by the TOC
 {:toc}
 
-## Common Options
+## 通用选项
 
 {% include generated/common_section.html %}
 
-## Full Reference
+## 全部参考
 
 ### HDFS
 
 <div class="alert alert-warning">
-  <strong>Note:</strong> These keys are deprecated and it is recommended to configure the Hadoop path with the environment variable <code>HADOOP_CONF_DIR</code> instead.
+  <strong>注意:</strong> 这些键已弃用，建议使用环境变量配置Hadoop路径 <code>HADOOP_CONF_DIR</code> 替代.
 </div>
 
 These parameters configure the default HDFS used by Flink. Setups that do not specify a HDFS configuration have to specify the full path to HDFS files (`hdfs://address:port/path/to/files`) Files will also be written with default HDFS parameters (block size, replication factor).
+
+这些参数配置Flink使用的默认HDFS。没有指定HDFS配置的设置必须指定到HDFS文件的完整路径(`hdfs://address:port/path/to/files`)文件也将使用默认的HDFS参数(块大小、复制因子)来编写。
 
 - `fs.hdfs.hadoopconf`: The absolute path to the Hadoop File System's (HDFS) configuration **directory** (OPTIONAL VALUE). Specifying this value allows programs to reference HDFS files using short URIs (`hdfs:///path/to/files`, without including the address and port of the NameNode in the file URI). Without this option, HDFS files can be accessed, but require fully qualified URIs like `hdfs://address:port/path/to/files`. This option also causes file writers to pick up the HDFS's default values for block sizes and replication factors. Flink will look for the "core-site.xml" and "hdfs-site.xml" files in the specified directory.
 

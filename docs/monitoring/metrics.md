@@ -820,7 +820,7 @@ Thus, in order to infer the metric identifier:
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
       <th class="text-left" style="width: 22%">Infix</th>
-      <th class="text-left" style="width: 20%">Metrics</th>
+      <th class="text-left" style="width: 20%">指标度量</th>
       <th class="text-left" style="width: 32%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -847,7 +847,7 @@ Thus, in order to infer the metric identifier:
     <tr>                                                           
       <th class="text-left" style="width: 18%">Scope</th>
       <th class="text-left" style="width: 22%">Infix</th>          
-      <th class="text-left" style="width: 20%">Metrics</th>                           
+      <th class="text-left" style="width: 20%">指标度量</th>                           
       <th class="text-left" style="width: 32%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>                       
     </tr>                                                          
@@ -924,7 +924,7 @@ Thus, in order to infer the metric identifier:
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
       <th class="text-left" style="width: 22%">Infix</th>
-      <th class="text-left" style="width: 20%">Metrics</th>
+      <th class="text-left" style="width: 20%">指标度量</th>
       <th class="text-left" style="width: 32%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -946,7 +946,7 @@ Thus, in order to infer the metric identifier:
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
       <th class="text-left" style="width: 22%">Infix</th>
-      <th class="text-left" style="width: 20%">Metrics</th>
+      <th class="text-left" style="width: 20%">指标度量</th>
       <th class="text-left" style="width: 32%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -973,7 +973,7 @@ Thus, in order to infer the metric identifier:
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
       <th class="text-left" style="width: 22%">Infix</th>
-      <th class="text-left" style="width: 20%">Metrics</th>
+      <th class="text-left" style="width: 20%">指标度量</th>
       <th class="text-left" style="width: 32%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -1000,7 +1000,7 @@ Thus, in order to infer the metric identifier:
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
       <th class="text-left" style="width: 22%">Infix</th>
-      <th class="text-left" style="width: 22%">Metrics</th>
+      <th class="text-left" style="width: 22%">指标度量</th>
       <th class="text-left" style="width: 30%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -1070,7 +1070,7 @@ Thus, in order to infer the metric identifier:
   <thead>
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
-      <th class="text-left" style="width: 26%">Metrics</th>
+      <th class="text-left" style="width: 26%">指标度量</th>
       <th class="text-left" style="width: 48%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -1105,7 +1105,7 @@ Thus, in order to infer the metric identifier:
   <thead>
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
-      <th class="text-left" style="width: 26%">Metrics</th>
+      <th class="text-left" style="width: 26%">指标度量</th>
       <th class="text-left" style="width: 48%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -1146,7 +1146,7 @@ Thus, in order to infer the metric identifier:
   <thead>
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
-      <th class="text-left" style="width: 26%">Metrics</th>
+      <th class="text-left" style="width: 26%">指标度量</th>
       <th class="text-left" style="width: 48%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -1215,7 +1215,7 @@ Certain RocksDB native metrics are available but disabled by default, you can fi
   <thead>
     <tr>
       <th class="text-left" style="width: 18%">Scope</th>
-      <th class="text-left" style="width: 26%">Metrics</th>
+      <th class="text-left" style="width: 26%">指标度量</th>
       <th class="text-left" style="width: 48%">Description</th>
       <th class="text-left" style="width: 8%">Type</th>
     </tr>
@@ -1361,7 +1361,7 @@ Certain RocksDB native metrics are available but disabled by default, you can fi
   <thead>
     <tr>
       <th class="text-left" style="width: 15%">Scope</th>
-      <th class="text-left" style="width: 18%">Metrics</th>
+      <th class="text-left" style="width: 18%">指标度量</th>
       <th class="text-left" style="width: 18%">User Variables</th>
       <th class="text-left" style="width: 39%">Description</th>
       <th class="text-left" style="width: 10%">Type</th>
@@ -1409,7 +1409,7 @@ Certain RocksDB native metrics are available but disabled by default, you can fi
   <thead>
     <tr>
       <th class="text-left" style="width: 15%">Scope</th>
-      <th class="text-left" style="width: 18%">Metrics</th>
+      <th class="text-left" style="width: 18%">指标度量</th>
       <th class="text-left" style="width: 18%">User Variables</th>
       <th class="text-left" style="width: 39%">Description</th>
       <th class="text-left" style="width: 10%">Type</th>
@@ -1520,7 +1520,7 @@ Certain RocksDB native metrics are available but disabled by default, you can fi
     <tr>
       <th class="text-left" style="width: 20%">Scope</th>
       <th class="text-left" style="width: 25%">Infix</th>
-      <th class="text-left" style="width: 23%">Metrics</th>
+      <th class="text-left" style="width: 23%">指标度量</th>
       <th class="text-left" style="width: 32%">Description</th>
     </tr>
   </thead>
@@ -1585,7 +1585,7 @@ Certain RocksDB native metrics are available but disabled by default, you can fi
     <tr>
       <th class="text-left" style="width: 20%">Scope</th>
       <th class="text-left" style="width: 25%">Infix</th>
-      <th class="text-left" style="width: 23%">Metrics</th>
+      <th class="text-left" style="width: 23%">指标度量</th>
       <th class="text-left" style="width: 32%">Description</th>
     </tr>
   </thead>
@@ -1619,7 +1619,7 @@ Certain RocksDB native metrics are available but disabled by default, you can fi
     <tr>
       <th class="text-left" style="width: 20%">Scope</th>
       <th class="text-left" style="width: 25%">Infix</th>
-      <th class="text-left" style="width: 23%">Metrics</th>
+      <th class="text-left" style="width: 23%">指标度量</th>
       <th class="text-left" style="width: 32%">Description</th>
     </tr>
   </thead>
