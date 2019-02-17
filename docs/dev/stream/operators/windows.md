@@ -349,23 +349,15 @@ input
 </div>
 </div>
 
-## Window Functions
+## 窗口函数
 
-After defining the window assigner, we need to specify the computation that we want
-to perform on each of these windows. This is the responsibility of the *window function*, which is used to process the
-elements of each (possibly keyed) window once the system determines that a window is ready for processing
-(see [triggers](#triggers) for how Flink determines when a window is ready).
+在定义了窗口分配程序之后，我们需要指定要在每个窗口上执行的计算。这是*窗口函数*的职责，当系统确定窗口已准备好处理时，该函数用于处理每个（可能是键控的）窗口的元素（请参阅[触发器](#triggers)，了解Flink如何确定窗口何时准备好了）。
 
-The window function can be one of `ReduceFunction`, `AggregateFunction`, `FoldFunction` or `ProcessWindowFunction`. The first
-two can be executed more efficiently (see [State Size](#state size) section) because Flink can incrementally aggregate
-the elements for each window as they arrive. A `ProcessWindowFunction` gets an `Iterable` for all the elements contained in a
-window and additional meta information about the window to which the elements belong.
+窗口函数可以是`ReduceFunction`，`AggregateFunction`，`FoldFunction`或`ProcessWindowFunction`之一。 前两个可以更有效地执行（参见[状态大小(state size)](#state size)部分）因为Flink可以在每个窗口到达时增量地聚合元素。 `ProcessWindowFunction`对窗口中包含的所有元素和关于元素所属窗口的其他元信息获取`Iterable可迭代`
 
-A windowed transformation with a `ProcessWindowFunction` cannot be executed as efficiently as the other
-cases because Flink has to buffer *all* elements for a window internally before invoking the function.
-This can be mitigated by combining a `ProcessWindowFunction` with a `ReduceFunction`, `AggregateFunction`, or `FoldFunction` to
-get both incremental aggregation of window elements and the additional window metadata that the
-`ProcessWindowFunction` receives. We will look at examples for each of these variants.
+使用`ProcessWindowFunction`的窗口转换不能像其他情况那样高效地执行，因为Flink必须在调用该函数之前必须在内部缓冲窗口的“所有”元素。
+这可以通过将`ProcessWindowFunction`与`ReduceFunction`，`AggregateFunction`或`FoldFunction`相组合以获得窗口元素的增量聚合和`ProcessWindowFunction`接收的其他窗口元数据来减轻。 
+我们将查看这些变体的示例。
 
 ### ReduceFunction
 
