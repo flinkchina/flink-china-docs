@@ -62,14 +62,6 @@ Flink在流式计算程序中支持不同的*时间*概念
     *摄取时间*在概念上位于*事件时间*和*处理时间*之间。 与*处理时间*相比，它稍微贵一些，但可以提供更可预测的结果。 因为*摄取时间*使用稳定的时间戳（在源处分配一次），对记录的不同窗口算子操作将引用相同的时间戳，而在*处理时间*中，每个窗口算子可以将记录分配给不同的窗口（基于 本地系统时钟和任何传输延迟）。
 
 
-
-    Compared to *event time*, *ingestion time* programs cannot handle any out-of-order events or late data,
-    but the programs don't have to specify how to generate *watermarks*.
-
-    Internally, *ingestion time* is treated much like *event time*, but with automatic timestamp assignment and
-    automatic watermark generation.
-
-
 与*事件时间*相比，*摄取时间*程序无法处理任何无序事件或延迟数据，但程序不必指定如何生成*水印*。
 
 在内部，*摄取时间*与*事件时间*非常相似，但具有自动时间戳分配和自动水印生成功能。
@@ -78,12 +70,9 @@ Flink在流式计算程序中支持不同的*时间*概念
 
 ### 设定时间特征
 
-The first part of a Flink DataStream program usually sets the base *time characteristic*. That setting
-defines how data stream sources behave (for example, whether they will assign timestamps), and what notion of
-time should be used by window operations like `KeyedStream.timeWindow(Time.seconds(30))`.
+Flink DataStream程序的第一部分通常设置基本*时间特征*。 该设置定义了数据流源的行为方式（例如，它们是否将分配时间戳），以及窗口算子操作应该使用什么样的时间概念，如`KeyedStream.timeWindow（Time.seconds（30））`。
 
-The following example shows a Flink program that aggregates events in hourly time windows. The behavior of the
-windows adapts with the time characteristic.
+下面的示例显示了一个Flink程序，它在每小时窗口中聚合事件。窗口的行为与时间特性相适应。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -126,34 +115,28 @@ stream
 </div>
 </div>
 
-
-Note that in order to run this example in *event time*, the program needs to either use sources
-that directly define event time for the data and emit watermarks themselves, or the program must
-inject a *Timestamp Assigner & Watermark Generator* after the sources. Those functions describe how to access
-the event timestamps, and what degree of out-of-orderness the event stream exhibits.
+请注意，为了在*事件时间*中运行此示例，程序需要使用直接为数据定义事件时间并自己发出水印的源，或者程序必须在源之后插入*时间戳分配程序和水印生成器*。这些函数描述了如何访问事件时间戳，以及事件流显示的无序程度。
 
 The section below describes the general mechanism behind *timestamps* and *watermarks*. For a guide on how
 to use timestamp assignment and watermark generation in the Flink DataStream API, please refer to
 [Generating Timestamps / Watermarks]({{ site.baseurl }}/dev/event_timestamps_watermarks.html).
 
+下一节描述*时间戳*和*水印*背后的一般机制。有关如何在Flink DataStream API中使用时间戳分配和水印生成的指南，请参阅[生成时间戳/水印]({{ site.baseurl }}/dev/event_timestamps_watermarks.html)
 
-# Event Time and Watermarks
+# 事件时间和水印
 
-*Note: Flink implements many techniques from the Dataflow Model. For a good introduction to event time and watermarks, have a look at the articles below.*
+*注意: Flink实现了数据流模型中的许多技术。有关事件时间和水印的详细介绍，请参阅下面的文章.*
 
   - [Streaming 101](https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101) by Tyler Akidau
   - The [Dataflow Model paper](https://research.google.com/pubs/archive/43864.pdf)
 
+支持*事件时间*的流处理器需要一种方法来衡量事件时间的进度
+例如，当事件时间超过一小时结束时，需要通知构建每小时窗口的窗口算子，以便算子可以关闭正在进行的窗口。
 
-A stream processor that supports *event time* needs a way to measure the progress of event time.
-For example, a window operator that builds hourly windows needs to be notified when event time has passed beyond the
-end of an hour, so that the operator can close the window in progress.
-
-*Event time* can progress independently of *processing time* (measured by wall clocks).
-For example, in one program the current *event time* of an operator may trail slightly behind the *processing time*
-(accounting for a delay in receiving the events), while both proceed at the same speed.
-On the other hand, another streaming program might progress through weeks of event time with only a few seconds of processing,
-by fast-forwarding through some historic data already buffered in a Kafka topic (or another message queue).
+*事件时间*可以独立于*处理时间*（由挂钟测量）进行。
+例如，在一个程序中，算子的当前*事件时间*可能略微落后于*处理时间*（考虑到接收事件的延迟），而两者都以相同的速度进行。
+另一方面，通过快速转发已经在Kafka主题（或另一个消息队列）中缓冲的一些历史数据，另一个流程序可以通过几周的事件时间进行，只需几秒钟的处理。
+（另一方面，另一个流式程序可能只需几秒钟的处理就可以在数周的事件时间内进行，通过快速转发已经在Kafka主题（或另一个消息队列）中缓冲的一些历史数据）
 
 ------
 
