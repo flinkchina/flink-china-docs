@@ -1,5 +1,5 @@
 ---
-title: "Event Time"
+title: "事件时间"
 nav-id: event_time
 nav-show_overview: true
 nav-parent_id: streaming
@@ -27,52 +27,41 @@ under the License.
 * toc
 {:toc}
 
-# Event Time / Processing Time / Ingestion Time
+# 事件时间 / 处理时间 / 摄入时间
 
-Flink supports different notions of *time* in streaming programs.
+Flink在流式计算程序中支持不同的*时间*概念
 
-- **Processing time:** Processing time refers to the system time of the machine that is executing the
-    respective operation.
+- **处理时间:** 处理时间是指执行相应操作的机器系统时间。
 
-    When a streaming program runs on processing time, all time-based operations (like time windows) will
-    use the system clock of the machines that run the respective operator. An hourly
-    processing time window will include all records that arrived at a specific operator between the
-    times when the system clock indicated the full hour. For example, if an application
-    begins running at 9:15am, the first hourly processing time window will include events
-    processed between 9:15am and 10:00am, the next window will include events processed between 10:00am and 11:00am, and so on.
+当流程序以处理时间运行时，所有基于时间的操作（如时间窗口）都将使用运行相应算子的机器的系统时钟。每小时[处理时间]窗口将包括在系统时钟指示整小时之间到达特定算子的所有记录。例如，如果应用程序在上午9:15开始运行，则第一个小时处理时间窗口将包括在上午9:15到10:00之间处理的事件，下一个窗口将包括在上午10:00到11:00之间处理的事件，依此类推。
 
-    Processing time is the simplest notion of time and requires no coordination between streams and machines.
-    It provides the best performance and the lowest latency. However, in distributed and asynchronous
-    environments processing time does not provide determinism, because it is susceptible to the speed at which
-    records arrive in the system (for example from the message queue), to the speed at which the
-    records flow between operators inside the system, and to outages (scheduled, or otherwise).
+[处理时间]是最简单的时间概念，不需要流和机器之间的协调。 它提供了最佳的性能和最低的延迟。 但是，在分布式和异步环境中，[处理时间]不提供确定性，因为它容易受到记录到达系统的速度（例如从消息队列）影响，以及易受记录在系统内算子之间流动的速度影响。 ，也易受中断（计划的或其他的）影响。
 
-- **Event time:** Event time is the time that each individual event occurred on its producing device.
-    This time is typically embedded within the records before they enter Flink, and that *event timestamp*
-    can be extracted from each record. In event time, the progress of time depends on the data,
-    not on any wall clocks. Event time programs must specify how to generate *Event Time Watermarks*,
-    which is the mechanism that signals progress in event time. This watermarking mechanism is
-    described in a later section, [below](#event-time-and-watermarks).
+- **事件时间:**  事件时间是每个单独事件在其生产设备上发生的时间。
+
+这个时间通常在记录输入(进入)Flink之前嵌入到记录中，并且可以从每个记录中提取*事件时间戳*。在[事件时间]中，时间的进度取决于数据，而不是任何墙上的时钟。[事件时间]程序必须指定如何生成*事件时间水印*，这是表示[事件时间]进度的机制。这种水印机制将在后面的章节[下面事件时间和水印]中描述(#event-time-and-watermarks)。
+
+
 
     In a perfect world, event time processing would yield completely consistent and deterministic results, regardless of when events arrive, or their ordering.
     However, unless the events are known to arrive in-order (by timestamp), event time processing incurs some latency while waiting for out-of-order events. As it is only possible to wait for a finite period of time, this places a limit on how deterministic event time applications can be.
 
-    Assuming all of the data has arrived, event time operations will behave as expected, and produce correct and consistent results even when working with out-of-order or late events, or when reprocessing historic data. For example, an hourly event time window will contain all records
-    that carry an event timestamp that falls into that hour, regardless of the order in which they arrive, or when they are processed. (See the section on [late events](#late-elements) for more information.)
+    在一个完美的世界中，事件时间处理将产生完全一致和确定的结果，无论事件何时到达或其排序。
+但是，除非事件是按顺序(通过时间戳)到达的，否则[事件时间]处理会在等待无序事件时产生一些延迟。 由于只能等待一段有限的时间，因此限制了确定性[事件时间]应用程序的运行方式？这就限制了确定性[事件时间]应用程序的可用性？这就限制了确定性[事件时间]应用程序的能力(译者注:这几个翻译在上下文中感觉都ok)
 
+假设所有数据都已到达(译者注:即不会等待)，事件时间算子操作将按预期运行，即使在处理无序或延迟事件或重新处理历史数据时也会产生正确且一致的结果。 例如，每小时事件时间窗口将包含带有落入该小时的事件时间戳的所有记录，无论(而不管)它们到达的顺序如何，或者何时处理它们。 （有关更多信息，请参阅[延迟事件](#late-element)一节。）
 
 
     Note that sometimes when event time programs are processing live data in real-time, they will use some *processing time* operations in order to guarantee that they are progressing in a timely fashion.
+    请注意，有时当[事件时间]程序实时处理实时数据时，它们将使用一些*处理时间*操作，以确保它们以一种及时的方式进行处理。
 
-- **Ingestion time:** Ingestion time is the time that events enter Flink. At the source operator each
-    record gets the source's current time as a timestamp, and time-based operations (like time windows)
-    refer to that timestamp.
+    请注意，有时事件时间程序实时处理实时数据时，它们将使用一些*处理时间*操作，以确保它们能够及时进行。
 
-    *Ingestion time* sits conceptually in between *event time* and *processing time*. Compared to
-    *processing time*, it is slightly more expensive, but gives more predictable results. Because
-    *ingestion time* uses stable timestamps (assigned once at the source), different window operations
-    over the records will refer to the same timestamp, whereas in *processing time* each window operator
-    may assign the record to a different window (based on the local system clock and any transport delay).
+- **摄入时间:** 摄取时间是事件进入Flink的时间。 在源算子处，每个记录将源的当前时间作为时间戳，并且基于时间的算子操作（如时间窗口）引用该时间戳。
+
+    *摄取时间*在概念上位于*事件时间*和*处理时间*之间。 与*处理时间*相比，它稍微贵一些，但可以提供更可预测的结果。 因为*摄取时间*使用稳定的时间戳（在源处分配一次），对记录的不同窗口算子操作将引用相同的时间戳，而在*处理时间*中，每个窗口算子可以将记录分配给不同的窗口（基于 本地系统时钟和任何传输延迟）。
+
+
 
     Compared to *event time*, *ingestion time* programs cannot handle any out-of-order events or late data,
     but the programs don't have to specify how to generate *watermarks*.
@@ -80,10 +69,14 @@ Flink supports different notions of *time* in streaming programs.
     Internally, *ingestion time* is treated much like *event time*, but with automatic timestamp assignment and
     automatic watermark generation.
 
+
+与*事件时间*相比，*摄取时间*程序无法处理任何无序事件或延迟数据，但程序不必指定如何生成*水印*。
+
+在内部，*摄取时间*与*事件时间*非常相似，但具有自动时间戳分配和自动水印生成功能。
+
 <img src="{{ site.baseurl }}/fig/times_clocks.svg" class="center" width="80%" />
 
-
-### Setting a Time Characteristic
+### 设定时间特征
 
 The first part of a Flink DataStream program usually sets the base *time characteristic*. That setting
 defines how data stream sources behave (for example, whether they will assign timestamps), and what notion of
