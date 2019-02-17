@@ -365,7 +365,10 @@ A `ReduceFunction` specifies how two elements from the input are combined to pro
 an output element of the same type. Flink uses a `ReduceFunction` to incrementally aggregate
 the elements of a window.
 
-A `ReduceFunction` can be defined and used like this:
+
+ReduceFunction指定如何组合来自输入的两个元素来生成相同类型的输出元素。Flink使用“ReduceFunction”递增地聚合窗口的元素。
+
+`ReduceFunction`可以这样定义和使用：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -395,21 +398,14 @@ input
 </div>
 </div>
 
-The above example sums up the second fields of the tuples for all elements in a window.
+上面的示例累加了窗口中所有元素元组的第二个字段。
 
 ### AggregateFunction
 
-An `AggregateFunction` is a generalized version of a `ReduceFunction` that has three types: an
-input type (`IN`), accumulator type (`ACC`), and an output type (`OUT`). The input type is the type
-of elements in the input stream and the `AggregateFunction` has a method for adding one input
-element to an accumulator. The interface also has methods for creating an initial accumulator,
-for merging two accumulators into one accumulator and for extracting an output (of type `OUT`) from
-an accumulator. We will see how this works in the example below.
+`AggregateFunction`是`ReduceFunction`的通用版本，它有三种类型：输入类型（`IN`），累加器类型（`ACC`）和输出类型（`OUT`）。 输入类型是输入流中元素的类型，`AggregateFunction`具有将一个输入元素添加到累加器的方法。 该接口还具有用于创建初始累加器的方法，用于将两个累加器合并到一个累加器中以及用于从累加器提取输出（类型为`OUT`）的方法。 我们将在下面的示例中看到它的工作原理。
+与`ReduceFunction`相同，Flink将在窗口到达时递增地聚合窗口的输入元素。
 
-Same as with `ReduceFunction`, Flink will incrementally aggregate input elements of a window as they
-arrive.
-
-An `AggregateFunction` can be defined and used like this:
+可以像这样定义和使用`AggregateFunction`：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -480,15 +476,14 @@ input
 </div>
 </div>
 
-The above example computes the average of the second field of the elements in the window.
+上面的示例计算窗口中元素的第二个字段的平均值。
 
 ### FoldFunction
 
-A `FoldFunction` specifies how an input element of the window is combined with an element of
-the output type. The `FoldFunction` is incrementally called for each element that is added
-to the window and the current output value. The first element is combined with a pre-defined initial value of the output type.
+`FoldFunction`指定如何将窗口的输入元素与输出类型的元素组合在一起。对于添加到窗口中的每个元素和当前输出值，将递增地调用`FoldFunction`。第一个元素与预先定义的输出类型初始值组合在一起。
 
-A `FoldFunction` can be defined and used like this:
+可以像这样定义和使用`FoldFunction`：
+
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -518,9 +513,9 @@ input
 </div>
 </div>
 
-The above example appends all input `Long` values to an initially empty `String`.
+上面的例子将所有输入`Long`值追加到初始为空的`String`。
 
-<span class="label label-danger">Attention</span> `fold()` cannot be used with session windows or other mergeable windows.
+<span class="label label-danger">注意</span> ` fold（）`不能与会话窗口或其他可合并窗口一起使用。
 
 ### ProcessWindowFunction
 
@@ -531,6 +526,18 @@ elements cannot be incrementally aggregated but instead need to be buffered inte
 window is considered ready for processing.
 
 The signature of `ProcessWindowFunction` looks as follows:
+
+
+
+ProcessWindowFunction获取包含窗口所有元素的Iterable，以及可访问时间和状态信息的Context对象，这使其能够提供比其他窗口函数更多的灵活性。 这是以性能和资源消耗为代价的，因为元素不能以递增方式聚合，而是需要在内部进行缓冲，直到认为窗口已准备好进行处理。
+
+`ProcessWindowFunction`的签名如下：
+
+
+
+ProcessWindowFunction获得一个包含窗口所有元素的可迭代器，以及一个具有时间和状态信息访问权的上下文对象，这使得它比其他窗口函数提供更大的灵活性。这是以性能和资源消耗为代价的，因为元素不能增量地聚合，而是需要在内部缓冲，直到认为窗口可以处理为止。
+
+“ProcessWindowFunction”的签名如下:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -640,12 +647,10 @@ abstract class ProcessWindowFunction[IN, OUT, KEY, W <: Window] extends Function
 </div>
 </div>
 
-<span class="label label-info">Note</span> The `key` parameter is the key that is extracted
-via the `KeySelector` that was specified for the `keyBy()` invocation. In case of tuple-index
-keys or string-field references this key type is always `Tuple` and you have to manually cast
-it to a tuple of the correct size to extract the key fields.
+<span class="label label-info">注意</span> `key`参数是通过为`keyBy（）`调用指定的`KeySelector`提取的键。 在元组索引键或字符串字段引用的情况下，此键类型始终为`Tuple`，您必须手动将其转换为正确大小的元组以提取键字段。
 
-A `ProcessWindowFunction` can be defined and used like this:
+
+`ProcessWindowFunction`可以像如下定义和使用:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -700,26 +705,23 @@ class MyProcessWindowFunction extends ProcessWindowFunction[(String, Long), Stri
 </div>
 </div>
 
-The example shows a `ProcessWindowFunction` that counts the elements in a window. In addition, the window function adds information about the window to the output.
+这个例子显示了一个`ProcessWindowFunction`，它对窗口中的元素进行计数。此外，窗口函数将有关窗口的信息添加到输出中。
 
-<span class="label label-danger">Attention</span> Note that using `ProcessWindowFunction` for simple aggregates such as count is quite inefficient. The next section shows how a `ReduceFunction` or `AggregateFunction` can be combined with a `ProcessWindowFunction` to get both incremental aggregation and the added information of a `ProcessWindowFunction`.
+<span class="label label-danger">注意</span> 请注意，对count等简单聚合使用 `ProcessWindowFunction`是非常低效的。下一节将展示如何将 `ReduceFunction` 或`AggregateFunction` 与`ProcessWindowFunction`组合，以获得增量聚合和`ProcessWindowFunction`的附加信息。
 
-### ProcessWindowFunction with Incremental Aggregation
+### ProcessWindowFunction with Incremental Aggregation 具有增量聚合的ProcessWindowFunction
 
-A `ProcessWindowFunction` can be combined with either a `ReduceFunction`, an `AggregateFunction`, or a `FoldFunction` to
-incrementally aggregate elements as they arrive in the window.
-When the window is closed, the `ProcessWindowFunction` will be provided with the aggregated result.
-This allows it to incrementally compute windows while having access to the
-additional window meta information of the `ProcessWindowFunction`.
+`ProcessWindowFunction`可以与`ReduceFunction`，`AggregateFunction`或`FoldFunction`结合使用，以便在元素到达窗口时增量聚合元素。
+当窗口关闭时时，`ProcessWindowFunction`将提供聚合结果。
+这允许它在访问`ProcessWindowFunction`的附加窗口元信息的同时增量计算窗口。
 
-<span class="label label-info">Note</span> You can also use the legacy `WindowFunction` instead of
-`ProcessWindowFunction` for incremental window aggregation.
+<span class="label label-info">注意</span> 您还可以使用传统的`WindowFunction`而不是`ProcessWindowFunction`进行增量窗口聚合。
 
-#### Incremental Window Aggregation with ReduceFunction
 
-The following example shows how an incremental `ReduceFunction` can be combined with
-a `ProcessWindowFunction` to return the smallest event in a window along
-with the start time of the window.
+
+#### 使用ReduceFunction做增量窗口聚合(Incremental Window Aggregation with ReduceFunction )
+
+以下示例显示了增量`ReduceFunction`如何与`ProcessWindowFunction`结合使用，以返回窗口中的最小事件以及窗口的开始时间。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -778,11 +780,13 @@ input
 </div>
 </div>
 
-#### Incremental Window Aggregation with AggregateFunction
+#### 使用AggregateFunction进行增量窗口聚合(Incremental Window Aggregation with AggregateFunction)  
 
 The following example shows how an incremental `AggregateFunction` can be combined with
 a `ProcessWindowFunction` to compute the average and also emit the key and window along with
 the average.
+
+下面的示例显示了增量`AggregateFunction`如何与`ProcessWindowFunction`结合使用，以计算平均值，并且还会发出键和窗口以及平均值。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -877,11 +881,9 @@ class MyProcessWindowFunction extends ProcessWindowFunction[Double, (String, Dou
 </div>
 </div>
 
-#### Incremental Window Aggregation with FoldFunction
+#### 使用FoldFunction进行增量窗口聚合(Incremental Window Aggregation with FoldFunction)
 
-The following example shows how an incremental `FoldFunction` can be combined with
-a `ProcessWindowFunction` to extract the number of events in the window and return also
-the key and end time of the window.
+以下示例显示了如何将增量`FoldFunction`与`ProcessWindowFunction`组合以提取窗口中的事件数量，并返回窗口的键和结束时间。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -944,12 +946,10 @@ input
 </div>
 </div>
 
-### Using per-window state in ProcessWindowFunction
+### 在ProcessWindowFunction中使用每个窗口的状态(Using per-window state in ProcessWindowFunction)
 
-In addition to accessing keyed state (as any rich function can) a `ProcessWindowFunction` can
-also use keyed state that is scoped to the window that the function is currently processing. In this
-context it is important to understand what the window that *per-window* state is referring to is.
-There are different "windows" involved:
+除了访问键控状态（任何富函数可以）之外，`ProcessWindowFunction`还可以使用键控状态，该键控状态的作用域是函数当前正在处理的窗口。 在这种情况下，了解*per-window每个窗口* 状态所指的窗口是什么是很重要的。 涉及到不同的"窗口"：
+
 
  - The window that was defined when specifying the windowed operation: This might be *tumbling
  windows of 1 hour* or *sliding windows of 2 hours that slide by 1 hour*.
@@ -958,32 +958,34 @@ There are different "windows" involved:
  based on the number of keys that the job is currently processing and based on what time slots
  the events fall into.
 
+ - 指定窗口操作时定义的窗口：这可能是*1小时的翻滚窗口*或*滑动1小时的2小时滑动窗口*。
+ - 给定键的已定义窗口的实际实例：对于user-id xyz *，这可能是从12:00到13:00的*时间窗口。 
+这是基于窗口定义的，根据Job作业当前正在处理的键的数量以及事件进入solts槽的时间段，将有许多窗口
+
+
+(译者注:保留)
 Per-window state is tied to the latter of those two. Meaning that if we process events for 1000
 different keys and events for all of them currently fall into the *[12:00, 13:00)* time window
 then there will be 1000 window instances that each have their own keyed per-window state.
 
-There are two methods on the `Context` object that a `process()` invocation receives that allow
-access to the two types of state:
+每个窗口状态与这两个状态中的后一个相关联(即与后一种状态相关联)。这意味着如果我们为1000个不同的键处理事件，并且当前所有这些键的事件都属于(落入 fall into)*[12:00,13:00)*时间窗口，那么将有1000个窗口实例，每个窗口实例都有自己的键控每个窗口状态。
 
- - `globalState()`, which allows access to keyed state that is not scoped to a window
- - `windowState()`, which allows access to keyed state that is also scoped to the window
 
-This feature is helpful if you anticipate multiple firing for the same window, as can happen when
-you have late firings for data that arrives late or when you have a custom trigger that does
-speculative early firings. In such a case you would store information about previous firings or
-the number of firings in per-window state.
 
-When using windowed state it is important to also clean up that state when a window is cleared. This
-should happen in the `clear()` method.
+`process()`调用接收到的`Context`对象上有两种方法允许访问这两种状态:
 
-### WindowFunction (Legacy)
+ - `globalState()`, 它允许访问不在窗口范围内的键控状态
+ - `windowState()`, 它允许访问也限定在窗口范围内的键控状态
 
-In some places where a `ProcessWindowFunction` can be used you can also use a `WindowFunction`. This
-is an older version of `ProcessWindowFunction` that provides less contextual information and does
-not have some advances features, such as per-window keyed state. This interface will be deprecated
-at some point.
+如果您预期对同一个窗口进行多次触发，那么这个特性是很有用的，因为当您对延迟到达的数据进行延迟触发时，或者当您有一个自定义触发器执行推测性的早期触发时，也可能会发生延迟触发。(因为对于延迟到达的数据可能会延迟触发，或者对于进行推测性早期触发的自定义触发器，也可能会延迟触发)。在这种情况下，您将存储有关以前的触发或每个窗口状态下的触发次数的信息。
+当使用窗口状态时，重要的是在清除窗口时也要清除该状态（清除窗口时清除该状态也很重要）。这应该发生在`clear()`方法中。
 
-The signature of a `WindowFunction` looks as follows:
+
+### WindowFunction（留存） WindowFunction (Legacy)
+
+在一些`ProcessWindowFunction`可以使用的地方你也可以使用`WindowFunction`。这是较旧版本`ProcessWindowFunction`，提供较少的上下文信息，并且没有一些高级函数，例如每窗口被Keys化状态。此接口将在某个时候弃用。
+
+`WindowFunction`签名如下：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1050,11 +1052,10 @@ input
 </div>
 </div>
 
-## Triggers
+## 触发器
 
-A `Trigger` determines when a window (as formed by the *window assigner*) is ready to be
-processed by the *window function*. Each `WindowAssigner` comes with a default `Trigger`.
-If the default trigger does not fit your needs, you can specify a custom trigger using `trigger(...)`.
+`触发器`决定窗口（由*窗口分配器*形成）何时准备由*window函数*处理。每个`WindowAssigner`都有一个默认的`Trigger`。
+如果默认触发器不符合您的需要，可以使用`trigger（...）`指定自定义触发器。
 
 The trigger interface has five methods that allow a `Trigger` to react to different events:
 
