@@ -315,16 +315,15 @@ input
 
 
 
-### Global Windows
+### 全局窗口
 
-A *global windows* assigner assigns all elements with the same key to the same single *global window*.
-This windowing scheme is only useful if you also specify a custom [trigger](#triggers). Otherwise,
-no computation will be performed, as the global window does not have a natural end at
-which we could process the aggregated elements.
+*全局窗口*分配器将具有相同键的所有元素分配给相同的单个全局窗口。
+此窗口模式仅在您还指定自定义[触发器](#triggers)时才有用。
+否则，将不会执行任何计算，因为全局窗口没有一个可以处理聚合元素的自然端(自然结束)
 
 <img src="{{ site.baseurl }}/fig/non-windowed.svg" class="center" style="width: 100%;" />
 
-The following code snippets show how to use a global window.
+下面的代码片段展示了如何使用全局窗口。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
