@@ -178,7 +178,7 @@ keyedStream.maxBy("key");
           <td>
             <p>Windows can be defined on already partitioned KeyedStreams. Windows group the data in each
             key according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-            See <a href="windows.html">windows</a> for a complete description of windows.
+            See <a href="windows.html">窗口</a> for a complete description of windows.
     {% highlight java %}
 dataStream.keyBy(0).window(TumblingEventTimeWindows.of(Time.seconds(5))); // Last 5 seconds of data
     {% endhighlight %}
@@ -190,7 +190,7 @@ dataStream.keyBy(0).window(TumblingEventTimeWindows.of(Time.seconds(5))); // Las
           <td>
               <p>Windows can be defined on regular DataStreams. Windows group all the stream events
               according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-              See <a href="windows.html">windows</a> for a complete description of windows.</p>
+              See <a href="windows.html">窗口</a> for a complete description of windows.</p>
               <p><strong>WARNING:</strong> This is in many cases a <strong>non-parallel</strong> transformation. All records will be
                gathered in one task for the windowAll operator.</p>
   {% highlight java %}
@@ -569,7 +569,7 @@ keyedStream.maxBy("key")
           <td>
             <p>Windows can be defined on already partitioned KeyedStreams. Windows group the data in each
             key according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-            See <a href="windows.html">windows</a> for a description of windows.
+            See <a href="windows.html">窗口</a> for a description of windows.
     {% highlight scala %}
 dataStream.keyBy(0).window(TumblingEventTimeWindows.of(Time.seconds(5))) // Last 5 seconds of data
     {% endhighlight %}
@@ -581,7 +581,7 @@ dataStream.keyBy(0).window(TumblingEventTimeWindows.of(Time.seconds(5))) // Last
           <td>
               <p>Windows can be defined on regular DataStreams. Windows group all the stream events
               according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-              See <a href="windows.html">windows</a> for a complete description of windows.</p>
+              See <a href="windows.html">窗口</a> for a complete description of windows.</p>
               <p><strong>WARNING:</strong> This is in many cases a <strong>non-parallel</strong> transformation. All records will be
                gathered in one task for the windowAll operator.</p>
   {% highlight scala %}

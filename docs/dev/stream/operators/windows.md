@@ -76,40 +76,34 @@ under the License.
 
 在非键控流的情况下，您的原始流将不会被拆分为多个逻辑流，并且所有窗口逻辑将由单个任务执行，*即*并行度为1。
 
-## Window Assigners
+## 窗口分配器
 
 After specifying whether your stream is keyed or not, the next step is to define a *window assigner*.
 The window assigner defines how elements are assigned to windows. This is done by specifying the `WindowAssigner`
 of your choice in the `window(...)` (for *keyed* streams) or the `windowAll()` (for *non-keyed* streams) call.
 
-A `WindowAssigner` is responsible for assigning each incoming element to one or more windows. Flink comes
-with pre-defined window assigners for the most common use cases, namely *tumbling windows*,
-*sliding windows*, *session windows* and *global windows*. You can also implement a custom window assigner by
-extending the `WindowAssigner` class. All built-in window assigners (except the global
-windows) assign elements to windows based on time, which can either be processing time or event
-time. Please take a look at our section on [event time]({{ site.baseurl }}/dev/event_time.html) to learn
-about the difference between processing time and event time and how timestamps and watermarks are generated.
 
-Time-based windows have a *start timestamp* (inclusive) and an *end timestamp* (exclusive)
-that together describe the size of the window. In code, Flink uses `TimeWindow` when working with
-time-based windows which has methods for querying the start- and end-timestamp and also an
-additional method `maxTimestamp()` that returns the largest allowed timestamp for a given windows.
+在指定了流是否是键控的之后，下一步是定义一个*窗口赋值器*。
+窗口分配程序定义元素如何分配给窗口。这是通过在“window（…）”（对于*keyed*streams）或`windowAll()`（对于*non keyed*streams）调用中指定所选的“windowassigner”来完成的。
 
-In the following, we show how Flink's pre-defined window assigners work and how they are used
-in a DataStream program. The following figures visualize the workings of each assigner. The purple circles
-represent elements of the stream, which are partitioned by some key (in this case *user 1*, *user 2* and *user 3*).
-The x-axis shows the progress of time.
+在指定流是否为键控后，下一步是定义一个*window assigner窗口分配器*。
+窗口分配器定义如何将元素分配给窗口。这是通过在`window(...)`(对于*键控*流)或`windowAll()`(对于*非键控*流)调用中指定您选择的`WindowAssigner`来完成实现的。
 
-### Tumbling Windows
+`WindowAssigner`负责将每个传入元素分配给一个或多个窗口。Flink为最常见的用例提供了预定义的窗口分配器，即*滚动窗口tumbling*、*滑动窗口sliding*、*会话窗口session*和*全局窗口global*。您还可以通过扩展`WindowAssigner`类来实现自定义窗口分配器。所有内置的窗口分配器(全局窗口除外)都根据时间为窗口分配元素，时间可以是处理时间，也可以是事件时间。请查看我们关于[事件时间]({{ site.baseurl }}/dev/event_time.html)的部分,以了解处理时间和事件时间之间的差异，以及如何生成时间戳和水印。
 
-A *tumbling windows* assigner assigns each element to a window of a specified *window size*.
-Tumbling windows have a fixed size and do not overlap. For example, if you specify a tumbling
-window with a size of 5 minutes, the current window will be evaluated and a new window will be
-started every five minutes as illustrated by the following figure.
+
+基于时间的窗口有一个*开始时间戳*（包括在内）和一个*结束时间戳*（不包括在内），它们共同描述窗口的大小。在代码中，Flink在处理基于时间的窗口时使用`TimeWindow`，该窗口具有查询开始和结束时间戳的方法，以及返回给定窗口允许的最大时间戳的附加方法`maxTimestamp（）`。
+
+在下面的文章中，我们将展示Flink的预定义窗口分配器是如何工作的，以及如何在DataStream数据流程序中使用它们。下图显示了每个分配程序的工作情况。紫色圆圈表示流的元素，这些元素由一些键(在本例中是*user 1*、*user 2*和*user 3*)进行分区。x轴表示时间的进度。
+
+### 滚动窗口
+
+*滚动窗口*分配器将每个元素分配给指定*窗口大小*的窗口。
+滚动窗口具有固定的尺寸即大小固定，不重叠。 例如，如果您指定了一个大小为5分钟的滚动窗口，那么将计算当前窗口并每5分钟启动一个新窗口，如下图所示。
 
 <img src="{{ site.baseurl }}/fig/tumbling-windows.svg" class="center" style="width: 100%;" />
 
-The following code snippets show how to use tumbling windows.
+以下代码段显示了如何使用滚动窗口。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -161,34 +155,22 @@ input
 </div>
 </div>
 
-Time intervals can be specified by using one of `Time.milliseconds(x)`, `Time.seconds(x)`,
-`Time.minutes(x)`, and so on.
+时间间隔可以通过使用 `Time.milliseconds(x)`, `Time.seconds(x)`,
+`Time.minutes(x)`等来指定。
 
-As shown in the last example, tumbling window assigners also take an optional `offset`
-parameter that can be used to change the alignment of windows. For example, without offsets
-hourly tumbling windows are aligned with epoch, that is you will get windows such as
-`1:00:00.000 - 1:59:59.999`, `2:00:00.000 - 2:59:59.999` and so on. If you want to change
-that you can give an offset. With an offset of 15 minutes you would, for example, get
-`1:15:00.000 - 2:14:59.999`, `2:15:00.000 - 3:14:59.999` etc.
-An important use case for offsets is to adjust windows to timezones other than UTC-0.
-For example, in China you would have to specify an offset of `Time.hours(-8)`.
+如上一个示例所示，滚动窗口分配器还接受一个可选的`偏移量offset`参数，该参数可用于更改窗口的对齐方式。例如，在没有偏移量的情况下，每小时滚动窗口将与epoch对齐，即您将获得诸如`1:00:00.000 - 1:59:59.999`、`2:00:00.000 - 2:59:59.999`等窗口。如果你想改变，你可以给出一个偏移量。例如，如果偏移15分钟，你会得到`1:15:00.000 - 2:14:59.999`，`2:15:00.000 - 3:14:59.999`等等。偏移量的一个重要用例是将窗口调整到UTC-0以外的时区。例如，在中国，您必须指定`Time.hours(-8)`的偏移量。
 
-### Sliding Windows
+### 滑动窗口
 
-The *sliding windows* assigner assigns elements to windows of fixed length. Similar to a tumbling
-windows assigner, the size of the windows is configured by the *window size* parameter.
-An additional *window slide* parameter controls how frequently a sliding window is started. Hence,
-sliding windows can be overlapping if the slide is smaller than the window size. In this case elements
-are assigned to multiple windows.
+*滑动窗口sliding windows*分配器将元素分配给固定长度的窗口。 与滚动窗口分配器类似，窗口大小由*window size*参数配置。
+附加的*window slide*参数控制滑动窗口的启动频率。因此，如果滑动窗口小于窗口大小，则滑动窗口可以重叠。在这种情况下，元素被分配给多个窗口。
 
-For example, you could have windows of size 10 minutes that slides by 5 minutes. With this you get every
-5 minutes a window that contains the events that arrived during the last 10 minutes as depicted by the
-following figure.
+例如，您可以让10分钟大小的窗口滑动5分钟。这样，你每隔5分钟就会得到一个窗口，其中包含在最后(过去)10分钟内到达的事件，如下图所示。
+
 
 <img src="{{ site.baseurl }}/fig/sliding-windows.svg" class="center" style="width: 100%;" />
 
-The following code snippets show how to use sliding windows.
-
+下面的代码片段展示了如何使用滑动窗口。
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -239,31 +221,16 @@ input
 </div>
 </div>
 
-Time intervals can be specified by using one of `Time.milliseconds(x)`, `Time.seconds(x)`,
-`Time.minutes(x)`, and so on.
+可以使用`Time.milliseconds（x）`，`Time.seconds（x）`，`Time.minutes（x）`等来指定时间间隔。
+如上一个示例所示，滑动窗口分配器还接受一个可选的`offset 偏移量`参数，该参数可用于更改窗口的对齐方式。 例如，如果没有偏移，每小时滑动30分钟的窗口将与epoch对齐，也就是说，您将得到“`1:00:00.000-1:59:59.999`、`1:30:00.000-2:29:59.999`等窗口。 如果你想改变它，你可以给出一个偏移量。 例如，如果偏移15分钟，则会得到`1：15：00.000  -  2：14：59.999`，`1：45：00.000  -  2：44：59.999`等。偏移量的一个重要用例是将窗口调整到UTC-0以外的时区。例如，在中国，您必须指定`Time.hours(-8)`的偏移量。
 
-As shown in the last example, sliding window assigners also take an optional `offset` parameter
-that can be used to change the alignment of windows. For example, without offsets hourly windows
-sliding by 30 minutes are aligned with epoch, that is you will get windows such as
-`1:00:00.000 - 1:59:59.999`, `1:30:00.000 - 2:29:59.999` and so on. If you want to change that
-you can give an offset. With an offset of 15 minutes you would, for example, get
-`1:15:00.000 - 2:14:59.999`, `1:45:00.000 - 2:44:59.999` etc.
-An important use case for offsets is to adjust windows to timezones other than UTC-0.
-For example, in China you would have to specify an offset of `Time.hours(-8)`.
+### 会话窗口
 
-### Session Windows
-
-The *session windows* assigner groups elements by sessions of activity. Session windows do not overlap and
-do not have a fixed start and end time, in contrast to *tumbling windows* and *sliding windows*. Instead a
-session window closes when it does not receive elements for a certain period of time, *i.e.*, when a gap of
-inactivity occurred. A session window assigner can be configured with either a static *session gap* or with a 
-*session gap extractor* function which defines how long the period of inactivity is. When this period expires, 
-the current session closes and subsequent elements are assigned to a new session window.
+*会话窗口*分配器根据活动的会话对元素进行分组。与“滚动窗口”和“滑动窗口”相比，会话窗口不重叠，也没有固定的开始和结束时间。相反，当会话窗口在一段时间内没有接收到元素时，会话窗口会关闭。*也就是说，当出现不活动的间隙时，会话窗口会关闭。会话窗口分配器既可以配置为静态的*会话间隙*，也可以配置为*会话间隙提取器*函数，该函数定义不活动时间段的长度。当这段时间到期时，当前会话将关闭，随后的元素将分配给新的会话窗口。
 
 <img src="{{ site.baseurl }}/fig/session-windows.svg" class="center" style="width: 100%;" />
 
-The following code snippets show how to use session windows.
-
+下面的代码片段展示了如何使用会话窗口。
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -339,18 +306,14 @@ input
 </div>
 </div>
 
-Static gaps can be specified by using one of `Time.milliseconds(x)`, `Time.seconds(x)`,
-`Time.minutes(x)`, and so on.
+静态间隔可以通过使用`Time.milliseconds（x）`，`Time.seconds（x）`，`Time.minutes（x）`等来指定。
+动态间隔是通过实现'`SessionWindowTimeGapExtractor`接口指定的。
 
-Dynamic gaps are specified by implementing the `SessionWindowTimeGapExtractor` interface.
+<span class="label label-danger">注意</span> 由于会话窗口没有固定的开始和结束，因此它们的计算方法与滚动和滑动窗口不同。在内部，会话窗口操作符为每个到达的记录创建一个新窗口，如果窗口之间的距离比定义的间隔更近，则将它们合并在一起。
+为了能够合并，会话窗口算子需要一个合并[触发器](#triggers)和一个合并[窗口函数](#window-functions)，例如`ReduceFunction`，`AggregateFunction`或`ProcessWindowFunction`
+（`FoldFunction`无法合并。）
 
-<span class="label label-danger">Attention</span> Since session windows do not have a fixed start and end,
-they are  evaluated differently than tumbling and sliding windows. Internally, a session window operator
-creates a new window for each arriving record and merges windows together if their are closer to each other
-than the defined gap.
-In order to be mergeable, a session window operator requires a merging [Trigger](#triggers) and a merging
-[Window Function](#window-functions), such as `ReduceFunction`, `AggregateFunction`, or `ProcessWindowFunction`
-(`FoldFunction` cannot merge.)
+
 
 ### Global Windows
 

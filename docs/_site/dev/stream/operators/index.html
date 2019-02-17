@@ -911,7 +911,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/operators/windows.html">Windows</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/operators/windows.html">窗口</a></li>
       
     
   
@@ -1238,7 +1238,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/testing.html">Testing</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/testing.html">测试</a></li>
       
     
   
@@ -1258,7 +1258,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/experimental.html">Experimental Features</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/experimental.html">实验性功能</a></li>
       
     
   
@@ -3635,7 +3635,7 @@ partitioning after applying those as well as insights into Flink’s operator ch
           <td>
             <p>Windows can be defined on already partitioned KeyedStreams. Windows group the data in each
             key according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-            See <a href="windows.html">windows</a> for a complete description of windows.
+            See <a href="windows.html">窗口</a> for a complete description of windows.
     
 <figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">dataStream</span><span class="o">.</span><span class="na">keyBy</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">window</span><span class="o">(</span><span class="n">TumblingEventTimeWindows</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">Time</span><span class="o">.</span><span class="na">seconds</span><span class="o">(</span><span class="mi">5</span><span class="o">)));</span> <span class="c1">// Last 5 seconds of data</span>
     </code></pre></figure>
@@ -3648,7 +3648,7 @@ partitioning after applying those as well as insights into Flink’s operator ch
           <td>
               <p>Windows can be defined on regular DataStreams. Windows group all the stream events
               according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-              See <a href="windows.html">windows</a> for a complete description of windows.</p>
+              See <a href="windows.html">窗口</a> for a complete description of windows.</p>
               <p><strong>WARNING:</strong> This is in many cases a <strong>non-parallel</strong> transformation. All records will be
                gathered in one task for the windowAll operator.</p>
   
@@ -4049,7 +4049,7 @@ partitioning after applying those as well as insights into Flink’s operator ch
           <td>
             <p>Windows can be defined on already partitioned KeyedStreams. Windows group the data in each
             key according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-            See <a href="windows.html">windows</a> for a description of windows.
+            See <a href="windows.html">窗口</a> for a description of windows.
     
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">dataStream</span><span class="o">.</span><span class="n">keyBy</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="n">window</span><span class="o">(</span><span class="nc">TumblingEventTimeWindows</span><span class="o">.</span><span class="n">of</span><span class="o">(</span><span class="nc">Time</span><span class="o">.</span><span class="n">seconds</span><span class="o">(</span><span class="mi">5</span><span class="o">)))</span> <span class="c1">// Last 5 seconds of data
 </span>    </code></pre></figure>
@@ -4062,7 +4062,7 @@ partitioning after applying those as well as insights into Flink’s operator ch
           <td>
               <p>Windows can be defined on regular DataStreams. Windows group all the stream events
               according to some characteristic (e.g., the data that arrived within the last 5 seconds).
-              See <a href="windows.html">windows</a> for a complete description of windows.</p>
+              See <a href="windows.html">窗口</a> for a complete description of windows.</p>
               <p><strong>WARNING:</strong> This is in many cases a <strong>non-parallel</strong> transformation. All records will be
                gathered in one task for the windowAll operator.</p>
   

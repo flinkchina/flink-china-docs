@@ -903,7 +903,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/operators/windows.html">Windows</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/operators/windows.html">窗口</a></li>
       
     
   
@@ -1230,7 +1230,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/testing.html">Testing</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/testing.html">测试</a></li>
       
     
   
@@ -1250,7 +1250,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/experimental.html">Experimental Features</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/experimental.html">实验性功能</a></li>
       
     
   
@@ -3447,7 +3447,7 @@ under the License.
   <li><a href="#levels-of-abstraction" id="markdown-toc-levels-of-abstraction">Levels of Abstraction</a></li>
   <li><a href="#programs-and-dataflows" id="markdown-toc-programs-and-dataflows">Programs and Dataflows</a></li>
   <li><a href="#parallel-dataflows" id="markdown-toc-parallel-dataflows">Parallel Dataflows</a></li>
-  <li><a href="#windows" id="markdown-toc-windows">Windows</a></li>
+  <li><a href="#windows" id="markdown-toc-windows">窗口</a></li>
   <li><a href="#time" id="markdown-toc-time">Time</a></li>
   <li><a href="#stateful-operations" id="markdown-toc-stateful-operations">Stateful Operations</a></li>
   <li><a href="#checkpoints-for-fault-tolerance" id="markdown-toc-checkpoints-for-fault-tolerance">Checkpoints for Fault Tolerance</a></li>
@@ -3558,12 +3558,12 @@ which the aggregated results for different keys arrive at the sink.</p>
 
 <p><a href="#top" class="top pull-right"><span class="glyphicon glyphicon-chevron-up"></span> Back to top</a></p>
 
-<h2 id="windows">Windows</h2>
+<h2 id="windows">窗口</h2>
 
 <p>Aggregating events (e.g., counts, sums) works differently on streams than in batch processing.
 For example, it is impossible to count all elements in a stream,
 because streams are in general infinite (unbounded). Instead, aggregates on streams (counts, sums, etc),
-are scoped by <strong>windows</strong>, such as <em>“count over the last 5 minutes”</em>, or <em>“sum of the last 100 elements”</em>.</p>
+are scoped by <strong>窗口</strong>, such as <em>“count over the last 5 minutes”</em>, or <em>“sum of the last 100 elements”</em>.</p>
 
 <p>Windows can be <em>time driven</em> (example: every 30 seconds) or <em>data driven</em> (example: every 100 elements).
 One typically distinguishes different types of windows, such as <em>tumbling windows</em> (no overlap),

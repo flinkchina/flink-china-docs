@@ -1,5 +1,5 @@
 ---
-title: "Experimental Features"
+title: "试验性功能"
 nav-id: experimental_features
 nav-show_overview: true
 nav-parent_id: streaming
@@ -24,10 +24,9 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-This section describes experimental features in the DataStream API. Experimental features are still evolving and can be either unstable,
-incomplete, or subject to heavy change in future versions.
+本节描述DataStream API中的实验特性。实验特性仍在发展中，可能是不稳定的、不完整的，也可能在未来的版本中发生重大变化。
 
-Reinterpreting a pre-partitioned data stream as keyed stream
+将预先分区的数据流重新解释为键控流 Reinterpreting a pre-partitioned data stream as keyed stream
 ------------------------------------------------------------
 
 We can re-interpret a pre-partitioned data stream as a keyed stream to avoid shuffling.

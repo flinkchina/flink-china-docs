@@ -911,7 +911,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/operators/windows.html">Windows</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/operators/windows.html">窗口</a></li>
       
     
   
@@ -1238,7 +1238,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/testing.html">Testing</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/testing.html">测试</a></li>
       
     
   
@@ -1258,7 +1258,7 @@ under the License.
     
       
       
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/experimental.html">Experimental Features</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/experimental.html">实验性功能</a></li>
       
     
   
@@ -3558,7 +3558,7 @@ The following code snippet shows how easy it is to train a multiple linear regre
 </span><span class="k">val</span> <span class="n">dataSet</span><span class="k">:</span> <span class="kt">DataSet</span><span class="o">[</span><span class="kt">LabeledVector</span><span class="o">]</span> <span class="k">=</span> <span class="o">...</span>
 <span class="k">val</span> <span class="n">trainTestData</span><span class="k">:</span> <span class="kt">DataSet</span><span class="o">[</span><span class="kt">TrainTestDataSet</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Splitter</span><span class="o">.</span><span class="n">trainTestSplit</span><span class="o">(</span><span class="n">dataSet</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">trainingData</span><span class="k">:</span> <span class="kt">DataSet</span><span class="o">[</span><span class="kt">LabeledVector</span><span class="o">]</span> <span class="k">=</span> <span class="n">trainTestData</span><span class="o">.</span><span class="n">training</span>
-<span class="k">val</span> <span class="n">testingData</span><span class="k">:</span> <span class="kt">DataSet</span><span class="o">[</span><span class="kt">Vector</span><span class="o">]</span> <span class="k">=</span> <span class="n">trainTestData</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">lv</span> <span class="k">=&gt;</span> <span class="n">lv</span><span class="o">.</span><span class="n">vector</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">testingData</span><span class="k">:</span> <span class="kt">DataSet</span><span class="o">[</span><span class="kt">Vector</span><span class="o">]</span> <span class="k">=</span> <span class="n">trainTestData</span><span class="o">.</span><span class="n">测试</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">lv</span> <span class="k">=&gt;</span> <span class="n">lv</span><span class="o">.</span><span class="n">vector</span><span class="o">)</span>
 
 <span class="k">val</span> <span class="n">mlr</span> <span class="k">=</span> <span class="nc">MultipleLinearRegression</span><span class="o">()</span>
   <span class="o">.</span><span class="n">setStepsize</span><span class="o">(</span><span class="mf">1.0</span><span class="o">)</span>
