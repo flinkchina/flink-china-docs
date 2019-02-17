@@ -1,6 +1,6 @@
 ---
-title: "Side Outputs"
-nav-title: "Side Outputs"
+title: "旁侧输出(额外输出)"
+nav-title: "旁侧输出(额外输出)"
 nav-parent_id: streaming
 nav-pos: 36
 ---
@@ -26,15 +26,9 @@ under the License.
 * This will be replaced by the TOC
 {:toc}
 
-In addition to the main stream that results from `DataStream` operations, you can also produce any
-number of additional side output result streams. The type of data in the result streams does not
-have to match the type of data in the main stream and the types of the different side outputs can
-also differ. This operation can be useful when you want to split a stream of data where you would
-normally have to replicate the stream and then filter out from each stream the data that you don't
-want to have.
+除了DataStream算子操作产生的主流之外，您还可以生成任意数量的附加旁侧输出结果流(额外输出结果流)。结果流中的数据类型不必与主流中的数据类型匹配，并且不同端输出的类型也可能不同。当您希望拆分数据流时通常必须复制该流，然后从每个流中过滤掉您不希望拥有的数据时，此 算子操作非常有用。
 
-When using side outputs, you first need to define an `OutputTag` that will be used to identify a
-side output stream:
+使用旁侧输出时，首先需要定义一个`OutputTag`，用于标识旁侧输出流：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -53,9 +47,11 @@ val outputTag = OutputTag[String]("side-output")
 </div>
 
 Notice how the `OutputTag` is typed according to the type of elements that the side output stream
-contains.
+contains.(译者注:临时保留)
 
-Emitting data to a side output is possible from the following functions:
+注意`OutputTag`是如何根据旁侧输出流包含的元素类型进行类型化的。
+
+可以通过以下函数将数据发送到侧输出:
 
 - [ProcessFunction]({{ site.baseurl }}/dev/stream/operators/process_function.html)
 - [KeyedProcessFunction]({{ site.baseurl }}/dev/stream/operators/process_function.html#the-keyedprocessfunction)
@@ -63,9 +59,7 @@ Emitting data to a side output is possible from the following functions:
 - [ProcessWindowFunction]({{ site.baseurl }}/dev/stream/operators/windows.html#processwindowfunction)
 - ProcessAllWindowFunction
 
-You can use the `Context` parameter, which is exposed to users in the above functions, to emit
-data to a side output identified by an `OutputTag`. Here is an example of emitting side output
-data from a `ProcessFunction`:
+您可以使用上述函数中向用户公开的`Context`参数，将数据发送到由`OutputTag`标识的侧输出。 以下是从`ProcessFunction`发出侧输出数据的示例：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -117,9 +111,8 @@ val mainDataStream = input
 </div>
 </div>
 
-For retrieving the side output stream you use `getSideOutput(OutputTag)`
-on the result of the `DataStream` operation. This will give you a `DataStream` that is typed
-to the result of the side output stream:
+要检索侧输出流，请使用`getSideOutput(OutputTag)`
+在`DataStream`操作的结果上。这将为您提供一个类型为侧输出流结果的`DataStream`
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
