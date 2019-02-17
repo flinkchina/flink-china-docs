@@ -686,7 +686,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">Generating Timestamps / Watermarks</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">生成时间戳/水印</a></li>
     
   
 
@@ -703,7 +703,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">Pre-defined Timestamp Extractors / Watermark Emitters</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">预定义的时间戳提取器/水印发射器</a></li>
     
   
 
@@ -1005,7 +1005,7 @@ under the License.
       
         
         
-<li><a href="#collapse-48" data-toggle="collapse">Connectors <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
+<li><a href="#collapse-48" data-toggle="collapse">连接器<i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
   <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/connectors/">概览</a></li>
         
         
@@ -1408,7 +1408,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">Connectors</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">连接器</a></li>
     
   
 
@@ -3613,7 +3613,7 @@ with pre-defined window assigners for the most common use cases, namely <em>tumb
 <em>sliding windows</em>, <em>session windows</em> and <em>global windows</em>. You can also implement a custom window assigner by
 extending the <code class="highlighter-rouge">WindowAssigner</code> class. All built-in window assigners (except the global
 windows) assign elements to windows based on time, which can either be processing time or event
-time. Please take a look at our section on <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">event time</a> to learn
+time. Please take a look at our section on <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">事件时间</a> to learn
 about the difference between processing time and event time and how timestamps and watermarks are generated.</p>
 
 <p>Time-based windows have a <em>start timestamp</em> (inclusive) and an <em>end timestamp</em> (exclusive)
@@ -4740,7 +4740,7 @@ necessarily the ones that arrive first or last.</p>
 
 <p>When working with <em>event-time</em> windowing, it can happen that elements arrive late, <em>i.e.</em> the watermark that Flink uses to
 keep track of the progress of event-time is already past the end timestamp of a window to which an element belongs. See
-<a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">event time</a> and especially <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html#late-elements">late elements</a> for a more thorough
+<a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">事件时间</a> and especially <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html#late-elements">late elements</a> for a more thorough
 discussion of how Flink deals with event time.</p>
 
 <p>By default, late elements are dropped when the watermark is past the end of the window. However,

@@ -686,7 +686,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">Generating Timestamps / Watermarks</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">生成时间戳/水印</a></li>
     
   
 
@@ -703,7 +703,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">Pre-defined Timestamp Extractors / Watermark Emitters</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">预定义的时间戳提取器/水印发射器</a></li>
     
   
 
@@ -1005,7 +1005,7 @@ under the License.
       
         
         
-<li><a href="#collapse-48" data-toggle="collapse">Connectors <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
+<li><a href="#collapse-48" data-toggle="collapse">连接器<i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
   <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/connectors/">概览</a></li>
         
         
@@ -1408,7 +1408,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">Connectors</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">连接器</a></li>
     
   
 
@@ -3491,7 +3491,7 @@ under the License.
   <li><a href="#async-io-api" id="markdown-toc-async-io-api">Async I/O API</a>    <ul>
       <li><a href="#timeout-handling" id="markdown-toc-timeout-handling">Timeout Handling</a></li>
       <li><a href="#order-of-results" id="markdown-toc-order-of-results">Order of Results</a></li>
-      <li><a href="#event-time" id="markdown-toc-event-time">Event Time</a></li>
+      <li><a href="#event-time" id="markdown-toc-event-time">事件时间</a></li>
       <li><a href="#fault-tolerance-guarantees" id="markdown-toc-fault-tolerance-guarantees">Fault Tolerance Guarantees</a></li>
       <li><a href="#implementation-tips" id="markdown-toc-implementation-tips">Implementation Tips</a></li>
       <li><a href="#caveat" id="markdown-toc-caveat">Caveat</a></li>
@@ -3691,9 +3691,9 @@ Use <code class="highlighter-rouge">AsyncDataStream.orderedWait(...)</code> for 
   </li>
 </ul>
 
-<h3 id="event-time">Event Time</h3>
+<h3 id="event-time">事件时间</h3>
 
-<p>When the streaming application works with <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">event time</a>, watermarks will be handled correctly by the
+<p>When the streaming application works with <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">事件时间</a>, watermarks will be handled correctly by the
 asynchronous I/O operator. That means concretely the following for the two order modes:</p>
 
 <ul>
@@ -3712,7 +3712,7 @@ significant change in overhead, compared to working with <em>processing time</em
   </li>
 </ul>
 
-<p>Please recall that <em>Ingestion Time</em> is a special case of <em>event time</em> with automatically generated watermarks that
+<p>Please recall that <em>Ingestion Time</em> is a special case of <em>事件时间</em> with automatically generated watermarks that
 are based on the sources processing time.</p>
 
 <h3 id="fault-tolerance-guarantees">Fault Tolerance Guarantees</h3>

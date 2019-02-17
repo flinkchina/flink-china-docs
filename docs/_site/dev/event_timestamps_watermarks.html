@@ -661,7 +661,7 @@ under the License.
       
         
         
-<li><a href="#collapse-29" data-toggle="collapse" class="active">Event Time</a><div class="collapse in" id="collapse-29"><ul>
+<li><a href="#collapse-29" data-toggle="collapse" class="active">事件时间</a><div class="collapse in" id="collapse-29"><ul>
   <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">概览</a></li>
         
         
@@ -686,7 +686,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html" class="active">Generating Timestamps / Watermarks</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html" class="active">生成时间戳/水印</a></li>
     
   
 
@@ -703,7 +703,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">Pre-defined Timestamp Extractors / Watermark Emitters</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">预定义的时间戳提取器/水印发射器</a></li>
     
   
 
@@ -1005,7 +1005,7 @@ under the License.
       
         
         
-<li><a href="#collapse-48" data-toggle="collapse">Connectors <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
+<li><a href="#collapse-48" data-toggle="collapse">连接器<i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
   <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/connectors/">概览</a></li>
         
         
@@ -1408,7 +1408,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">Connectors</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">连接器</a></li>
     
   
 
@@ -3470,17 +3470,17 @@ under the License.
 
   
   
-    <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">Event Time</a></li>
+    <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">事件时间</a></li>
   
 
   
   
-    <li class="active">Generating Timestamps / Watermarks</li>
+    <li class="active">生成时间戳/水印</li>
   
 
 </ol>
 
-<h1>Generating Timestamps / Watermarks</h1>
+<h1>生成时间戳/水印</h1>
 
 
 
@@ -3494,10 +3494,10 @@ under the License.
   <li><a href="#timestamps-per-kafka-partition" id="markdown-toc-timestamps-per-kafka-partition">Timestamps per Kafka Partition</a></li>
 </ul>
 
-<p>This section is relevant for programs running on <strong>event time</strong>. For an introduction to <em>event time</em>,
+<p>This section is relevant for programs running on <strong>事件时间</strong>. For an introduction to <em>事件时间</em>,
 <em>processing time</em>, and <em>ingestion time</em>, please refer to the <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">introduction to event time</a>.</p>
 
-<p>To work with <em>event time</em>, streaming programs need to set the <em>time characteristic</em> accordingly.</p>
+<p>To work with <em>事件时间</em>, streaming programs need to set the <em>time characteristic</em> accordingly.</p>
 
 <div class="codetabs">
   <div data-lang="java">
@@ -3516,7 +3516,7 @@ under the License.
 
 <h2 id="assigning-timestamps">Assigning Timestamps</h2>
 
-<p>In order to work with <em>event time</em>, Flink needs to know the events’ <em>timestamps</em>, meaning each element in the
+<p>In order to work with <em>事件时间</em>, Flink needs to know the events’ <em>timestamps</em>, meaning each element in the
 stream needs to have its event timestamp <em>assigned</em>. This is usually done by accessing/extracting the
 timestamp from some field in the element.</p>
 
@@ -3592,7 +3592,7 @@ the source (or consumer) itself. More information on how to do so can be found i
 <p><strong>NOTE:</strong> The remainder of this section presents the main interfaces a programmer has
 to implement in order to create her own timestamp extractors/watermark emitters.
 To see the pre-implemented extractors that ship with Flink, please refer to the
-<a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">Pre-defined Timestamp Extractors / Watermark Emitters</a> page.</p>
+<a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">预定义的时间戳提取器/水印发射器</a> page.</p>
 
 <div class="codetabs">
   <div data-lang="java">

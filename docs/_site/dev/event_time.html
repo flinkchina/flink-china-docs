@@ -653,7 +653,7 @@ under the License.
       
         
         
-<li><a href="#collapse-29" data-toggle="collapse" class="active">Event Time</a><div class="collapse in" id="collapse-29"><ul>
+<li><a href="#collapse-29" data-toggle="collapse" class="active">事件时间</a><div class="collapse in" id="collapse-29"><ul>
   <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html" class="active">概览</a></li>
         
         
@@ -678,7 +678,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">Generating Timestamps / Watermarks</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">生成时间戳/水印</a></li>
     
   
 
@@ -695,7 +695,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">Pre-defined Timestamp Extractors / Watermark Emitters</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">预定义的时间戳提取器/水印发射器</a></li>
     
   
 
@@ -997,7 +997,7 @@ under the License.
       
         
         
-<li><a href="#collapse-48" data-toggle="collapse">Connectors <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
+<li><a href="#collapse-48" data-toggle="collapse">连接器<i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
   <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/connectors/">概览</a></li>
         
         
@@ -1400,7 +1400,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">Connectors</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">连接器</a></li>
     
   
 
@@ -3454,12 +3454,12 @@ under the License.
 
   
   
-    <li class="active">Event Time</li>
+    <li class="active">事件时间</li>
   
 
 </ol>
 
-<h1>Event Time</h1>
+<h1>事件时间</h1>
 
 
 
@@ -3522,16 +3522,16 @@ under the License.
   record gets the source’s current time as a timestamp, and time-based operations (like time windows)
   refer to that timestamp.</p>
 
-    <p><em>Ingestion time</em> sits conceptually in between <em>event time</em> and <em>processing time</em>. Compared to
+    <p><em>Ingestion time</em> sits conceptually in between <em>事件时间</em> and <em>processing time</em>. Compared to
   <em>processing time</em>, it is slightly more expensive, but gives more predictable results. Because
   <em>ingestion time</em> uses stable timestamps (assigned once at the source), different window operations
   over the records will refer to the same timestamp, whereas in <em>processing time</em> each window operator
   may assign the record to a different window (based on the local system clock and any transport delay).</p>
 
-    <p>Compared to <em>event time</em>, <em>ingestion time</em> programs cannot handle any out-of-order events or late data,
+    <p>Compared to <em>事件时间</em>, <em>ingestion time</em> programs cannot handle any out-of-order events or late data,
   but the programs don’t have to specify how to generate <em>watermarks</em>.</p>
 
-    <p>Internally, <em>ingestion time</em> is treated much like <em>event time</em>, but with automatic timestamp assignment and
+    <p>Internally, <em>ingestion time</em> is treated much like <em>事件时间</em>, but with automatic timestamp assignment and
   automatic watermark generation.</p>
   </li>
 </ul>
@@ -3588,14 +3588,14 @@ windows adapts with the time characteristic.</p>
   </div>
 </div>
 
-<p>Note that in order to run this example in <em>event time</em>, the program needs to either use sources
+<p>Note that in order to run this example in <em>事件时间</em>, the program needs to either use sources
 that directly define event time for the data and emit watermarks themselves, or the program must
 inject a <em>Timestamp Assigner &amp; Watermark Generator</em> after the sources. Those functions describe how to access
 the event timestamps, and what degree of out-of-orderness the event stream exhibits.</p>
 
 <p>The section below describes the general mechanism behind <em>timestamps</em> and <em>watermarks</em>. For a guide on how
 to use timestamp assignment and watermark generation in the Flink DataStream API, please refer to
-<a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">Generating Timestamps / Watermarks</a>.</p>
+<a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">生成时间戳/水印</a>.</p>
 
 <h1 id="event-time-and-watermarks">Event Time and Watermarks</h1>
 
@@ -3606,12 +3606,12 @@ to use timestamp assignment and watermark generation in the Flink DataStream API
   <li>The <a href="https://research.google.com/pubs/archive/43864.pdf">Dataflow Model paper</a></li>
 </ul>
 
-<p>A stream processor that supports <em>event time</em> needs a way to measure the progress of event time.
+<p>A stream processor that supports <em>事件时间</em> needs a way to measure the progress of event time.
 For example, a window operator that builds hourly windows needs to be notified when event time has passed beyond the
 end of an hour, so that the operator can close the window in progress.</p>
 
-<p><em>Event time</em> can progress independently of <em>processing time</em> (measured by wall clocks).
-For example, in one program the current <em>event time</em> of an operator may trail slightly behind the <em>processing time</em>
+<p><em>事件时间</em> can progress independently of <em>processing time</em> (measured by wall clocks).
+For example, in one program the current <em>事件时间</em> of an operator may trail slightly behind the <em>processing time</em>
 (accounting for a delay in receiving the events), while both proceed at the same speed.
 On the other hand, another streaming program might progress through weeks of event time with only a few seconds of processing,
 by fast-forwarding through some historic data already buffered in a Kafka topic (or another message queue).</p>

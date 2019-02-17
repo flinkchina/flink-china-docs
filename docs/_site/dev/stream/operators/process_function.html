@@ -686,7 +686,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">Generating Timestamps / Watermarks</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamps_watermarks.html">生成时间戳/水印</a></li>
     
   
 
@@ -703,7 +703,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">Pre-defined Timestamp Extractors / Watermark Emitters</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_timestamp_extractors.html">预定义的时间戳提取器/水印发射器</a></li>
     
   
 
@@ -1005,7 +1005,7 @@ under the License.
       
         
         
-<li><a href="#collapse-48" data-toggle="collapse">Connectors <i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
+<li><a href="#collapse-48" data-toggle="collapse">连接器<i class="fa fa-caret-down pull-right" aria-hidden="true" style="padding-top: 4px"></i></a><div class="collapse" id="collapse-48"><ul>
   <li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/connectors/">概览</a></li>
         
         
@@ -1408,7 +1408,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">Connectors</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/batch/connectors.html">连接器</a></li>
     
   
 
@@ -3514,7 +3514,7 @@ by being invoked for each event received in the input stream(s).</p>
 <p>For fault-tolerant state, the <code class="highlighter-rouge">ProcessFunction</code> gives access to Flink’s <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/state/state.html">keyed state</a>, accessible via the
 <code class="highlighter-rouge">RuntimeContext</code>, similar to the way other stateful functions can access keyed state.</p>
 
-<p>The timers allow applications to react to changes in processing time and in <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">event time</a>.
+<p>The timers allow applications to react to changes in processing time and in <a href="//ci.apache.org/projects/flink/flink-docs-master/dev/event_time.html">事件时间</a>.
 Every call to the function <code class="highlighter-rouge">processElement(...)</code> gets a <code class="highlighter-rouge">Context</code> object which gives access to the element’s
 event time timestamp, and to the <em>TimerService</em>. The <code class="highlighter-rouge">TimerService</code> can be used to register callbacks for future
 event-/processing-time instants. When a timer’s particular time is reached, the <code class="highlighter-rouge">onTimer(...)</code> method is
