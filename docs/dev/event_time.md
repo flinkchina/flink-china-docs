@@ -140,24 +140,20 @@ to use timestamp assignment and watermark generation in the Flink DataStream API
 
 ------
 
-The mechanism in Flink to measure progress in event time is **watermarks**.
-Watermarks flow as part of the data stream and carry a timestamp *t*. A *Watermark(t)* declares that event time has reached time
-*t* in that stream, meaning that there should be no more elements from the stream with a timestamp *t' <= t* (i.e. events with timestamps
-older or equal to the watermark).
+Flink中用于衡量事件时间进度的机制是**水印**。
+水印作为数据流的一部分流动并带有时间戳*t*。*Watermark(t)*声明该流中的事件时间已达到时间*t*，这意味着流中不应再有带时间戳* t'<= t *的元素（即时间戳较旧或相等的事件） 到水印）。【这意味着该流中不应再存在时间戳为*t'<=t*的元素（即时间戳早于或等于水印的事件）】
 
-The figure below shows a stream of events with (logical) timestamps, and watermarks flowing inline. In this example the events are in order
-(with respect to their timestamps), meaning that the watermarks are simply periodic markers in the stream.
+下图显示了具有（逻辑）时间戳的事件流，以及内联流动的水印。 在该示例中，事件按顺序（相对于它们的时间戳）排列，意味着水印仅是流中的周期性标记。
 
-<img src="{{ site.baseurl }}/fig/stream_watermark_in_order.svg" alt="A data stream with events (in order) and watermarks" class="center" width="65%" />
+<img src="{{ site.baseurl }}/fig/stream_watermark_in_order.svg" alt="带有事件(按顺序)和水印的数据流" class="center" width="65%" />
 
-Watermarks are crucial for *out-of-order* streams, as illustrated below, where the events are not ordered by their timestamps.
-In general a watermark is a declaration that by that point in the stream, all events up to a certain timestamp should have arrived.
-Once a watermark reaches an operator, the operator can advance its internal *event time clock* to the value of the watermark.
+水印对于*无序*流至关重要，如下所示，其中事件不是按照时间戳排序的。
+一般来说，水印是一种声明，通过流中的该点，到达某个时间戳的所有事件都应该到达。
+一旦水印到达算子，算子可以将其内部的*事件时间时钟*推进到水印的值。
 
-<img src="{{ site.baseurl }}/fig/stream_watermark_out_of_order.svg" alt="A data stream with events (out of order) and watermarks" class="center" width="65%" />
+<img src="{{ site.baseurl }}/fig/stream_watermark_out_of_order.svg" alt="带有事件(无序)和水印的数据流" class="center" width="65%" />
 
-Note that event time is inherited by a freshly created stream element (or elements) from either the event that produced them or
-from watermark that triggered creation of those elements.
+请注意，事件时间由新生成的流元素（或多个元素）继承，这些元素来自生成它们的事件或触发创建这些元素的水印。
 
 ## Watermarks in Parallel Streams
 
