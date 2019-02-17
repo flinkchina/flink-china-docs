@@ -1,5 +1,5 @@
 ---
-title: "Windows"
+title: "窗口"
 nav-parent_id: streaming_operators
 nav-id: windows
 nav-pos: 10
@@ -23,16 +23,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Windows are at the heart of processing infinite streams. Windows split the stream into "buckets" of finite size,
-over which we can apply computations. This document focuses on how windowing is performed in Flink and how the
-programmer can benefit to the maximum from its offered functionality.
+窗口是处理无限流的核心。Windows将流分割成有限大小的"buckets"，我们可以在其上应用计算。本文档重点介绍如何在Flink中执行窗口化，以及程序员如何从其所提供的功能中最大限度地获益。
 
-The general structure of a windowed Flink program is presented below. The first snippet refers to *keyed* streams,
-while the second to *non-keyed* ones. As one can see, the only difference is the `keyBy(...)` call for the keyed streams
-and the `window(...)` which becomes `windowAll(...)` for non-keyed streams. This is also going to serve as a roadmap
-for the rest of the page.
+下面介绍了窗口Flink程序的总体结构(或一般结构)。第一个片段引用*键控Keys*流，而第二个片段引用*非键控non-keyed*流。如您所见，唯一的区别是对键化流的`keyBy(...)`调用和对非键化流的`window(...)`（变成`windowAll(...)`的调用。这也将作为页面其余部分的路线图。
 
-**Keyed Windows**
+
+**键控(Keyd)窗口**
 
     stream
            .keyBy(...)               <-  keyed versus non-keyed windows
@@ -44,7 +40,7 @@ for the rest of the page.
            .reduce/aggregate/fold/apply()      <-  required: "function"
           [.getSideOutput(...)]      <-  optional: "output tag"
 
-**Non-Keyed Windows**
+**非键控(Non-Keyed)窗口**
 
     stream
            .windowAll(...)           <-  required: "assigner"
@@ -55,51 +51,30 @@ for the rest of the page.
            .reduce/aggregate/fold/apply()      <-  required: "function"
           [.getSideOutput(...)]      <-  optional: "output tag"
 
-In the above, the commands in square brackets ([...]) are optional. This reveals that Flink allows you to customize your
-windowing logic in many different ways so that it best fits your needs.
-
+在上面的例子中，方括号([…])中的命令是可选的。这表明Flink允许您以许多不同的方式定制窗口逻辑，以便它最适合您的需要。
 * This will be replaced by the TOC
 {:toc}
 
-## Window Lifecycle
+## 窗口生命周期
 
-In a nutshell, a window is **created** as soon as the first element that should belong to this window arrives, and the
-window is **completely removed** when the time (event or processing time) passes its end timestamp plus the user-specified
-`allowed lateness` (see [Allowed Lateness](#allowed-lateness)). Flink guarantees removal only for time-based
-windows and not for other types, *e.g.* global windows (see [Window Assigners](#window-assigners)). For example, with an
-event-time-based windowing strategy that creates non-overlapping (or tumbling) windows every 5 minutes and has an allowed
-lateness of 1 min, Flink will create a new window for the interval between `12:00` and `12:05` when the first element with
-a timestamp that falls into this interval arrives, and it will remove it when the watermark passes the `12:06`
-timestamp.
+简而言之，只要应该属于该窗口的第一个元素到达，就会立即创建一个窗口**，当时间（事件或处理时间）超过其结束时间戳时加上用户指定的时间戳时，窗口将被**完全删除** 用户指定的“允许迟到”（参见[Allowed Lateness](#allowed-lateness)）。 Flink保证仅删除基于时间的窗口而不是其他类型，例如*全局窗口（参见[Window Assigners](#window-assigners)）。 例如，使用基于事件时间的窗口策略，每5分钟创建一个不重叠（或翻滚）的窗口，并允许延迟1分钟，Flink将为第一个元素使用时的`12:00`到`12:05`之间的间隔创建一个新窗口。 当水印通过`12：06`时间戳时它将删除它。
+当第一个带有时间戳的元素到达时，Flink将为`12:00`到`12:05`之间的时间间隔创建一个新窗口，当水印通过`12:06`时间戳时，Flink将删除该时间戳。
 
-In addition, each window will have a `Trigger` (see [Triggers](#triggers)) and a function (`ProcessWindowFunction`, `ReduceFunction`,
-`AggregateFunction` or `FoldFunction`) (see [Window Functions](#window-functions)) attached to it. The function will contain the computation to
-be applied to the contents of the window, while the `Trigger` specifies the conditions under which the window is
-considered ready for the function to be applied. A triggering policy might be something like "when the number of elements
-in the window is more than 4", or "when the watermark passes the end of the window". A trigger can also decide to
-purge a window's contents any time between its creation and removal. Purging in this case only refers to the elements
-in the window, and *not* the window metadata. This means that new data can still be added to that window.
 
-Apart from the above, you can specify an `Evictor` (see [Evictors](#evictors)) which will be able to remove
-elements from the window after the trigger fires and before and/or after the function is applied.
+此外，每个窗口都将附加一个`触发器`（请参见[触发器](#triggers)）和一个函数（`ProcessWindowFunction`、`ReduceFunction`、`AggregateFunction`或'FoldFunction`）(请参见[窗口函数](#window-functions))。函数将包含要应用于窗口内容的计算，而`触发器`指定了窗口被视为已准备好应用该函数的条件。触发策略可能类似于“当窗口中的元素数量大于4时”，或者“当水印通过窗口末尾时”。触发器还可以决定在创建和删除窗口之间的任何时间清除窗口的内容。在这种情况下，清除只涉及窗口中的元素，而 *不是* 窗口元数据。这意味着新数据仍然可以添加到该窗口中。
 
-In the following we go into more detail for each of the components above. We start with the required parts in the above
-snippet (see [Keyed vs Non-Keyed Windows](#keyed-vs-non-keyed-windows), [Window Assigner](#window-assigner), and
-[Window Function](#window-function)) before moving to the optional ones.
+除上述之外，您还可以指定一个`evictor驱逐器`（请参见[Evictors](#evictors)）），它将能够在触发器触发之后以及在和/或函数应用之前从窗口中删除元素。
 
-## Keyed vs Non-Keyed Windows
+在下面我们将详细介绍上面每个组件。在移动到可选部分之前，我们先从上面的代码片段中所需的部分开始（请参见[键控窗口vs非键控窗口](#keyed-vs-non-keyed-windows)、[窗口配置器](#window-assigner)和[窗口函数](#window-function)）。
 
-The first thing to specify is whether your stream should be keyed or not. This has to be done before defining the window.
-Using the `keyBy(...)` will split your infinite stream into logical keyed streams. If `keyBy(...)` is not called, your
-stream is not keyed.
+## 键控(Keyed) vs非键控Non-Keyed窗口
 
-In the case of keyed streams, any attribute of your incoming events can be used as a key
-(more details [here]({{ site.baseurl }}/dev/api_concepts.html#specifying-keys)). Having a keyed stream will
-allow your windowed computation to be performed in parallel by multiple tasks, as each logical keyed stream can be processed
-independently from the rest. All elements referring to the same key will be sent to the same parallel task.
+要指定的第一件事是您的流是否应该键入。 必须在定义窗口之前完成此操作。
+使用`keyBy（...）`将您的无限流分成逻辑键控流。 如果未调用`keyBy（...）`，则表示您的流不是键控的(则不会为流设置键)。
 
-In case of non-keyed streams, your original stream will not be split into multiple logical streams and all the windowing logic
-will be performed by a single task, *i.e.* with parallelism of 1.
+对于键控流，可以将传入事件的任何属性用作键（更多详细信息[here]({{ site.baseurl }}/dev/api_concepts.html#specifying-keys)）。 拥有键控流将允许您的窗口计算由多个任务并行执行，因为每个逻辑键控流可以独立于其余任务进行处理。  所有引用相同键的元素将被发送到相同的并行任务(即引用同一个键的所有元素都将发送到同一个并行任务)
+
+在非键控流的情况下，您的原始流将不会被拆分为多个逻辑流，并且所有窗口逻辑将由单个任务执行，*即*并行度为1。
 
 ## Window Assigners
 
