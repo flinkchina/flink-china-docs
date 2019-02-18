@@ -1,5 +1,5 @@
 ---
-title: Flink DataSet API数据集API编程指南
+title: DataSet API编程指南
 nav-id: batch
 nav-title: 批处理(DataSet 数据集API)
 nav-parent_id: dev
@@ -25,32 +25,23 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-DataSet programs in Flink are regular programs that implement transformations on data sets
-(e.g., filtering, mapping, joining, grouping). The data sets are initially created from certain
-sources (e.g., by reading files, or from local collections). Results are returned via sinks, which may for
-example write the data to (distributed) files, or to standard output (for example the command line
-terminal). Flink programs run in a variety of contexts, standalone, or embedded in other programs.
-The execution can happen in a local JVM, or on clusters of many machines.
 
-Please see [basic concepts]({{ site.baseurl }}/dev/api_concepts.html) for an introduction
-to the basic concepts of the Flink API.
+Flink中的数据集程序是在数据集上实现转换（例如过滤、映射、连接、分组 filtering, mapping, joining, grouping）的常规程序。数据集最初是从某些源（例如，通过读取文件或从本地集合）创建的。结果通过接收器返回，接收器可以将数据写入（分布式）文件或标准输出（例如命令行终端）。Flink程序在各种环境下运行，独立运行，或嵌入到其他程序中。
 
-In order to create your own Flink DataSet program, we encourage you to start with the
-[anatomy of a Flink Program]({{ site.baseurl }}/dev/api_concepts.html#anatomy-of-a-flink-program)
-and gradually add your own
-[transformations](#dataset-transformations). The remaining sections act as references for additional
-operations and advanced features.
+执行可以在本地JVM中执行，也可以在许多机器的集群中执行。
+
+请参阅[基本概念]({{ site.baseurl }}/dev/api_concepts.html)了解Flink API的基本概念。
+
+为了创建自己的Flink数据集程序，我们鼓励您从[Flink程序的解剖结构]({{ site.baseurl }}/dev/api_concepts.html#anatomy-of-a-flink-program)开始，逐步添加自己的[转换结构](#dataset-transformations)。其余部分作为附加操作和高级功能的参考。
 
 * This will be replaced by the TOC
 {:toc}
 
-Example Program
+
+示例程序
 ---------------
 
-The following program is a complete, working example of WordCount. You can copy &amp; paste the code
-to run it locally. You only have to include the correct Flink's library into your project
-(see Section [Linking with Flink]({{ site.baseurl }}/dev/linking_with_flink.html)) and specify the imports. Then you are ready
-to go!
+下面的程序是wordcount的一个完整的工作示例。您可以复制和粘贴代码以在本地运行它。您只需在项目中包含正确的Flink类库（请参见[链接到Flink]({{ site.baseurl }}/dev/linking_with_flink.html)) 一节），并指定导入。那你就准备好了！
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -112,15 +103,12 @@ object WordCount {
 
 {% top %}
 
-DataSet Transformations
+数据集转换
 -----------------------
 
-Data transformations transform one or more DataSets into a new DataSet. Programs can combine
-multiple transformations into sophisticated assemblies.
+数据转换将一个或多个DataSet转换为新的DataSet。 程序可以将多个转换组合成复杂的程序集。
 
-This section gives a brief overview of the available transformations. The [transformations
-documentation](dataset_transformations.html) has a full description of all transformations with
-examples.
+本节简要概述了可用的转换。 [转换文档](dataset_transformations.html)通过示例对所有转换进行了完整描述。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -448,7 +436,7 @@ DataSet<Tuple2<String,Integer>> result3 = in.groupBy(0)
 
 ----------
 
-The following transformations are available on data sets of Tuples:
+元组数据集可进行以下转换:
 
 <table class="table table-bordered">
   <thead>
@@ -749,7 +737,7 @@ val result3 = in.groupBy(0).sortGroup(1, Order.ASCENDING).first(3)
 
 ----------
 
-The following transformations are available on data sets of Tuples:
+元组数据集可进行以下转换:
 
 <table class="table table-bordered">
   <thead>
@@ -788,15 +776,13 @@ is not supported by the API out-of-the-box. To use this feature, you should use 
 </div>
 </div>
 
-The [parallelism]({{ site.baseurl }}/dev/parallel.html) of a transformation can be defined by `setParallelism(int)` while
-`name(String)` assigns a custom name to a transformation which is helpful for debugging. The same is
-possible for [Data Sources](#data-sources) and [Data Sinks](#data-sinks).
+转换的[parallelism]({{ site.baseurl }}/dev/parallel.html)可以通过`setParallelism（int）`定义，而`name（String）`为转换分配一个自定义名称。 调试。 [数据源](#data-sources)和[数据接收器](#data-sinks)也是如此。
 
-`withParameters(Configuration)` passes Configuration objects, which can be accessed from the `open()` method inside the user function.
+`withParameters（Configuration）`传递Configuration对象，可以从用户函数内的`open（）`方法访问。
 
 {% top %}
 
-Data Sources
+数据源
 ------------
 
 <div class="codetabs" markdown="1">
@@ -809,7 +795,11 @@ Flink comes
 with several built-in formats to create data sets from common file formats. Many of them have
 shortcut methods on the *ExecutionEnvironment*.
 
-File-based:
+数据源创建初始数据集，例如来自文件或Java集合。 创建数据集的一般机制在{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/io/InputFormat.java "InputFormat"%}后面抽象出来。
+Flink附带了几种内置格式，可以从通用文件格式创建数据集。 他们中的许多人在* ExecutionEnvironment *上都有快捷方法。
+
+
+基于文件的:
 
 - `readTextFile(path)` / `TextInputFormat` - Reads files line wise and returns them as Strings.
 
@@ -827,7 +817,7 @@ File-based:
    delimited primitive data types such as `String` or `Integer` using the given delimiter.
 
 
-Collection-based:
+基于Collection集合的:
 
 - `fromCollection(Collection)` - Creates a data set from the Java Java.util.Collection. All elements
   in the collection must be of the same type.
@@ -844,13 +834,13 @@ Collection-based:
 - `generateSequence(from, to)` - Generates the sequence of numbers in the given interval, in
   parallel.
 
-Generic:
+通用的:
 
 - `readFile(inputFormat, path)` / `FileInputFormat` - Accepts a file input format.
 
 - `createInput(inputFormat)` / `InputFormat` - Accepts a generic input format.
 
-**Examples**
+**示例**
 
 {% highlight java %}
 ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -900,9 +890,11 @@ DataSet<Tuple2<String, Integer> dbData =
 // manually provide the type information as shown in the examples above.
 {% endhighlight %}
 
-#### Configuring CSV Parsing
+#### 配置CSV解析
 
-Flink offers a number of configuration options for CSV parsing:
+
+
+Flink为CSV解析提供了许多配置选项：
 
 - `types(Class ... types)` specifies the types of the fields to parse. **It is mandatory to configure the types of the parsed fields.**
   In case of the type class Boolean.class, "True" (case-insensitive), "False" (case-insensitive), "1" and "0" are treated as booleans.
@@ -922,9 +914,9 @@ Flink offers a number of configuration options for CSV parsing:
 - `ignoreFirstLine()` configures the InputFormat to ignore the first line of the input file. By default no line is ignored.
 
 
-#### Recursive Traversal of the Input Path Directory
+#### 递归遍历输入路径目录
 
-For file-based inputs, when the input path is a directory, nested files are not enumerated by default. Instead, only the files inside the base directory are read, while nested files are ignored. Recursive enumeration of nested files can be enabled through the `recursive.file.enumeration` configuration parameter, like in the following example.
+对于基于文件的输入，当输入路径是目录时，默认情况下不会枚举嵌套文件。 相反，只读取基目录中的文件，而忽略嵌套文件。 可以通过`recursive.file.enumeration`配置参数启用嵌套文件的递归枚举，如下例所示。
 
 {% highlight java %}
 // enable recursive enumeration of nested input files
@@ -944,14 +936,10 @@ DataSet<String> logs = env.readTextFile("file:///path/with.nested/files")
 </div>
 <div data-lang="scala" markdown="1">
 
-Data sources create the initial data sets, such as from files or from Java collections. The general
-mechanism of creating data sets is abstracted behind an
-{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/io/InputFormat.java "InputFormat"%}.
-Flink comes
-with several built-in formats to create data sets from common file formats. Many of them have
-shortcut methods on the *ExecutionEnvironment*.
 
-File-based:
+数据源创建初始数据集，例如来自文件或Java集合。 创建数据集的一般机制在{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/io/InputFormat.java "InputFormat"%}后面抽象出来。
+Flink附带了几种内置格式，可以从通用文件格式创建数据集。 他们中的许多人在*ExecutionEnvironment*上都有快捷方法。
+基于文件的:
 
 - `readTextFile(path)` / `TextInputFormat` - Reads files line wise and returns them as Strings.
 
@@ -1074,11 +1062,11 @@ env.readTextFile("file:///path/with.nested/files").withParameters(parameters)
 </div>
 </div>
 
-### Read Compressed Files
+### 读取压缩文件
 
-Flink currently supports transparent decompression of input files if these are marked with an appropriate file extension. In particular, this means that no further configuration of the input formats is necessary and any `FileInputFormat` support the compression, including custom input formats. Please notice that compressed files might not be read in parallel, thus impacting job scalability.
+link目前支持输入文件的透明解压缩，如果它们标有适当的文件扩展名。 特别是，这意味着不需要进一步配置输入格式，任何`FileInputFormat`都支持压缩，包括自定义输入格式。 请注意，压缩文件可能无法并行读取，从而影响作业可伸缩性。
 
-The following table lists the currently supported compression methods.
+下表列出了当前支持的压缩方法。
 
 <br />
 
@@ -1118,17 +1106,16 @@ The following table lists the currently supported compression methods.
 
 {% top %}
 
-Data Sinks
+Data Sinks 数据结构器
 ----------
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
-Data sinks consume DataSets and are used to store or return them. Data sink operations are described
-using an
-{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/io/OutputFormat.java "OutputFormat" %}.
-Flink comes with a variety of built-in output formats that are encapsulated behind operations on the
-DataSet:
+
+数据接收器使用数据集并用于存储或返回它们。使用{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/io/OutputFormat.java "OutputFormat" %}来描述数据接收器操作。
+
+Flink附带了各种内置输出格式，这些格式封装在数据集的操作之后：
 
 - `writeAsText()` / `TextOutputFormat` - Writes elements line-wise as Strings. The Strings are
   obtained by calling the *toString()* method of each element.
@@ -1145,12 +1132,11 @@ greater than 1, the output will also be prepended with the identifier of the tas
 - `output()`/ `OutputFormat` - Most generic output method, for data sinks that are not file based
   (such as storing the result in a database).
 
-A DataSet can be input to multiple operations. Programs can write or print a data set and at the
-same time run additional transformations on them.
+可以将DataSet输入到多个操作。 程序可以编写或打印数据集，同时对它们执行其他转换。
 
-**Examples**
+**示例**
 
-Standard data sink methods:
+标准数据接收器方法:
 
 {% highlight java %}
 // text data
@@ -1197,12 +1183,11 @@ myResult.output(
     );
 {% endhighlight %}
 
-#### Locally Sorted Output
+#### 本地排序输出
 
-The output of a data sink can be locally sorted on specified fields in specified orders using [tuple field positions]({{ site.baseurl }}/dev/api_concepts.html#define-keys-for-tuples) or [field expressions]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions). This works for every output format.
+数据接收器的输出可以使用[元组字段位置]({{ site.baseurl }}/dev/api_concepts.html#define-keys-for-tuples)或[字段表达式]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions)按指定顺序在指定字段上进行本地排序 。 这适用于每种输出格式。
 
-The following examples show how to use this feature:
-
+以下示例显示如何使用此功能：
 {% highlight java %}
 
 DataSet<Tuple3<Integer, String, Double>> tData = // [...]
@@ -1226,15 +1211,13 @@ sData.sortPartition("*", Order.DESCENDING).writeAsText(...);
 
 {% endhighlight %}
 
-Globally sorted output is not supported yet.
+尚不支持全局排序的输出。
 
 </div>
 <div data-lang="scala" markdown="1">
-Data sinks consume DataSets and are used to store or return them. Data sink operations are described
-using an
-{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/io/OutputFormat.java "OutputFormat" %}.
-Flink comes with a variety of built-in output formats that are encapsulated behind operations on the
-DataSet:
+
+据接收器使用DataSet并用于存储或返回它们。 使用{% gh_link /flink-core/src/main/java/org/apache/flink/api/common/io/OutputFormat.java "OutputFormat" %}描述数据接收器操作。
+Flink带有各种内置输出格式，这些格式封装在DataSet上的操作后面：
 
 - `writeAsText()` / `TextOutputFormat` - Writes elements line-wise as Strings. The Strings are
   obtained by calling the *toString()* method of each element.
@@ -1247,12 +1230,11 @@ DataSet:
 - `output()`/ `OutputFormat` - Most generic output method, for data sinks that are not file based
   (such as storing the result in a database).
 
-A DataSet can be input to multiple operations. Programs can write or print a data set and at the
-same time run additional transformations on them.
+一个数据集可以输入多个操作。程序可以写入或打印数据集，同时在其上运行额外的转换。
 
-**Examples**
+**示例**
 
-Standard data sink methods:
+标准数据接收器方法:
 
 {% highlight scala %}
 // text data
@@ -1527,18 +1509,18 @@ env.execute()
 
 {% top %}
 
-Operating on data objects in functions
+对函数中的数据对象进行操作
 --------------------------------------
 
-Flink's runtime exchanges data with user functions in form of Java objects. Functions receive input objects from the runtime as method parameters and return output objects as result. Because these objects are accessed by user functions and runtime code, it is very important to understand and follow the rules about how the user code may access, i.e., read and modify, these objects.
+Flink的运行时以Java对象的形式与用户函数交换数据。函数从运行时接收输入对象作为方法参数，并返回输出对象作为结果。因为这些对象是由用户函数和运行时代码访问的，所以理解并遵循有关用户代码如何访问（即读取和修改）这些对象的规则非常重要。
 
-User functions receive objects from Flink's runtime either as regular method parameters (like a `MapFunction`) or through an `Iterable` parameter (like a `GroupReduceFunction`). We refer to objects that the runtime passes to a user function as *input objects*. User functions can emit objects to the Flink runtime either as a method return value (like a `MapFunction`) or through a `Collector` (like a `FlatMapFunction`). We refer to objects which have been emitted by the user function to the runtime as *output objects*.
+用户函数从Flink的运行时接收对象，作为常规方法参数（如`MapFunction`）或通过`Iterable`参数（如`GroupReduceFunction`）。我们将运行时传递给用户函数的对象称为*输入对象*。用户函数可以将对象作为方法返回值（如`MapFunction`）或通过`Collector`（如`FlatMapFunction`）发送到Flink运行时。我们将用户函数发出的对象称为*输出对象*。
 
-Flink's DataSet API features two modes that differ in how Flink's runtime creates or reuses input objects. This behavior affects the guarantees and constraints for how user functions may interact with input and output objects. The following sections define these rules and give coding guidelines to write safe user function code.
+Flink的DataSet API具有两种模式，这些模式在Flink的运行时创建或重用输入对象方面有所不同。此行为会影响用户函数如何与输入和输出对象进行交互的保证和约束。以下部分定义了这些规则，并给出了编写安全用户功能代码的编码指南。
 
-### Object-Reuse Disabled (DEFAULT)
+### 禁用对象重用（DEFAULT）
 
-By default, Flink operates in object-reuse disabled mode. This mode ensures that functions always receive new input objects within a function call. The object-reuse disabled mode gives better guarantees and is safer to use. However, it comes with a certain processing overhead and might cause higher Java garbage collection activity. The following table explains how user functions may access input and output objects in object-reuse disabled mode.
+默认情况下，Flink在禁用对象重用模式下运行。 此模式可确保函数始终在函数调用中接收新的输入对象。 禁用对象重用模式可提供更好的保证，并且使用起来更安全。 但是，它带来了一定的处理开销，可能会导致更高的Java垃圾回收活动。 下表说明了用户函数如何在禁用对象重用模式下访问输入和输出对象。
 
 <table class="table table-bordered">
   <thead>
@@ -1577,16 +1559,16 @@ By default, Flink operates in object-reuse disabled mode. This mode ensures that
   </tbody>
 </table>
 
-**Coding guidelines for the object-reuse disabled (default) mode:**
+**禁用对象重用（默认）模式的编码指南:**
 
 - Do not remember and read input objects across method calls.
 - Do not read objects after you emitted them.
+-不要在方法调用之间记住和读取输入对象。
+-发出对象后不要读取它们。
 
+### 对象重用启用
 
-### Object-Reuse Enabled
-
-In object-reuse enabled mode, Flink's runtime minimizes the number of object instantiations. This can improve the performance and can reduce the Java garbage collection pressure. The object-reuse enabled mode is activated by calling `ExecutionConfig.enableObjectReuse()`. The following table explains how user functions may access input and output objects in object-reuse enabled mode.
-
+在支持对象重用模式下，Flink的运行时最小化了对象实例化的数量。这可以提高性能并减少Java垃圾收集压力。通过调用`ExecutionConfig.enableObjectReuse()`激活支持对象重用的模式。下表解释了用户函数如何在支持对象重用模式下访问输入和输出对象。
 <table class="table table-bordered">
   <thead>
     <tr>
@@ -1630,33 +1612,33 @@ In object-reuse enabled mode, Flink's runtime minimizes the number of object ins
   </tbody>
 </table>
 
-**Coding guidelines for object-reuse enabled:**
+**启用了对象重用的编码指南:**
 
 - Do not remember input objects received from an `Iterable`.
 - Do not remember and read input objects across method calls.
 - Do not modify or emit input objects, except for input objects of `MapFunction`, `FlatMapFunction`, `MapPartitionFunction`, `GroupReduceFunction`, `GroupCombineFunction`, `CoGroupFunction`, and `InputFormat.next(reuse)`.
 - To reduce object instantiations, you can always emit a dedicated output object which is repeatedly modified but never read.
 
+
+-不要记住从“iterable”接收的输入对象。
+-不要在方法调用之间记住和读取输入对象。
+-不要修改或发出输入对象，除了“mapFunction”、“flatmapFunction”、“mapPartitionFunction”、“groupReduceFunction”、“groupCombineFunction”、“coGroupFunction”和“inputformat.next（重用）”的输入对象。
+-为了减少对象实例化，您可以始终发出一个专用的输出对象，该对象被反复修改但从不读取。
+
 {% top %}
 
-Debugging
+调试
 ---------
 
-Before running a data analysis program on a large data set in a distributed cluster, it is a good
-idea to make sure that the implemented algorithm works as desired. Hence, implementing data analysis
-programs is usually an incremental process of checking results, debugging, and improving.
+在对分布式集群中的大型数据集运行数据分析程序之前，最好确保所实现的算法能够正常工作。因此，实现数据分析程序通常是检查结果、调试和改进的增量过程。
 
-Flink provides a few nice features to significantly ease the development process of data analysis
-programs by supporting local debugging from within an IDE, injection of test data, and collection of
-result data. This section give some hints how to ease the development of Flink programs.
+Flink提供了一些很好的特性，通过支持IDE中的本地调试、测试数据的注入和结果数据的收集，可以显著简化数据分析程序的开发过程。本节给出了一些如何简化Flink程序开发的提示。
 
-### Local Execution Environment
+### 本地执行环境
 
-A `LocalEnvironment` starts a Flink system within the same JVM process it was created in. If you
-start the LocalEnvironment from an IDE, you can set breakpoints in your code and easily debug your
-program.
+“LocalEnvironment”在它创建的JVM进程中启动Flink系统。如果从IDE启动LocalEnvironment，可以在代码中设置断点并轻松调试程序。
 
-A LocalEnvironment is created and used as follows:
+创建并使用LocalEnvironment如下所示:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1682,7 +1664,7 @@ env.execute()
 </div>
 </div>
 
-### Collection Data Sources and Sinks
+### 集合的支持数据源和接收器
 
 Providing input for an analysis program and checking its output is cumbersome when done by creating
 input files and reading output files. Flink features special data sources and sinks which are backed
@@ -1691,6 +1673,10 @@ easily replaced by sources and sinks that read from / write to external data sto
 
 Collection data sources can be used as follows:
 
+
+通过创建输入文件和读取输出文件，为分析程序提供输入并检查其输出非常麻烦。Flink具有由Java集合支持的特殊数据源和接收器，以简化测试。一旦对程序进行了测试，源和接收器就可以很容易地被从/写入外部数据存储(如HDFS)的源和接收器所替代。
+
+集合支持的数据源的使用方法如下:
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -1717,7 +1703,7 @@ List<Tuple2<String, Integer>> outData = new ArrayList<Tuple2<String, Integer>>()
 myResult.output(new LocalCollectionOutputFormat(outData));
 {% endhighlight %}
 
-**Note:** Currently, the collection data sink is restricted to local execution, as a debugging tool.
+**注意:** 目前，作为调试工具，集合支持的数据接收器仅限于本地执行。
 
 </div>
 <div data-lang="scala" markdown="1">
@@ -1738,72 +1724,61 @@ val myLongs = env.fromCollection(longIt)
 </div>
 </div>
 
-**Note:** Currently, the collection data source requires that data types and iterators implement
+**注意:** Currently, the collection data source requires that data types and iterators implement
 `Serializable`. Furthermore, collection data sources can not be executed in parallel (
 parallelism = 1).
 
 {% top %}
 
-Semantic Annotations
+语义标注
 -----------
 
-Semantic annotations can be used to give Flink hints about the behavior of a function.
-They tell the system which fields of a function's input the function reads and evaluates and
-which fields it unmodified forwards from its input to its output.
-Semantic annotations are a powerful means to speed up execution, because they
-allow the system to reason about reusing sort orders or partitions across multiple operations. Using
-semantic annotations may eventually save the program from unnecessary data shuffling or unnecessary
-sorts and significantly improve the performance of a program.
+语义注释可用于提供有关函数行为的Flink提示。它们告诉系统函数读取和评估函数输入的哪些字段以及未修改的字段从其输入转发到其输出。
+语义注释是加速执行的有力手段，因为它们允许系统推断在多个操作中重用排序顺序或分区。使用语义注释最终可以使程序免于不必要的数据混洗或不必要的排序，并显着提高程序的性能。
 
-**Note:** The use of semantic annotations is optional. However, it is absolutely crucial to
-be conservative when providing semantic annotations!
-Incorrect semantic annotations will cause Flink to make incorrect assumptions about your program and
-might eventually lead to incorrect results.
-If the behavior of an operator is not clearly predictable, no annotation should be provided.
-Please read the documentation carefully.
+**注意：**语义注释的使用是可选的。但是，在提供语义注释时保守是绝对至关重要的！不正确的语义注释会导致Flink对您的程序做出错误的假设，并最终可能导致错误的结果。如果操作员的行为不明确可预测，则不应提供注释。请仔细阅读文档。
 
-The following semantic annotations are currently supported.
+目前支持以下语义注释。
 
-#### Forwarded Fields Annotation
+#### 转发字段注释
+Forwarded Fields Information声明输入字段，这些字段未经修改，由函数转发到输出中的同一位置或另一位置。
 
-Forwarded fields information declares input fields which are unmodified forwarded by a function to the same position or to another position in the output.
-This information is used by the optimizer to infer whether a data property such as sorting or
-partitioning is preserved by a function.
-For functions that operate on groups of input elements such as `GroupReduce`, `GroupCombine`, `CoGroup`, and `MapPartition`, all fields that are defined as forwarded fields must always be jointly forwarded from the same input element. The forwarded fields of each element that is emitted by a group-wise function may originate from a different element of the function's input group.
+优化器使用此信息来推断数据属性（如排序或分区）是否由函数保留。
 
-Field forward information is specified using [field expressions]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions).
-Fields that are forwarded to the same position in the output can be specified by their position.
-The specified position must be valid for the input and output data type and have the same type.
-For example the String `"f2"` declares that the third field of a Java input tuple is always equal to the third field in the output tuple.
+对于对“groupReduce”、“groupCombine”、“cogroup”和“mapPartition”等输入元素组进行操作的函数，定义为转发字段的所有字段必须始终从同一输入元素进行联合转发。由分组函数发出的每个元素的转发字段可能来自函数输入组的不同元素。
 
-Fields which are unmodified forwarded to another position in the output are declared by specifying the
-source field in the input and the target field in the output as field expressions.
-The String `"f0->f2"` denotes that the first field of the Java input tuple is
-unchanged copied to the third field of the Java output tuple. The wildcard expression `*` can be used to refer to a whole input or output type, i.e., `"f0->*"` denotes that the output of a function is always equal to the first field of its Java input tuple.
 
-Multiple forwarded fields can be declared in a single String by separating them with semicolons as `"f0; f2->f1; f3->f2"` or in separate Strings `"f0", "f2->f1", "f3->f2"`. When specifying forwarded fields it is not required that all forwarded fields are declared, but all declarations must be correct.
+使用[字段表达式]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions)指定字段转发信息。
 
-Forwarded field information can be declared by attaching Java annotations on function class definitions or
-by passing them as operator arguments after invoking a function on a DataSet as shown below.
+在输出中转发到相同位置的字段可以由其位置指定。
+指定的位置必须对输入和输出数据类型有效，并且具有相同的类型。
+例如，字符串“f2”声明Java输入元组的第三字段总是等于输出元组中的第三字段。
 
-##### Function Class Annotations
+通过将输入中的源字段和输出中的目标字段指定为字段表达式，可以声明转发到输出中其他位置的未修改字段。
+
+字符串“f0-> f2”表示Java输入元组的第一个字段未被复制到Java输出元组的第三个字段。通配符表达式“*”可以用来指一个完整的输入或输出类型，即`"f0->*"`表示函数的输出总是等于它的Java输入元组的第一个字段。
+
+可以在单个字符串中声明多个转发字段，方法是用分号将其分隔为“f0；f2->f1；f3->f2”`或在单独的字符串“f0”、“f2->f1”、“f3->f2”`。指定转发字段时，不要求声明所有转发字段，但所有声明必须正确。
+
+转发的字段信息可以通过在函数类定义上附加Java注释，或者在调用DataSet上的函数之后将它们作为操作符参数来声明，如下所示。
+##### 函数类的注释
 
 * `@ForwardedFields` for single input functions such as Map and Reduce.
 * `@ForwardedFieldsFirst` for the first input of a functions with two inputs such as Join and CoGroup.
 * `@ForwardedFieldsSecond` for the second input of a functions with two inputs such as Join and CoGroup.
 
-##### Operator Arguments
+##### 算子参数
 
 * `data.map(myMapFnc).withForwardedFields()` for single input function such as Map and Reduce.
 * `data1.join(data2).where().equalTo().with(myJoinFnc).withForwardFieldsFirst()` for the first input of a function with two inputs such as Join and CoGroup.
 * `data1.join(data2).where().equalTo().with(myJoinFnc).withForwardFieldsSecond()` for the second input of a function with two inputs such as Join and CoGroup.
 
-Please note that it is not possible to overwrite field forward information which was specified as a class annotation by operator arguments.
+请注意，无法覆盖由运算符参数指定为类注释的字段转发信息。
 
-##### Example
 
-The following example shows how to declare forwarded field information using a function class annotation:
+##### 示例
 
+下面的例子展示了如何使用函数类注释声明转发的字段信息:
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -1830,30 +1805,26 @@ class MyMap extends MapFunction[(Int, Int), (String, Int, Int)]{
 </div>
 </div>
 
-#### Non-Forwarded Fields
+#### Non-Forwarded字段
 
-Non-forwarded fields information declares all fields which are not preserved on the same position in a function's output.
-The values of all other fields are considered to be preserved at the same position in the output.
-Hence, non-forwarded fields information is inverse to forwarded fields information.
-Non-forwarded field information for group-wise operators such as `GroupReduce`, `GroupCombine`, `CoGroup`, and `MapPartition` must fulfill the same requirements as for forwarded field information.
+非转发字段信息声明所有未保留在函数输出中相同位置的字段。
+所有其他字段的值都被视为保留在输出中的相同位置。
+因此，非转发字段信息与转发字段信息相反。
+用于分组操作符的非转发字段信息，例如“GroupReduce”，“GroupCombine”，“CoGroup”和“MapPartition”必须满足与转发字段信息相同的要求。
 
-**IMPORTANT**: The specification of non-forwarded fields information is optional. However if used,
-**ALL!** non-forwarded fields must be specified, because all other fields are considered to be forwarded in place. It is safe to declare a forwarded field as non-forwarded.
+**重要**：非转发字段信息的规范是可选的。但是，如果使用，则必须指定** ALL！**非转发字段，因为所有其他字段都被视为在适当位置转发。将转发字段声明为非转发是安全的。
 
-Non-forwarded fields are specified as a list of [field expressions]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions). The list can be either given as a single String with field expressions separated by semicolons or as multiple Strings.
-For example both `"f1; f3"` and `"f1", "f3"` declare that the second and fourth field of a Java tuple
-are not preserved in place and all other fields are preserved in place.
-Non-forwarded field information can only be specified for functions which have identical input and output types.
+非转发字段被指定为[字段表达式]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions)列表。该列表可以作为单个String给出，字段表达式用分号分隔，也可以作为多个字符串。例如，“f1; f3”和“f1”，“f3”都声明Java元组的第二个和第四个字段没有保留到位，所有其他字段都保留在原位。
+只能为具有相同输入和输出类型的函数指定非转发字段信息。
 
-Non-forwarded field information is specified as function class annotations using the following annotations:
-
+使用以下注释将未转发的字段信息指定为功能类注释：
 * `@NonForwardedFields` for single input functions such as Map and Reduce.
 * `@NonForwardedFieldsFirst` for the first input of a function with two inputs such as Join and CoGroup.
 * `@NonForwardedFieldsSecond` for the second input of a function with two inputs such as Join and CoGroup.
 
-##### Example
+##### 示例
 
-The following example shows how to declare non-forwarded field information:
+下面的例子展示了如何声明非转发字段信息:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1881,28 +1852,24 @@ class MyMap extends MapFunction[(Int, Int), (Int, Int)]{
 </div>
 </div>
 
-#### Read Fields
+#### 读取字段
 
-Read fields information declares all fields that are accessed and evaluated by a function, i.e.,
-all fields that are used by the function to compute its result.
-For example, fields which are evaluated in conditional statements or used for computations must be marked as read when specifying read fields information.
-Fields which are only unmodified forwarded to the output without evaluating their values or fields which are not accessed at all are not considered to be read.
+读取字段信息声明由函数访问和评估的所有字段，即函数用于计算其结果的所有字段。
+例如，在指定读取字段信息时，必须将在条件语句中计算或用于计算的字段标记为已读。
+只有未经修改的字段转发到输出而不评估它们的值或根本不被访问的字段不被认为是被读取的。
 
-**IMPORTANT**: The specification of read fields information is optional. However if used,
-**ALL!** read fields must be specified. It is safe to declare a non-read field as read.
+**重要**：读取字段信息的规范是可选的。但是如果使用，则必须指定**ALL**读取字段。将非读取字段声明为读取是安全的。
 
-Read fields are specified as a list of [field expressions]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions). The list can be either given as a single String with field expressions separated by semicolons or as multiple Strings.
-For example both `"f1; f3"` and `"f1", "f3"` declare that the second and fourth field of a Java tuple are read and evaluated by the function.
+读取字段被指定为[字段表达式]({{ site.baseurl }}/dev/api_concepts.html#define-keys-using-field-expressions)列表）。该列表可以作为单个String给出，字段表达式用分号分隔，也可以作为多个字符串。例如，“f1; f3”和“f1”，“f3”都声明Java元组的第二个和第四个字段由函数读取和评估。
 
-Read field information is specified as function class annotations using the following annotations:
-
+使用以下注释将读取字段信息指定为函数类注释：
 * `@ReadFields` for single input functions such as Map and Reduce.
 * `@ReadFieldsFirst` for the first input of a function with two inputs such as Join and CoGroup.
 * `@ReadFieldsSecond` for the second input of a function with two inputs such as Join and CoGroup.
 
-##### Example
+##### 示例
 
-The following example shows how to declare read field information:
+以下示例显示如何声明读取字段信息：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1942,13 +1909,11 @@ class MyMap extends MapFunction[(Int, Int, Int, Int), (Int, Int)]{
 {% top %}
 
 
-Broadcast Variables
+广播变量
+
 -------------------
 
-Broadcast variables allow you to make a data set available to all parallel instances of an
-operation, in addition to the regular input of the operation. This is useful for auxiliary data
-sets, or data-dependent parameterization. The data set will then be accessible at the operator as a
-Collection.
+除了操作的常规输入之外，广播变量还允许您将数据集提供给操作的所有并行实例。这对于辅助数据集或依赖于数据的参数化非常有用。然后，该数据集将作为集合在操作符中进行访问。
 
 - **Broadcast**: broadcast sets are registered by name via `withBroadcastSet(DataSet, String)`, and
 - **Access**: accessible via `getRuntimeContext().getBroadcastVariable(String)` at the target operator.
@@ -1976,9 +1941,8 @@ data.map(new RichMapFunction<String, String>() {
 }).withBroadcastSet(toBroadcast, "broadcastSetName"); // 2. Broadcast the DataSet
 {% endhighlight %}
 
-Make sure that the names (`broadcastSetName` in the previous example) match when registering and
-accessing broadcast data sets. For a complete example program, have a look at
-{% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/clustering/KMeans.java "K-Means Algorithm" %}.
+在注册和访问广播数据集时，请确保名称（前一个示例中的`broadcastSetName`）匹配。 有关完整的示例程序，请查看{% gh_link /flink-examples/flink-examples-batch/src/main/java/org/apache/flink/examples/java/clustering/KMeans.java "K-Means Algorithm" %}.
+
 </div>
 <div data-lang="scala" markdown="1">
 
@@ -2008,25 +1972,23 @@ accessing broadcast data sets. For a complete example program, have a look at
 </div>
 </div>
 
-**Note**: As the content of broadcast variables is kept in-memory on each node, it should not become
-too large. For simpler things like scalar values you can simply make parameters part of the closure
-of a function, or use the `withParameters(...)` method to pass in a configuration.
+**注意**: 由于广播变量的内容保存在每个节点的内存中，因此不应该变得太大。 对于像标量值这样的简单事物，您可以简单地将参数作为函数闭包的一部分，或者使用`withParameters（...）`方法传递配置。
 
 {% top %}
 
-Distributed Cache
+分布式缓存
 -------------------
 
-Flink offers a distributed cache, similar to Apache Hadoop, to make files locally accessible to parallel instances of user functions. This functionality can be used to share files that contain static external data such as dictionaries or machine-learned regression models.
+Flink提供了一个分布式缓存，类似于Apache Hadoop，可以在本地访问用户函数的并行实例。 此功能可用于共享包含静态外部数据的文件，如词典或机器学习回归模型。
 
-The cache works as follows. A program registers a file or directory of a [local or remote filesystem such as HDFS or S3]({{ site.baseurl }}/dev/batch/connectors.html#reading-from-file-systems) under a specific name in its `ExecutionEnvironment` as a cached file. When the program is executed, Flink automatically copies the file or directory to the local filesystem of all workers. A user function can look up the file or directory under the specified name and access it from the worker's local filesystem.
+缓存的工作原理如下。 程序在特定名称下注册[本地或远程文件系统，如HDFS或S3]({{ site.baseurl }}/dev/batch/connectors.html#reading-from-file-systems)的文件或目录。 它的`ExecutionEnvironment`作为缓存文件。 执行程序时，Flink会自动将文件或目录复制到所有工作程序的本地文件系统。 用户函数可以查找指定名称下的文件或目录，并从worker的本地文件系统访问它。
 
-The distributed cache is used as follows:
+分布式缓存使用如下：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
-Register the file or directory in the `ExecutionEnvironment`.
+在`ExecutionEnvironment`中注册文件或目录。
 
 {% highlight java %}
 ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -2046,7 +2008,7 @@ env.execute();
 {% endhighlight %}
 
 Access the cached file or directory in a user function (here a `MapFunction`). The function must extend a [RichFunction]({{ site.baseurl }}/dev/api_concepts.html#rich-functions) class because it needs access to the `RuntimeContext`.
-
+访问用户函数中的缓存文件或目录（此处为`MapFunction`）。 该函数必须扩展 [RichFunction]({{ site.baseurl }}/dev/api_concepts.html#rich-functions)类，因为它需要访问`RuntimeContext`。
 {% highlight java %}
 
 // extend a RichFunction to have access to the RuntimeContext
@@ -2072,7 +2034,7 @@ public final class MyMapper extends RichMapFunction<String, Integer> {
 </div>
 <div data-lang="scala" markdown="1">
 
-Register the file or directory in the `ExecutionEnvironment`.
+在“ExecutionEnvironment”中注册文件或目录。
 
 {% highlight scala %}
 val env = ExecutionEnvironment.getExecutionEnvironment
@@ -2091,7 +2053,7 @@ val result: DataSet[Integer] = input.map(new MyMapper())
 env.execute()
 {% endhighlight %}
 
-Access the cached file in a user function (here a `MapFunction`). The function must extend a [RichFunction]({{ site.baseurl }}/dev/api_concepts.html#rich-functions) class because it needs access to the `RuntimeContext`.
+访问用户函数中的缓存文件（这里是一个`MapFunction`）。 该函数必须扩展[RichFunction]({{ site.baseurl }}/dev/api_concepts.html#rich-functions)类，因为它需要访问`RuntimeContext`。
 
 {% highlight scala %}
 
@@ -2118,14 +2080,14 @@ class MyMapper extends RichMapFunction[String, Int] {
 
 {% top %}
 
-Passing Parameters to Functions
+将参数传递给函数
 -------------------
 
-Parameters can be passed to functions using either the constructor or the `withParameters(Configuration)` method. The parameters are serialized as part of the function object and shipped to all parallel task instances.
+可以使用构造函数或`withParameters（Configuration）`方法将参数传递给函数。 参数被序列化为函数对象的一部分并传送到所有并行任务实例。
 
-Check also the [best practices guide on how to pass command line arguments to functions]({{ site.baseurl }}/dev/best_practices.html#parsing-command-line-arguments-and-passing-them-around-in-your-flink-application).
+另请参阅[关于如何将命令行参数传递给函数的最佳实践指南]({{ site.baseurl }}/dev/best_practices.html#parsing-command-line-arguments-and-passing-them-around-in-your-flink-application)。
 
-#### Via Constructor
+#### 通过构造函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -2164,10 +2126,9 @@ class MyFilter(limit: Int) extends FilterFunction[Int] {
 </div>
 </div>
 
-#### Via `withParameters(Configuration)`
+####  通过`withParameters(Configuration)`
 
-This method takes a Configuration object as an argument, which will be passed to the [rich function]({{ site.baseurl }}/dev/api_concepts.html#rich-functions)'s `open()`
-method. The Configuration object is a Map from String keys to different value types.
+此方法将一个Configuration对象作为参数，该参数将传递给[rich function]({{ site.baseurl }}/dev/api_concepts.html#rich-functions)的`open（）`方法。 Configuration对象是从String键到不同值类型的Map。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -2214,12 +2175,11 @@ toFilter.filter(new RichFilterFunction[Int]() {
 </div>
 </div>
 
-#### Globally via the `ExecutionConfig`
+#### 全局地通过`ExecutionConfig`
 
-Flink also allows to pass custom configuration values to the `ExecutionConfig` interface of the environment. Since the execution config is accessible in all (rich) user functions, the custom configuration will be available globally in all functions.
+Flink还允许将自定义配置值传递给环境的“ExecutionConfig”接口。由于执行配置在所有(富)用户函数中都可以访问，因此自定义配置在所有函数中都是全局可用的。
 
-
-**Setting a custom global configuration**
+**设置自定义全局配置**
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -2241,12 +2201,11 @@ env.getConfig.setGlobalJobParameters(conf)
 </div>
 </div>
 
-Please note that you can also pass a custom class extending the `ExecutionConfig.GlobalJobParameters` class as the global job parameters to the execution config. The interface allows to implement the `Map<String, String> toMap()` method which will in turn show the values from the configuration in the web frontend.
+请注意，您还可以传递一个自定义类，将“ExecutionConfig.GlobalJobParameters”类作为全局作业参数扩展到执行配置。 该接口允许实现`Map <String，String> toMap（）`方法，该方法将依次显示Web前端中配置的值。
 
+**访问全局配置中的值**
 
-**Accessing values from the global configuration**
-
-Objects in the global job parameters are accessible in many places in the system. All user functions implementing a `RichFunction` interface have access through the runtime context.
+全局作业参数中的对象在系统中的许多位置都可以访问。所有实现“RichFunction”接口的用户函数都可以通过运行时上下文进行访问。
 
 {% highlight java %}
 public static final class Tokenizer extends RichFlatMapFunction<String, Tuple2<String, Integer>> {
