@@ -1,5 +1,5 @@
 ---
-title: "DataSet Transformations"
+title: "数据集转换"
 nav-title: Transformations
 nav-parent_id: batch
 nav-pos: 1
@@ -23,21 +23,18 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-This document gives a deep-dive into the available transformations on DataSets. For a general introduction to the
-Flink Java API, please refer to the [Programming Guide](index.html).
-
-For zipping elements in a data set with a dense index, please refer to the [Zip Elements Guide](zip_elements_guide.html).
+本文档深入研究了数据集上可用的转换。有关FLink Java API的一般介绍，请参阅[编程指南](index.html)。
+对于具有密集索引的数据集中的压缩元素(zipping elements in a data set with a dense index)，请参阅[Zip Elements Guide](zip_elements_guide.html)。
 
 * This will be replaced by the TOC
 {:toc}
 
 ### Map
 
-The Map transformation applies a user-defined map function on each element of a DataSet.
-It implements a one-to-one mapping, that is, exactly one element must be returned by
-the function.
+Map转换在DataSet的每个元素上应用用户定义的map函数。
+它实现了一对一的映射，也就是说，函数必须返回一个元素。
 
-The following code transforms a DataSet of Integer pairs into a DataSet of Integers:
+以下代码将Integer对的DataSet转换为Integers的DataSet：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -76,10 +73,10 @@ val intSums = intPairs.map { pair => pair._1 + pair._2 }
 
 ### FlatMap
 
-The FlatMap transformation applies a user-defined flat-map function on each element of a DataSet.
-This variant of a map function can return arbitrary many result elements (including none) for each input element.
+FlatMap转换在DataSet的每个元素上应用用户定义的平面贴图函数。
+map函数的这种变体可以为每个输入元素返回任意多个结果元素（包括none）。
 
-The following code transforms a DataSet of text lines into a DataSet of words:
+以下代码将文本行的DataSet转换为单词的DataSet：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
