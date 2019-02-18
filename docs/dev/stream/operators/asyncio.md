@@ -1,6 +1,6 @@
 ---
-title: "Asynchronous I/O for External Data Access"
-nav-title: "Async I/O"
+title: "用于外部数据访问的异步I/O"
+nav-title: "异步I/O"
 nav-parent_id: streaming_operators
 nav-pos: 60
 ---
@@ -26,58 +26,41 @@ under the License.
 * ToC
 {:toc}
 
-This page explains the use of Flink's API for asynchronous I/O with external data stores.
-For users not familiar with asynchronous or event-driven programming, an article about Futures and
-event-driven programming may be useful preparation.
+这个页面解释了使用Flink的API实现外部数据存储的异步I/O。
+对于不熟悉异步或事件驱动编程的用户，一篇关于Futures和事件驱动编程的文章可能是有用的准备。
 
-Note: Details about the design and implementation of the asynchronous I/O utility can be found in the proposal and design document
-[FLIP-12: Asynchronous I/O Design and Implementation](https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=65870673).
+注意:有关异步I/O实用程序的设计和实现的详细信息可以在建议和设计文档中找到
+[FLIP-12:异步I/O设计与实现](https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=65870673)。
 
+## 异步I/O操作的需要
 
-## The need for Asynchronous I/O Operations
+当与外部系统交互时（例如，当使用存储在数据库中的数据丰富流事件时），需要注意与外部系统的通信延迟不会支配流应用程序的全部工作。
 
-When interacting with external systems (for example when enriching stream events with data stored in a database), one needs to take care
-that communication delay with the external system does not dominate the streaming application's total work.
+简单地访问外部数据库中的数据，例如在“mapfunction”中，通常意味着**同步**交互：向数据库发送请求，而“mapfunction”等待直到收到响应。在许多情况下，这种等待占据了函数的大部分时间。
 
-Naively accessing data in the external database, for example in a `MapFunction`, typically means **synchronous** interaction:
-A request is sent to the database and the `MapFunction` waits until the response has been received. In many cases, this waiting
-makes up the vast majority of the function's time.
-
-Asynchronous interaction with the database means that a single parallel function instance can handle many requests concurrently and
-receive the responses concurrently. That way, the waiting time can be overlayed with sending other requests and
-receiving responses. At the very least, the waiting time is amortized over multiple requests. This leads in most cased to much higher
-streaming throughput.
+与数据库的异步交互意味着单个并行函数实例可以同时处理多个请求，并同时接收响应。这样，等待时间可以与发送其他请求和接收响应重叠。至少，等待时间是在多个请求上分摊的。这在大多数情况下导致了更高的流吞吐量。
 
 <img src="{{ site.baseurl }}/fig/async_io.svg" class="center" width="50%" />
 
-*Note:* Improving throughput by just scaling the `MapFunction` to a very high parallelism is in some cases possible as well, but usually
-comes at a very high resource cost: Having many more parallel MapFunction instances means more tasks, threads, Flink-internal network
-connections, network connections to the database, buffers, and general internal bookkeeping overhead.
+*注意：* 通过将`MapFunction`扩展到非常高的并行度来提高吞吐量在某些情况下也是可能的，但通常需要非常高的资源成本：拥有更多并行MapFunction实例意味着更多的任务，线程，Flink内部网络连接，与数据库的网络连接，缓冲区和一般内部簿记开销。
 
+## 先决条件
 
-## Prerequisites
+如以上部分所示，实现对数据库（或键/值存储）的适当异步I/O需要该数据库的客户端支持异步请求。许多流行的数据库都提供这样的客户机。
+如果没有这样的客户机，可以尝试通过创建多个客户机并使用线程池处理同步调用，将同步客户机转变为有限的并发客户机。然而，这种方法通常较少
+比适当的异步客户机更有效。
 
-As illustrated in the section above, implementing proper asynchronous I/O to a database (or key/value store) requires a client
-to that database that supports asynchronous requests. Many popular databases offer such a client.
+## 异步I/O API
 
-In the absence of such a client, one can try and turn a synchronous client into a limited concurrent client by creating
-multiple clients and handling the synchronous calls with a thread pool. However, this approach is usually less
-efficient than a proper asynchronous client.
+Flink的异步I/O API允许用户使用带有数据流的异步请求客户机。API处理与数据流的集成，以及处理顺序、事件时间、容错等。
 
+假设目标数据库有一个异步客户机，则需要三个部分来实现对数据库的异步I/O流转换：
 
-## Async I/O API
+- 发送请求的“asyncFunction”的实现
+- 一个*回调*，它获取操作的结果并将其传递给“ResultFuture”`  
+- 将异步I/O操作作为转换应用于数据流
 
-Flink's Async I/O API allows users to use asynchronous request clients with data streams. The API handles the integration with
-data streams, well as handling order, event time, fault tolerance, etc.
-
-Assuming one has an asynchronous client for the target database, three parts are needed to implement a stream transformation
-with asynchronous I/O against the database:
-
-  - An implementation of `AsyncFunction` that dispatches the requests
-  - A *callback* that takes the result of the operation and hands it to the `ResultFuture`
-  - Applying the async I/O operation on a DataStream as a transformation
-
-The following code example illustrates the basic pattern:
+下面的代码示例说明了基本模式：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -175,46 +158,35 @@ val resultStream: DataStream[(String, String)] =
 </div>
 </div>
 
-**Important note**: The `ResultFuture` is completed with the first call of `ResultFuture.complete`.
-All subsequent `complete` calls will be ignored.
+**重要注意事项**: `ResultFuture`是通过第一次调用`ResultFuture.complete`完成的。
+将忽略所有后续的“complete”调用。
 
-The following two parameters control the asynchronous operations:
+以下两个参数控制异步操作：
 
-  - **Timeout**: The timeout defines how long an asynchronous request may take before it is considered failed. This parameter
-    guards against dead/failed requests.
+-**超时**：超时定义异步请求在被认为失败之前可能需要多长时间。此参数可防止死机/失败的请求。
+-**容量**：此参数定义了同时进行的异步请求数。
+尽管异步I/O方法通常会带来更好的吞吐量，但操作员仍然是流应用程序中的瓶颈。限制并发请求的数量可确保操作员不会积累不断增长的待处理请求积压，但一旦容量耗尽，它将触发反压力。
 
-  - **Capacity**: This parameter defines how many asynchronous requests may be in progress at the same time.
-    Even though the async I/O approach leads typically to much better throughput, the operator can still be the bottleneck in
-    the streaming application. Limiting the number of concurrent requests ensures that the operator will not
-    accumulate an ever-growing backlog of pending requests, but that it will trigger backpressure once the capacity
-    is exhausted.
+### 超时处理
 
+当异步I / O请求超时时，默认情况下会引发异常并重新启动作业。
+如果要处理超时，可以覆盖`AsyncFunction#timeout`方法。
 
-### Timeout Handling
+### 结果的顺序
 
-When an async I/O request times out, by default an exception is thrown and job is restarted.
-If you want to handle timeouts, you can override the `AsyncFunction#timeout` method.
+由“AsyncFunction”发出的并发请求经常以某种未定义的顺序完成，基于哪个请求首先完成。
+为了控制发出结果记录的顺序，Flink提供了两种模式：  
 
+   - **无序**：异步请求完成后立即发出结果记录。
+    在异步I / O运算符之后，流中记录的顺序与以前不同。
+    当使用*处理时间*作为基本时间特性时，此模式具有最低延迟和最低开销。
+    对此模式使用`AsyncDataStream.unorderedWait（...）`。
 
-### Order of Results
+   - **有序**：在这种情况下，保留流顺序。结果记录的发出顺序与触发异步请求的顺序相同（运算符输入记录的顺序）。为此，操作员缓冲结果记录
+    直到所有先前的记录被发出（或超时）。这通常会在检查点中引入一些额外的延迟和一些开销，因为与无序模式相比，记录或结果在检查点状态下保持更长的时间。
+    对此模式使用`AsyncDataStream.orderedWait（...）`。
 
-The concurrent requests issued by the `AsyncFunction` frequently complete in some undefined order, based on which request finished first.
-To control in which order the resulting records are emitted, Flink offers two modes:
-
-  - **Unordered**: Result records are emitted as soon as the asynchronous request finishes.
-    The order of the records in the stream is different after the async I/O operator than before.
-    This mode has the lowest latency and lowest overhead, when used with *processing time* as the basic time characteristic.
-    Use `AsyncDataStream.unorderedWait(...)` for this mode.
-
-  - **Ordered**: In that case, the stream order is preserved. Result records are emitted in the same order as the asynchronous
-    requests are triggered (the order of the operators input records). To achieve that, the operator buffers a result record
-    until all its preceding records are emitted (or timed out).
-    This usually introduces some amount of extra latency and some overhead in checkpointing, because records or results are maintained
-    in the checkpointed state for a longer time, compared to the unordered mode.
-    Use `AsyncDataStream.orderedWait(...)` for this mode.
-
-
-### Event Time
+### 事件时间
 
 When the streaming application works with [event time]({{ site.baseurl }}/dev/event_time.html), watermarks will be handled correctly by the
 asynchronous I/O operator. That means concretely the following for the two order modes:
@@ -234,36 +206,44 @@ Please recall that *Ingestion Time* is a special case of *event time* with autom
 are based on the sources processing time.
 
 
-### Fault Tolerance Guarantees
+当流应用程序使用[事件时间]({{ site.baseurl }}/dev/event_time.html)，异步I/O操作符将正确处理水印。具体地说，两阶模态如下:
 
-The asynchronous I/O operator offers full exactly-once fault tolerance guarantees. It stores the records for in-flight
-asynchronous requests in checkpoints and restores/re-triggers the requests when recovering from a failure.
+- **无序**:水印不会超过记录，反之亦然，这意味着水印会建立一个*有序边界*。
+记录只在水印之间无序地发出。
+在某个水印之后出现的记录只会在该水印发出之后才会发出。
+然后，只有在发出水印之前的输入的所有结果记录之后，才会发出水印。
+
+这意味着在有水印的情况下，*无序*模式引入了一些与*有序*模式相同的延迟和管理开销。这种开销的大小取决于水印频率。
+
+- **有序**:保存水印记录的顺序，就像保存记录之间的顺序一样。与使用*处理时间*相比，开销没有显著变化。
+
+请记住，*摄取时间*是*事件时间*的一种特殊情况，它根据源处理时间自动生成水印。
+
+### 容错保障
 
 
-### Implementation Tips
+异步I / O运算符提供完全一次的容错保证。 它在检查点中存储正在进行的异步请求的记录，并在从故障中恢复时恢复/重新触发请求。
 
-For implementations with *Futures* that have an *Executor* (or *ExecutionContext* in Scala) for callbacks, we suggests to use a `DirectExecutor`, because the
-callback typically does minimal work, and a `DirectExecutor` avoids an additional thread-to-thread handover overhead. The callback typically only hands
-the result to the `ResultFuture`, which adds it to the output buffer. From there, the heavy logic that includes record emission and interaction
-with the checkpoint bookkeeping happens in a dedicated thread-pool anyways.
+### 实现技巧
 
-A `DirectExecutor` can be obtained via `org.apache.flink.runtime.concurrent.Executors.directExecutor()` or
-`com.google.common.util.concurrent.MoreExecutors.directExecutor()`.
+对于具有* Executor *（或Scala中的* ExecutionContext *）进行回调的* Futures *的实现，我们建议使用`DirectExecutor`，因为回调通常只做最小的工作，并且`DirectExecutor`避免了额外的线程到线程间的切换开销。 回调通常只将结果传递给`ResultFuture`，后者将其添加到输出缓冲区。 从那里开始，包括记录发射和与检查点簿记交互的重要逻辑无论如何都发生在专用线程池中。
+
+可以通过`org.apache.flink.runtime.concurrent.Executors.directExecutor（）`或`com.google.common.util.concurrent.MoreExecutors.directExecutor（）`获取`DirectExecutor`。
+
+### Caveat 附加
+
+**AsyncFunction不是多线程的**
 
 
-### Caveat
+我们想在这里明确指出的常见混淆是“AsyncFunction”不是以多线程方式调用的。
+只存在一个“AsyncFunction”实例，并且为相应分区中的每个记录顺序调用它
+的流。 除非`asyncInvoke（...）`方法返回快并依赖于回调（由客户端），否则它不会导致
+适当的异步I / O.
 
-**The AsyncFunction is not called Multi-Threaded**
+例如，以下模式导致阻塞`asyncInvoke（...）`函数，从而使异步行为无效：
 
-A common confusion that we want to explicitly point out here is that the `AsyncFunction` is not called in a multi-threaded fashion.
-There exists only one instance of the `AsyncFunction` and it is called sequentially for each record in the respective partition
-of the stream. Unless the `asyncInvoke(...)` method returns fast and relies on a callback (by the client), it will not result in
-proper asynchronous I/O.
+    - 使用其查找/查询方法调用阻塞的数据库客户端，直到收到结果为止
 
-For example, the following patterns result in a blocking `asyncInvoke(...)` functions and thus void the asynchronous behavior:
-
-  - Using a database client whose lookup/query method call blocks until the result has been received back
-
-  - Blocking/waiting on the future-type objects returned by an asynchronous client inside the `asyncInvoke(...)` method
+    - 阻止/等待`asyncInvoke（...）`方法中异步客户端返回的future类型对象
 
 {% top %}
