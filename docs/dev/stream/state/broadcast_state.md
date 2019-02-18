@@ -1,5 +1,5 @@
 ---
-title: "The Broadcast State Pattern"
+title: "广播状态模式"
 nav-parent_id: streaming_state
 nav-pos: 2
 ---
@@ -25,31 +25,24 @@ under the License.
 * ToC
 {:toc}
 
-[Working with State](state.html) describes operator state which upon restore is either evenly distributed among the 
-parallel tasks of an operator, or unioned, with the whole state being used to initialize the restored parallel tasks.
 
-A third type of supported *operator state* is the *Broadcast State*. Broadcast state was introduced to support use cases
-where some data coming from one stream is required to be broadcasted to all downstream tasks, where it is stored locally
-and is used to process all incoming elements on the other stream. As an example where broadcast state can emerge as a 
-natural fit, one can imagine a low-throughput stream containing a set of rules which we want to evaluate against all 
-elements coming from another stream. Having the above type of use cases in mind, broadcast state differs from the rest 
-of operator states in that:
- 1. it has a map format,
- 2. it is only available to specific operators that have as inputs a *broadcasted* stream and a *non-broadcasted* one, and
- 3. such an operator can have *multiple broadcast states* with different names.
+[使用状态](state.html)描述了操作员状态，恢复时，该状态要么均匀分布在操作员的并行任务中，要么联合，整个状态用于初始化恢复的并行任务。
 
-## Provided APIs
+第三种受支持的*操作员状态*是*广播状态*。引入广播状态是为了支持一些用例，其中来自一个流的某些数据需要被广播到所有下游任务，在那里它被存储在本地
+并用于处理另一个流上的所有传入元素。广播状态可以作为一种自然匹配出现，我们可以想象一个低吞吐量流，其中包含一组规则，我们希望对来自另一个流的所有元素进行计算。考虑到上述类型的用例，广播状态与其他操作员状态的区别在于：
 
-To show the provided APIs, we will start with an example before presenting their full functionality. As our running 
-example, we will use the case where we have a stream of objects of different colors and shapes and we want to find pairs
-of objects of the same color that follow a certain pattern, *e.g.* a rectangle followed by a triangle. We assume that
-the set of interesting patterns evolves over time. 
+1。它有一个map格式，
+2。它仅适用于具有*广播*流和*非广播*流作为输入的特定操作员，以及
+3。这样的操作员可以有多个具有不同名称的广播状态。
 
-In this example, the first stream will contain elements of type `Item` with a `Color` and a `Shape` property. The other
-stream will contain the `Rules`.
+## 提供的APIs
 
-Starting from the stream of `Items`, we just need to *key it* by `Color`, as we want pairs of the same color. This will
-make sure that elements of the same color end up on the same physical machine.
+为了展示所提供的API，我们将从一个示例开始，然后介绍它们的全部功能。作为我们的运行示例，我们将使用这样一种情况：我们有不同颜色和形状的对象流，我们希望找到对
+同一颜色的物体，具有相同的图案的物体，*例如，*一个矩形，后面跟着一个三角形。我们假设一组有趣的模式随着时间的推移而发展。
+
+在本例中，第一个流将包含类型为“Item”的元素，其属性为“Color”和“Shape”。另一个流将包含“规则”。
+
+从“items”流开始，我们只需要按“color”对其进行“key”，因为我们需要相同颜色的对。这将确保相同颜色的元素最终出现在同一台物理机器上。
 
 {% highlight java %}
 // key the shapes by color
@@ -57,10 +50,8 @@ KeyedStream<Item, Color> colorPartitionedStream = shapeStream
                         .keyBy(new KeySelector<Shape, Color>(){...});
 {% endhighlight %}
 
-Moving on to the `Rules`, the stream containing them should be broadcasted to all downstream tasks, and these tasks 
-should store them locally so that they can evaluate them against all incoming `Items`. The snippet below will i) broadcast 
-the stream of rules and ii) using the provided `MapStateDescriptor`, it will create the broadcast state where the rules
-will be stored.
+
+接下来是“规则”，包含这些规则的流应该广播给到所有下游任务，这些任务应该在本地存储这些规则，这样它们就可以对所有传入的“项”进行计算。下面的代码片段将i）广播规则流，i i）使用提供的“MapStateDescriptor”，它将创建存储规则的广播状态。
 
 {% highlight java %}
 
@@ -75,22 +66,23 @@ BroadcastStream<Rule> ruleBroadcastStream = ruleStream
                         .broadcast(ruleStateDescriptor);
 {% endhighlight %}
 
-Finally, in order to evaluate the `Rules` against the incoming elements from the `Item` stream, we need to:
- 1. connect the two streams, and
- 2. specify our match detecting logic.
 
-Connecting a stream (keyed or non-keyed) with a `BroadcastStream` can be done by calling `connect()` on the 
-non-broadcasted stream, with the `BroadcastStream` as an argument. This will return a `BroadcastConnectedStream`, on 
-which we can call `process()` with a special type of `CoProcessFunction`. The function will contain our matching logic. 
-The exact type of the function depends on the type of the non-broadcasted stream: 
- - if that is **keyed**, then the function is a `KeyedBroadcastProcessFunction`. 
- - if it is **non-keyed**, the function is a `BroadcastProcessFunction`. 
+最后，为了对来自“Item”流的输入元素计算“规则”，我们需要:
+1. 连接两个流
+2. 指定匹配检测逻辑。
+
+
+将一个流(键控的或非键控的)与一个“广播流”连接起来可以通过调用非广播流上的“connect()”来实现，“BroadcastStream”作为参数来完成。这将返回一个' BroadcastConnectedStream' 
+
+我们可以用一种特殊的“协处理器函数CoProcessFunction”来调用`process()`。该函数将包含我们的匹配逻辑。
+函数的确切类型取决于非广播流的类型:
+-如果这是**键控**，则该函数是' KeyedBroadcastProcessFunction '。
+-如果是**非键控**，则该函数是' BroadcastProcessFunction '。
  
- Given that our non-broadcasted stream is keyed, the following snippet includes the above calls:
+鉴于我们的非广播流是键控的，以下代码段包含以上调用：
 
 <div class="alert alert-info">
-  <strong>Attention:</strong> The connect should be called on the non-broadcasted stream, with the BroadcastStream
-   as an argument.
+  <strong>注意:</strong> 应该在非广播流上调用connect，并将BroadcastStream作为参数。
 </div>
 
 {% highlight java %}
@@ -110,11 +102,9 @@ DataStream<String> output = colorPartitionedStream
                  );
 {% endhighlight %}
 
-### BroadcastProcessFunction and KeyedBroadcastProcessFunction
+### BroadcastProcessFunction 和 KeyedBroadcastProcessFunction 广播处理函数和键控广播处理函数
 
-As in the case of a `CoProcessFunction`, these functions have two process methods to implement; the `processBroadcastElement()`
-which is responsible for processing incoming elements in the broadcasted stream and the `processElement()` which is used 
-for the non-broadcasted one. The full signatures of the methods are presented below:
+与“CoProcessFunction”的情况一样，这些函数有两种实现方法; `processBroadcastElement（）`负责处理广播流中的传入元素和processElement（）`，用于非广播流。 这些方法的完整签名如下：
 
 {% highlight java %}
 public abstract class BroadcastProcessFunction<IN1, IN2, OUT> extends BaseBroadcastProcessFunction {
@@ -142,47 +132,38 @@ for processing elements in the broadcast side and the `processElement()` for ele
 The two methods differ in the context they are provided. The non-broadcast side has a `ReadOnlyContext`, while the 
 broadcasted side has a `Context`. 
 
-Both of these contexts (`ctx` in the following enumeration):
- 1. give access to the broadcast state: `ctx.getBroadcastState(MapStateDescriptor<K, V> stateDescriptor)`
- 2. allow to query the timestamp of the element: `ctx.timestamp()`, 
- 3. get the current watermark: `ctx.currentWatermark()`
- 4. get the current processing time: `ctx.currentProcessingTime()`, and 
- 5. emit elements to side-outputs: `ctx.output(OutputTag<X> outputTag, X value)`. 
 
-The `stateDescriptor` in the `getBroadcastState()` should be identical to the one in the `.broadcast(ruleStateDescriptor)` 
-above.
+首先要注意的是，两个函数都需要实现`processBroadcastElement（）`方法来处理广播端的元素，并且`processElement（）`用于非广播端的元素。
+这两种方法在提供的上下文中有所不同。 非广播方具有“ReadOnlyContext”，而广播方具有“Context”。
 
-The difference lies in the type of access each one gives to the broadcast state. The broadcasted side has 
-**read-write access** to it, while the non-broadcast side has **read-only access** (thus the names). The reason for this
-is that in Flink there is no cross-task communication. So, to guarantee that the contents in the Broadcast State are the
-same across all parallel instances of our operator, we give read-write access only to the broadcast side, which sees the
-same elements across all tasks, and we require the computation on each incoming element on that side to be identical 
-across all tasks. Ignoring this rule would break the consistency guarantees of the state, leading to inconsistent and 
-often difficult to debug results.
+这两种上下文（以下枚举中的“ctx”）:
+ 1. 访问广播状态: `ctx.getBroadcastState(MapStateDescriptor<K, V> stateDescriptor)`
+ 2. 允许查询元素的时间戳: `ctx.timestamp()`, 
+ 3. 获取当前水印: `ctx.currentWatermark()`
+ 4. 获取当前处理时间: `ctx.currentProcessingTime()`, and 
+ 5. 将元素发送到旁侧输出: `ctx.output(OutputTag<X> outputTag, X value)`. 
+
+
+getBroadcastState（）`中的`stateDescriptor`应该与上面`.broadcast（ruleStateDescriptor）`中的'stateDescriptor`相同。
+
+不同之处在于每个人对广播状态的访问类型。 广播方对其具有**读写访问权限**，而非广播方具有**只读访问权限**（thus the names）。 原因是在Flink中没有跨任务通信。 因此，为了保证广播状态中的内容在我们的运算符的所有并行实例中是相同的，我们只对广播端提供读写访问，广播端在所有任务中都看到相同的元素，并且我们需要对每个任务进行计算。 这一侧的传入元素在所有任务中都是相同的(我们要求该端的每个传入元素的计算在所有任务中都是相同的)。 忽略此规则会破坏状态的一致性保证，从而导致不一致且通常难以调试的结果。
 
 <div class="alert alert-info">
-  <strong>Attention:</strong> The logic implemented in `processBroadcast()` must have the same deterministic behavior
-  across all parallel instances!
+  <strong>注意:</strong> 在“processBroadcast()”中实现的逻辑必须在所有并行实例中具有相同的确定性行为!
 </div>
 
-Finally, due to the fact that the `KeyedBroadcastProcessFunction` is operating on a keyed stream, it 
-exposes some functionality which is not available to the `BroadcastProcessFunction`. That is:
- 1. the `ReadOnlyContext` in the `processElement()` method gives access to Flink's underlying timer service, which allows
-  to register event and/or processing time timers. When a timer fires, the `onTimer()` (shown above) is invoked with an 
-  `OnTimerContext` which exposes the same functionality as the `ReadOnlyContext` plus 
-   - the ability to ask if the timer that fired was an event or processing time one and 
-   - to query the key associated with the timer.
- 2. the `Context` in the `processBroadcastElement()` method contains the method 
- `applyToKeyedState(StateDescriptor<S, VS> stateDescriptor, KeyedStateFunction<KS, S> function)`. This allows to 
-  register a `KeyedStateFunction` to be **applied to all states of all keys** associated with the provided `stateDescriptor`. 
+最后，由于`KeyedBroadcastProcessFunction`在键控流上运行，它暴露了一些“BroadcastProcessFunction”无法使用的功能。 那是：
+  1.“processElement（）”方法中的`ReadOnlyContext`可以访问Flink的底层计时器服务，该服务允许注册事件和/或处理时间计时器。 当一个计时器触发时，调用`onTimer（）`（如上所示）
+   `OnTimerContext`，它显示与`ReadOnlyContext` plus相同的功能
+     - 询问触发的计时器是事件还是处理时间的能力
+     - 查询与计时器关联的key。
+  2.“processBroadcastElement（）”方法中的`Context`包含方法`applyToKeyedState（StateDescriptor <S，VS> stateDescriptor，KeyedStateFunction <KS，S> function）`。 这允许注册一个“keyedstatefunction”，将其**应用于与提供的“statedescriptor”关联的所有键**的所有状态。
 
 <div class="alert alert-info">
-  <strong>Attention:</strong> Registering timers is only possible at `processElement()` of the `KeyedBroadcastProcessFunction`
-  and only there. It is not possible in the `processBroadcastElement()` method, as there is no key associated to the 
-  broadcasted elements.
+  <strong>注意:</strong> 只能在“keyedBroadcastProcessFunction”的“processElement（）”处注册计时器，并且只能在那里注册计时器。在'processBroadcasteElement（）'方法中是不可能的，因为没有与广播元素关联的键。
 </div>
   
-Coming back to our original example, our `KeyedBroadcastProcessFunction` could look like the following:
+回到我们原来的示例，我们的“keyedBroadcastProcessFunction”可以如下所示：
 
 {% highlight java %}
 new KeyedBroadcastProcessFunction<Color, Item, Rule, String>() {
@@ -249,31 +230,16 @@ new KeyedBroadcastProcessFunction<Color, Item, Rule, String>() {
 }
 {% endhighlight %}
 
-## Important Considerations
+## 重要注意事项
 
-After describing the offered APIs, this section focuses on the important things to keep in mind when using broadcast 
-state. These are:
+在描述了所提供的API之后，本节将重点介绍在使用广播状态时要记住的重要事项。这些是：
 
-  - **There is no cross-task communication:** As stated earlier, this is the reason why only the broadcast side of a 
-`(Keyed)-BroadcastProcessFunction` can modify the contents of the broadcast state. In addition, the user has to make 
-sure that all tasks modify the contents of the broadcast state in the same way for each incoming element. Otherwise,
-different tasks might have different contents, leading to inconsistent results.
+- **没有跨任务通信:** 如前所述，这就是为什么只有`（keyed）-broadcastprocessfunction`的广播端才能修改广播状态的内容的原因。此外，用户必须确保所有任务都以相同的方式为每个传入元素修改广播状态的内容。否则，不同的任务可能有不同的内容，导致结果不一致。
 
-  - **Order of events in Broadcast State may differ across tasks:** Although broadcasting the elements of a stream 
-guarantees that all elements will (eventually) go to all downstream tasks, elements may arrive in a different order 
-to each task. So the state updates for each incoming element *MUST NOT depend on the ordering* of the incoming
-events.
+- **广播状态下的事件顺序可能因任务而异：*尽管广播流的元素可以保证所有元素（最终）都将转到所有下游任务，但元素可能以不同的顺序到达。对每一项任务。因此，每个传入元素*的状态更新不能依赖于传入事件的顺序*。
 
-  - **All tasks checkpoint their broadcast state:** Although all tasks have the same elements in their broadcast state
-when a checkpoint takes place (checkpoint barriers do not overpass elements), all tasks checkpoint their broadcast state, 
-and not just one of them. This is a design decision to avoid having all tasks read from the same file during a restore 
-(thus avoiding hotspots), although it comes at the expense of increasing the size of the checkpointed state by a factor 
-of p (= parallelism). Flink guarantees that upon restoring/rescaling there will be **no duplicates** and **no missing data**. 
-In case of recovery with the same or smaller parallelism, each task reads its checkpointed state. Upon scaling up, each
-task reads its own state, and the remaining tasks (`p_new`-`p_old`) read checkpoints of previous tasks in a round-robin
-manner.
+- **所有任务检查点其广播状态：**尽管所有任务在发生检查点时在其广播状态中具有相同的元素（检查点屏障不会跨过元素），但所有任务检查点其广播状态，不仅仅是其中一个。这是一个设计决策，避免在恢复过程中从同一个文件中读取所有任务（从而避免热点），尽管这样做的代价是增加检查点状态的大小平行度。Flink保证在恢复/重新缩放时会有**没有重复**和**没有丢失的数据**。对于具有相同或更小并行性的恢复，每个任务都会读取其检查点状态。放大后，每个任务读取其自身状态，其余任务（`p_new`-`p_old`）以循环方式读取以前任务的检查点。
 
-  - **No RocksDB state backend:** Broadcast state is kept in-memory at runtime and memory provisioning should be done 
-accordingly. This holds for all operator states.
+- **没有rocksdb状态后端：**广播状态在运行时保存在内存中，应相应地进行内存配置。这适用于所有操作员状态。
 
 {% top %}
