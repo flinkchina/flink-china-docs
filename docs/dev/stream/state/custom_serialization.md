@@ -1,5 +1,5 @@
 ---
-title: "Custom Serialization for Managed State"
+title: "自定义序列化托管状态"
 nav-title: "Custom State Serialization"
 nav-parent_id: streaming_state
 nav-pos: 7
@@ -26,21 +26,15 @@ under the License.
 * ToC
 {:toc}
 
-This page is targeted as a guideline for users who require the use of custom serialization for their state, covering
-how to provide a custom state serializer as well as guidelines and best practices for implementing serializers that allow
-state schema evolution.
+此页面的目标是为需要对其状态使用自定义序列化的用户提供指导方针，包括如何提供自定义状态序列化器，以及实现允许状态模式演化的序列化器的指导方针和最佳实践。
 
-If you're simply using Flink's own serializers, this page is irrelevant and can be ignored.
+如果您只是使用Flink自己的序列化器，那么这个页面是无关紧要的，可以忽略它。
 
-## Using custom state serializers
+## 使用自定义状态序列化器
 
-When registering a managed operator or keyed state, a `StateDescriptor` is required
-to specify the state's name, as well as information about the type of the state. The type information is used by Flink's
-[type serialization framework](../../types_serialization.html) to create appropriate serializers for the state.
+注册托管操作员或键控状态时，需要“StateDescriptor”来指定状态名称，以及有关状态类型的信息。 Flink的[类型序列化框架](../../types_serialization.html)使用类型信息为状态创建适当的序列化程序。
 
-It is also possible to completely bypass this and let Flink use your own custom serializer to serialize managed states,
-simply by directly instantiating the `StateDescriptor` with your own `TypeSerializer` implementation:
-
+也可以完全绕过这个并让Flink使用你自己的自定义序列化程序来序列化托管状态，只需直接用你自己的`TypeSerializer`实现实例化`StateDescriptor`：
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -69,30 +63,25 @@ checkpointedState = getRuntimeContext.getListState(descriptor)
 </div>
 </div>
 
-## State serializers and schema evolution
+## 状态序列化器和Schema演化
 
-This section explains the user-facing abstractions related to state serialization and schema evolution, and necessary
-internal details about how Flink interacts with these abstractions.
 
-When restoring from savepoints, Flink allows changing the serializers used to read and write previously registered state,
-so that users are not locked in to any specific serialization schema. When state is restored, a new serializer will be
-registered for the state (i.e., the serializer that comes with the `StateDescriptor` used to access the state in the
-restored job). This new serializer may have a different schema than that of the previous serializer. Therefore, when
-implementing state serializers, besides the basic logic of reading / writing data, another important thing to keep in
-mind is how the serialization schema can be changed in the future.
+本节介绍与状态序列化和模式演变相关的面向用户的抽象，以及有关Flink如何与这些抽象交互的必要内部详细信息。
 
-When speaking of *schema*, in this context the term is interchangeable between referring to the *data model* of a state
-type and the *serialized binary format* of a state type. The schema, generally speaking, can change for a few cases:
+从保存点恢复时，Flink允许更改用于读取和写入先前注册状态的序列化程序，以便用户不会锁定到任何特定的序列化模式。 当状态恢复时，将为状态注册新的序列化器（即，用于访问恢复的作业中的状态的`StateDescriptor`附带的串行器）。 此新序列化程序可能具有与先前序列化程序不同的架构。 因此，何时
+实现状态序列化程序，除了读/写数据的基本逻辑之外，还要记住的另一个重要事项是如何在将来更改序列化模式。
 
- 1. Data schema of the state type has evolved, i.e. adding or removing a field from a POJO that is used as state.
- 2. Generally speaking, after a change to the data schema, the serialization format of the serializer will need to be upgraded.
- 3. Configuration of the serializer has changed.
- 
-In order for the new execution to have information about the *written schema* of state and detect whether or not the
-schema has changed, upon taking a savepoint of an operator's state, a *snapshot* of the state serializer needs to be
-written along with the state bytes. This is abstracted a `TypeSerializerSnapshot`, explained in the next subsection.
 
-### The `TypeSerializerSnapshot` abstraction
+
+当谈到* schema *时，在此上下文中，该术语在引用状态类型的*数据模型*和状态类型的*序列化二进制格式*之间是可互换的。 一般来说，架构可能会在以下几种情况下发生变化：
+
+  1. 状态类型的数据模式已经发展，即从用作状态的POJO添加或删除字段。  
+  2. 一般来说，在更改数据模式后，需要升级序列化程序的序列化格式。  
+  3. 序列化器的配置已更改。  
+ 
+为了使新执行具有关于状态的*写入模式*的信息并检测模式是否已经改变，在获取操作员状态的保存点时，需要同时写入状态序列化器的*快照*。 状态字节。 这被抽象为一个`TypeSerializerSnapshot`，在下一小节中解释。
+
+### `TypeSerializerSnapshot` 抽象
 
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -117,156 +106,124 @@ public abstract class TypeSerializer<T> {
 {% endhighlight %}
 </div>
 
-A serializer's `TypeSerializerSnapshot` is a point-in-time information that serves as the single source of truth about
-the state serializer's write schema, as well as any additional information mandatory to restore a serializer that
-would be identical to the given point-in-time. The logic about what should be written and read at restore time
-as the serializer snapshot is defined in the `writeSnapshot` and `readSnapshot` methods.
+序列化程序的`TypeSerializerSnapshot`是一个时间点信息，作为状态序列化程序写入模式的单一事实来源，以及恢复与给定点相同的序列化程序所必需的任何其他信息。时间。关于在恢复时应该写入和读取的内容的逻辑，因为序列化器快照在`writeSnapshot`和`readSnapshot`方法中定义。
 
-Note that the snapshot's own write schema may also need to change over time (e.g. when you wish to add more information
-about the serializer to the snapshot). To facilitate this, snapshots are versioned, with the current version
-number defined in the `getCurrentVersion` method. On restore, when the serializer snapshot is read from savepoints,
-the version of the schema in which the snapshot was written in will be provided to the `readSnapshot` method so that
-the read implementation can handle different versions.
+请注意，快照自己的写入架构可能还需要随时间更改（例如，当您希望向快照添加有关序列化程序的更多信息时）。为了实现这一点，快照是版本化的，当前版本号在`getCurrentVersion`方法中定义。在还原时，从保存点读取序列化程序快照时，将在其中写入快照的模式版本提供给`readSnapshot`方法，以便读取实现可以处理不同的版本。
 
-At restore time, the logic that detects whether or not the new serializer's schema has changed should be implemented in
-the `resolveSchemaCompatibility` method. When previous registered state is registered again with new serializers in the
-restored execution of an operator, the new serializer is provided to the previous serializer's snapshot via this method.
-This method returns a `TypeSerializerSchemaCompatibility` representing the result of the compatibility resolution,
-which can be one of the following:
+在恢复时，检测新序列化程序的模式是否已更改的逻辑应在`resolveSchemaCompatibility`方法中实现。当使用新的序列化程序再次注册先前注册的状态时
+恢复了运算符的执行，新的序列化程序通过此方法提供给先前的序列化程序的快照。此方法返回一个`TypeSerializerSchemaCompatibility`，表示兼容性解析的结果，可以是以下之一：
 
- 1. **`TypeSerializerSchemaCompatibility.compatibleAsIs()`**: this result signals that the new serializer is compatible,
- meaning that the new serializer has identical schema with the previous serializer. It is possible that the new
- serializer has been reconfigured in the `resolveSchemaCompatibility` method so that it is compatible.
- 2. **`TypeSerializerSchemaCompatibility.compatibleAfterMigration()`**: this result signals that the new serializer has a
- different serialization schema, and it is possible to migrate from the old schema by using the previous serializer
- (which recognizes the old schema) to read bytes into state objects, and then rewriting the object back to bytes with
- the new serializer (which recognizes the new schema). 
- 3. **`TypeSerializerSchemaCompatibility.incompatible()`**: this result signals that the new serializer has a
- different serialization schema, but it is not possible to migrate from the old schema.
+1. **`TypeSerializerSchemaCompatibility.compatibleAsIs（）`**：此结果表示新的串行器兼容，这意味着新的序列化器与先前的序列化器具有相同的模式。 可能已在`resolveSchemaCompatibility`方法中重新配置了新的序列化程序，以使其兼容。
+  2. **`TypeSerializerSchemaCompatibility.compatibleAfterMigration（）`**：这个结果表明新的序列化程序具有不同的序列化模式，并且可以通过使用先前的序列化程序（识别旧模式）从旧模式迁移到 将字节读入状态对象，然后使用新的序列化程序（识别新模式）将对象重写回字节。
+  3. **`TypeSerializerSchemaCompatibility.incompatible（）`**：此结果表示新的序列化程序具有不同的序列化架构，但无法从旧架构迁移。
 
-The last bit of detail is how the previous serializer is obtained in the case that migration is required.
-Another important role of a serializer's `TypeSerializerSnapshot` is that it serves as a factory to restore
-the previous serializer. More specifically, the `TypeSerializerSnapshot` should implement the `restoreSerializer` method
-to instantiate a serializer instance that recognizes the previous serializer's schema and configuration, and can therefore
-safely read data written by the previous serializer.
 
-### How Flink interacts with the `TypeSerializer` and `TypeSerializerSnapshot` abstractions
+最后一点详细信息是在需要迁移的情况下如何获得先前的序列化器。
+序列化程序的“TypeSerializerSnapshot”的另一个重要作用是它用作恢复先前序列化程序的工厂。 更具体地说，`TypeSerializerSnapshot`应该实现`restoreSerializer`方法来实例化一个识别先前串行器的模式和配置的串行器实例，因此可以安全地读取前一个串行器写入的数据。
 
-To wrap up, this section concludes how Flink, or more specifically the state backends, interact with the
-abstractions. The interaction is slightly different depending on the state backend, but this is orthogonal
-to the implementation of state serializers and their serializer snapshots.
+### Flink如何与`TypeSerializer`和`TypeSerializerSnapshot`抽象交互
 
-#### Off-heap state backends (e.g. `RocksDBStateBackend`)
+总而言之，本节总结了Flink，或者更具体地说，状态后端是如何与抽象交互的。根据状态后端，交互略有不同，但这与状态序列化程序及其序列化程序快照的实现是正交的。
 
- 1. **Register new state with a state serializer that has schema _A_**
-  - the registered `TypeSerializer` for the state is used to read / write state on every state access.
-  - State is written in schema *A*.
- 2. **Take a savepoint**
-  - The serializer snapshot is extracted via the `TypeSerializer#snapshotConfiguration` method.
-  - The serializer snapshot is written to the savepoint, as well as the already-serialized state bytes (with schema *A*).
- 3. **Restored execution re-accesses restored state bytes with new state serializer that has schema _B_**
-  - The previous state serializer's snapshot is restored.
-  - State bytes are not deserialized on restore, only loaded back to the state backends (therefore, still in schema *A*).
-  - Upon receiving the new serializer, it is provided to the restored previous serializer's snapshot via the
-  `TypeSerializer#resolveSchemaCompatibility` to check for schema compatibility.
- 4. **Migrate state bytes in backend from schema _A_ to schema _B_**
-  - If the compatibility resolution reflects that the schema has changed and migration is possible, schema migration is 
-  performed. The previous state serializer which recognizes schema _A_ will be obtained from the serializer snapshot, via
-   `TypeSerializerSnapshot#restoreSerializer()`, and is used to deserialize state bytes to objects, which in turn
-   are re-written again with the new serializer, which recognizes schema _B_ to complete the migration. All entries
-   of the accessed state is migrated all-together before processing continues.
-  - If the resolution signals incompatibility, then the state access fails with an exception.
- 
-#### Heap state backends (e.g. `MemoryStateBackend`, `FsStateBackend`)
 
- 1. **Register new state with a state serializer that has schema _A_**
-  - the registered `TypeSerializer` is maintained by the state backend.
- 2. **Take a savepoint, serializing all state with schema _A_**
-  - The serializer snapshot is extracted via the `TypeSerializer#snapshotConfiguration` method.
-  - The serializer snapshot is written to the savepoint.
-  - State objects are now serialized to the savepoint, written in schema _A_.
- 3. **On restore, deserialize state into objects in heap**
-  - The previous state serializer's snapshot is restored.
-  - The previous serializer, which recognizes schema _A_, is obtained from the serializer snapshot, via
-  `TypeSerializerSnapshot#restoreSerializer()`, and is used to deserialize state bytes to objects.
-  - From now on, all of the state is already deserialized.
- 4. **Restored execution re-accesses previous state with new state serializer that has schema _B_**
-  - Upon receiving the new serializer, it is provided to the restored previous serializer's snapshot via the
-  `TypeSerializer#resolveSchemaCompatibility` to check for schema compatibility.
-  - If the compatibility check signals that migration is required, nothing happens in this case since for
-   heap backends, all state is already deserialized into objects.
-  - If the resolution signals incompatibility, then the state access fails with an exception.
- 5. **Take another savepoint, serializing all state with schema _B_**
-  - Same as step 2., but now state bytes are all in schema _B_.
+#### 堆外状态后端（例如`RocksDBStateBackend`）
 
-## Implementation notes and best practices
+ 1. **使用具有Schema_A _ **的状态序列化程序注册新状态
 
-#### 1. Flink restores serializer snapshots by instantiating them with their classname
+    - 状态的已注册`TypeSerializer`用于在每次状态访问时读/写状态。
+    - State用schema * A *编写。
 
-A serializer's snapshot, being the single source of truth for how a registered state was serialized, serves as an
-entry point to reading state in savepoints. In order to be able to restore and access previous state, the previous state
-serializer's snapshot must be able to be restored.
+ 2. **Take a savepoint 写入保存点**
+ - 序列化器快照是通过“TypeSerializer#snapshotConfiguration”方法提取的。
+ - 序列化器快照被写入保存点，以及已经序列化的状态字节(使用模式*A*)。
 
-Flink restores serializer snapshots by first instantiating the `TypeSerializerSnapshot` with its classname (written
-along with the snapshot bytes). Therefore, to avoid being subject to unintended classname changes or instantiation
-failures, `TypeSerializerSnapshot` classes should:
+ 3. **已还原的执行使用具有架构 _B_ 的新状态序列化程序重新访问已还原的状态字节**
+  - 上一个状态序列化程序的快照已还原。
+  - 还原时不反序列化状态字节，只将其加载回状态后端（因此，仍在模式*A*中）。
+  - 接收到新的序列化程序后，将通过“TypeSerializer#resolveSchemaCompatibility”将其提供给还原的前一个序列化程序的快照，以检查架构兼容性。
 
- - avoid being implemented as anonymous classes or nested classes,
- - have a public, nullary constructor for instantiation
+ 4. **将后端中的状态字节从模式 _A_ 迁移到模式 _B_ **
+- 如果兼容性解决方案反映了架构已更改并且可以进行迁移，则会执行架构迁移。 识别模式 _A_ 的先前状态序列化器将从序列化器快照中获取
+    `TypeSerializerSnapshot#restoreSerializer（）`，用于将状态字节反序列化为对象，然后使用新的序列化程序再次重写，后者识别模式 _B_ 以完成迁移。 在继续处理之前，将访问状态的所有条目全部迁移。
+    - 如果解析信号不兼容，则状态访问失败并出现异常。
 
-#### 2. Avoid sharing the same `TypeSerializerSnapshot` class across different serializers
+#### 堆状态后端（例如`MemoryStateBackend`，`FsStateBackend`）
 
-Since schema compatibility checks goes through the serializer snapshots, having multiple serializers returning
-the same `TypeSerializerSnapshot` class as their snapshot would complicate the implementation for the
-`TypeSerializerSnapshot#resolveSchemaCompatibility` and `TypeSerializerSnapshot#restoreSerializer()` method.
+1. **使用具有架构的状态序列化程序注册新状态_A _ **
 
-This would also be a bad separation of concerns; a single serializer's serialization schema,
-configuration, as well as how to restore it, should be consolidated in its own dedicated `TypeSerializerSnapshot` class.
+   - 注册的`TypeSerializer`由状态后端维护。
 
-#### 3. Use the `CompositeSerializerSnapshot` utility for serializers that contain nested serializers
+ 2. **获取保存点，使用模式_A _ **序列化所有状态
 
-There may be cases where a `TypeSerializer` relies on other nested `TypeSerializer`s; take for example Flink's
-`TupleSerializer`, where it is configured with nested `TypeSerializer`s for the tuple fields. In this case,
-the snapshot of the most outer serializer should also contain snapshots of the nested serializers.
+   - 通过`TypeSerializer＃snapshotConfiguration`方法提取序列化程序快照。
+   - 序列化程序快照将写入保存点。
+   - 状态对象现在被序列化为保存点，以模式_A_编写。
 
-The `CompositeSerializerSnapshot` can be used specifically for this scenario. It wraps the logic of resolving
-the overall schema compatibility check result for the composite serializer.
-For an example of how it should be used, one can refer to Flink's
-[ListSerializerSnapshot](https://github.com/apache/flink/blob/master/flink-core/src/main/java/org/apache/flink/api/common/typeutils/base/ListSerializerSnapshot.java) implementation.
+ 3. **恢复时，将状态反序列化为堆中的对象**
 
-## Migrating from deprecated serializer snapshot APIs before Flink 1.7
+   - 恢复先前的状态序列化程序的快照。
+   - 识别模式_A_的前一个序列化程序是通过`TypeSerializerSnapshot＃restoreSerializer（）`从序列化程序快照获得的，用于将状态字节反序列化为对象。
+   - 从现在开始，所有的州都已经反序列化了。
 
-This section is a guide for API migration from serializers and serializer snapshots that existed before Flink 1.7.
+ 4. **恢复执行使用具有模式_B _ **的新状态序列化器重新访问先前状态
 
-Before Flink 1.7, serializer snapshots were implemented as a `TypeSerializerConfigSnapshot` (which is now deprecated,
-and will eventually be removed in the future to be fully replaced by the new `TypeSerializerSnapshot` interface).
-Moreover, the responsibility of serializer schema compatibility checks lived within the `TypeSerializer`,
-implemented in the `TypeSerializer#ensureCompatibility(TypeSerializerConfigSnapshot)` method.
+   - 收到新的序列化程序后，通过`TypeSerializer＃resolveSchemaCompatibility`将其提供给恢复的先前序列化程序的快照，以检查架构兼容性。
+   - 如果兼容性检查发出需要迁移的信号，则在这种情况下不会发生任何事情，因为对于堆后端，所有状态都已反序列化为对象。
+   - 如果解析信号不兼容，则状态访问失败并出现异常。
 
-Another major difference between the new and old abstractions is that the deprecated `TypeSerializerConfigSnapshot`
-did not have the capability of instantiating the previous serializer. Therefore, in the case where your serializer
-still returns a subclass of `TypeSerializerConfigSnapshot` as its snapshot, the serializer instance itself will always
-be written to savepoints using Java serialization so that the previous serializer may be available at restore time.
-This is very undesirable, since whether or not restoring the job will be successful is susceptible to availability
-of the previous serializer's class, or in general, whether or not the serializer instance can be read back at restore
-time using Java serialization. This means that you be limited to the same serializer for your state,
-and could be problematic once you want to upgrade serializer classes or perform schema migration.
+ 5. **获取另一个保存点，使用模式_B _ **序列化所有状态
 
-To be future-proof and have flexibility to migrate your state serializers and schema, it is highly recommended to
-migrate from the old abstractions. The steps to do this is as follows:
+   - 与步骤2相同，但现在状态字节都在模式_B_中。
 
- 1. Implement a new subclass of `TypeSerializerSnapshot`. This will be the new snapshot for your serializer.
- 2. Return the new `TypeSerializerSnapshot` as the serializer snapshot for your serializer in the
- `TypeSerializer#snapshotConfiguration()` method.
- 3. Restore the job from the savepoint that existed before Flink 1.7, and then take a savepoint again.
- Note that at this step, the old `TypeSerializerConfigSnapshot` of the serializer must still exist in the classpath,
- and the implementation for the `TypeSerializer#ensureCompatibility(TypeSerializerConfigSnapshot)` method must not be
- removed. The purpose of this process is to replace the `TypeSerializerConfigSnapshot` written in old savepoints
- with the newly implemented `TypeSerializerSnapshot` for the serializer.
- 4. Once you have a savepoint taken with Flink 1.7, the savepoint will contain `TypeSerializerSnapshot` as the
- state serializer snapshot, and the serializer instance will no longer be written in the savepoint.
- At this point, it is now safe to remove all implementations of the old abstraction (remove the old
- `TypeSerializerConfigSnapshot` implementation as will as the
- `TypeSerializer#ensureCompatibility(TypeSerializerConfigSnapshot)` from the serializer).
+## 实现说明和最佳实践
+
+#### 1. Flink通过使用类名实例化它们来恢复序列化程序快照
+
+序列化程序的快照是注册状态序列化的唯一真实来源，它是保存点中读取状态的入口点。 为了能够恢复和访问先前的状态，必须能够恢复先前的状态序列化程序的快照。
+
+Flink通过首先使用其类名（与快照字节一起写入）实例化`TypeSerializerSnapshot`来恢复序列化程序快照。 因此，为避免出现意外的类名更改或实例化失败，`TypeSerializerSnapshot`类应该：
+
+   - 避免被实现为匿名类或嵌套类，
+   - 有一个公共的，无效的构造函数用于实例化
+
+
+#### 2. 避免跨不同的序列化程序共享相同的`TypeSerializerSnapshot`类
+
+由于模式兼容性检查通过序列化程序快照，让多个序列化程序返回相同的`TypeSerializerSnapshot`类作为它们的快照会使`TypeSerializerSnapshot＃resolveSchemaCompatibility`和`TypeSerializerSnapshot＃restoreSerializer（）`方法的实现复杂化。
+
+这也是对问题的严重分离; 单个序列化程序的序列化架构，配置以及如何还原它应该合并到它自己的专用`TypeSerializerSnapshot`类中。
+
+#### 3. 对包含嵌套序列化程序的序列化程序使用`CompositeSerializerSnapshot`实用程序
+
+可能存在`TypeSerializer`依赖于其他嵌套`TypeSerializer'的情况; 以Flink的`TupleSerializer`为例，它为元组字段配置了嵌套的`TypeSerializer'。 在这种情况下，最外部序列化程序的快照还应包含嵌套序列化程序的快照。
+
+`CompositeSerializerSnapshot`可以专门用于此场景。 它包含了解决复合序列化器的整体架构兼容性检查结果的逻辑。
+有关如何使用它的示例，可以参考Flink的[ListSerializerSnapshot](https://github.com/apache/flink/blob/master/flink-core/src/main/java/org/apache/flink/api/common/typeutils/base/ListSerializerSnapshot.java)实现。
+
+## 从Flink 1.7之前已弃用的序列化程序快照API迁移
+
+
+本节是从Flink 1.7之前存在的序列化程序和序列化程序快照进行API迁移的指南。
+
+在Flink 1.7之前，串行器快照被实现为`TypeSerializerConfigSnapshot`（现在已弃用，并且最终将被删除以完全被新的`TypeSerializerSnapshot`接口替换）。
+此外，序列化器模式兼容性检查的责任在于`TypeSerializer`，在`TypeSerializer＃ensureCompatibility（TypeSerializerConfigSnapshot）`方法中实现。
+
+新旧抽象之间的另一个主要区别是，已弃用的`TypeSerializerConfigSnapshot`无法实例化先前的序列化程序。因此，在序列化程序仍然返回“TypeSerializerConfigSnapshot”的子类作为其快照的情况下，序列化程序实例本身将始终使用Java序列化写入保存点，以便在恢复时可以使用先前的序列化程序。
+这是非常不合需要的，因为恢复作业是否成功容易受到先前序列化程序类的可用性的影响，或者通常，是否可以使用Java序列化在恢复时读回序列化程序实例。这意味着您只能使用适用于您的状态的相同序列化程序，并且一旦您想要升级序列化程序类或执行架构迁移，就可能会出现问题。
+
+为了面向未来并具有迁移状态序列化程序和模式的灵活性，强烈建议从旧的抽象中进行迁移。执行此操作的步骤如下：
+
+ 1.实现`TypeSerializerSnapshot`的新子类。这将是序列化程序的新快照。
+
+ 2.在`TypeSerializer＃snapshotConfiguration（）`方法中将新的`TypeSerializerSnapshot`作为序列化程序的序列化程序快照返回。
+
+ 3.从Flink 1.7之前存在的保存点还原作业，然后再次使用保存点。
+
+ 请注意，在此步骤中，序列化程序的旧`TypeSerializerConfigSnapshot`必须仍存在于类路径中，并且`TypeSerializer＃ensureCompatibility（TypeSerializerConfigSnapshot）`方法的实现不得为
+ 除去。此过程的目的是用新实现的序列化程序的`TypeSerializerSnapshot`替换旧保存点中写入的`TypeSerializerConfigSnapshot`。
+
+ 4.使用Flink 1.7获取保存点后，保存点将包含“TypeSerializerSnapshot”作为状态序列化程序快照，并且不再在保存点中写入序列化程序实例。
+ 此时，现在可以安全地删除旧抽象的所有实现（从序列化器中删除旧的`TypeSerializerConfigSnapshot`实现以及`TypeSerializer＃ensureCompatibility（TypeSerializerConfigSnapshot）`）。
+
 
 {% top %}
