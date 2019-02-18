@@ -34,28 +34,29 @@ under the License.
 简而言之，此功能将Flink的托管键控(分区)状态（请参阅[使用状态]({{ site.baseurl }}/dev/stream/state/state.html)暴露给外部世界并允许用户从外部Flink查询作业的状态。 对于某些场景，可查询状态消除了与外部系统(如键值存储)进行分布式操作/事务的需求，这通常是实践中的瓶颈。 此外，此功能特性对于调试可能特别有用。
 
 <div class="alert alert-warning">
-  <strong>注意:</strong> 查询状态对象时，无需任何同步或复制即可从并发线程访问该对象。 这是一种设计选择，因为上述任何一种都会导致增加作业延迟(导致作业延迟增加)，我们希望避免这种情况。 由于任何使用Java堆空间的状态后端，<i>例如</i> <code> MemoryStateBackend </code>或<code> FsStateBackend </code>，在检索值时不适用于副本，而是直接引用存储的值 ，读修改写模式是不安全的，并且可能会导致可查询状态服务器由于并发修改而失败。 <code> RocksDBStateBackend </ code>可以避免这些问题
+  <strong>注意:</strong> 查询状态对象时，无需任何同步或复制即可从并发线程访问该对象。 这是一种设计选择，因为上述任何一种都会导致增加作业延迟(导致作业延迟增加)，我们希望避免这种情况。 由于任何使用Java堆空间的状态后端，<i>例如</i> <code> MemoryStateBackend </code>或<code> FsStateBackend </code>，在检索值时不适用于副本，而是直接引用存储的值 ，读修改写模式是不安全的，并且可能会导致可查询状态服务器由于并发修改而失败。 <code> RocksDBStateBackend </code>可以避免这些问题
 </div>
 
-## Architecture架构
 
+## Architecture架构
 
 在展示如何使用可查询状态之前，简要描述组成它的实体是有用的。
 可查询状态特性包括三个主要实体:
 
- 1. the `QueryableStateClient`, 它(可能)运行在Flink集群之外并提交用户查询， 
- 2. the `QueryableStateClientProxy`, 它在每个“task manager”上运行（即在flink集群内），负责接收客户端的查询，代表其从负责的任务管理器获取请求的状态，并将其返回给客户端。
- 3. the `QueryableStateServer` 它运行在每个“taskmanager”上，负责服务本地存储的状态。
+ 1. the `QueryableStateClient`, 它(可能)运行在Flink集群之外并提交用户查询，   
+ 2. the `QueryableStateClientProxy`, 它在每个“task manager”上运行（即在flink集群内），负责接收客户端的查询，代表其从负责的任务管理器获取请求的状态，并将其返回给客户端。  
+ 3. the `QueryableStateServer` 它运行在每个“taskmanager”上，负责服务本地存储的状态。  
 
 客户端连接到其中一个代理，并发送与指定key“k”相关联的状态的请求。 如[使用状态]({{ site.baseurl }}/dev/stream/state/state.html)中所述，键控状态组织在*键组Key Group*中，每个`TaskManager`都被分配了一些这些键组。 要发现哪个“taskmanager”负责保存“k”的Key组，代理将询问`JobManager`。 根据答案，代理将查询在`TaskManager`上运行的`QueryableStateServer`以查找了解与`k`相关联的状态，并将响应转发回客户端。
 
-## 激活可查询状态
+
+## 激活可查询状态  
 
 要在Flink集群上启用可查询状态，您只需从您的 [Flink 发行版](https://flink.apache.org/downloads.html "Apache Flink: Downloads")中`opt /`文件夹中复制`flink-queryable-state-runtime{{ site.scala_version_suffix }}-{{site.version }}.jar` 到`lib/`文件夹。 否则，将不启用可查询状态特性。
 
 要验证您的群集是否在启用了可查询状态的情况下运行，请检查任何任务管理器的日志中的行：`“started the queryable state proxy server@…”`。
 
-## 使状态可查询
+## 使状态可查询  
 
 现在您已在群集上激活了可查询状态，现在是时候看看如何使用它了。为了使状态对外界可见，需要使用以下方法显式地使其可查询：
 
@@ -65,7 +66,7 @@ under the License.
 
 以下部分将解释这两种方法的使用
 
-### 可查询状态流
+### 可查询状态流  
 
 在`KeyedStream`上调用`.asQueryableState（stateName，stateDescriptor）`会返回一个`QueryableStateStream`，它将其值提供为可查询状态。 根据状态的类型，`asQueryableState（）`方法有以下变体：
 
@@ -101,9 +102,9 @@ QueryableStateStream asQueryableState(
 stream.keyBy(0).asQueryableState("query-name")
 {% endhighlight %}
 
-这类似于Scala API中的`flatMapWithState`。
+这类似于Scala API中的`flatMapWithState`。  
 
-### 托管键控状态
+### 托管键控状态  
 
 操作符的托管键控状态(参见[使用托管键控状态]({{ site.baseurl }}/dev/stream/state/state.html#using-managed-keyed-state)可以通过以下方式使适当的状态描述符成为可查询的
 `StateDescriptor.setQueryable(String queryableStateName)`，如下例所示:
@@ -117,12 +118,13 @@ descriptor.setQueryable("query-name"); // queryable state name
 {% endhighlight %}
 
 <div class="alert alert-info">
-  <strong>注意:</strong> <code>queryableStateName<code>参数可以任意选择，仅用于查询。它不必与状态自己的名字相同。
+  <strong>注意:</strong> <code>queryableStateName</code>参数可以任意选择，仅用于查询。它不必与状态自己的名字相同。
 </div>
 
 对于可以查询哪种类型的状态，这个变量没有限制。这意味着它可以用于任何`ValueState`，`ReduceState`，`ListState`，`MapState`，`AggregatingState`，以及当前不推荐(废弃)使用的`FoldingState`
 
-## 查询状态
+
+## 查询状态  
 
 到目前为止，您已经将集群设置为以可查询状态运行，并且已经将（部分）状态声明为可查询。现在是时候看看如何查询这个状态了。
 
@@ -146,7 +148,7 @@ descriptor.setQueryable("query-name"); // queryable state name
 有关更多信息，您可以查看如何[设置Flink程序]({{ site.baseurl }}/dev/linking_with_flink.html)。
 
 `QueryableStateClient`会将查询提交给内部代理，然后由内部代理处理您的查询并返回最终结果。初始化客户端的唯一要求是提供有效的`TaskManager`主机名（请记住
-在每个任务管理器上运行一个可查询的状态代理）和代理侦听的端口。有关如何在[配置部分](#Configuration)中配置代理和状态服务器端口的详细信息
+在每个任务管理器上运行一个可查询的状态代理）和代理侦听的端口。有关如何在[配置部分](#Configuration)中配置代理和状态服务器端口的详细信息  
 
 {% highlight java %}
 QueryableStateClient client = new QueryableStateClient(tmHostname, proxyPort);
@@ -170,7 +172,7 @@ CompletableFuture<S> getKvState(
 
 <div class="alert alert-info">
   <strong>注意:</strong> 
-这些状态对象不允许修改包含的状态。 您可以使用它们来获取状态的实际值，<i>例如</i>使用<code>valueState.get（）</code>，或迭代所包含的<code> <K，V> </代码>条目，<i>例如</i>使用<code> mapState.entries（）</ code>，但您无法修改它们。 例如，在返回的列表状态上调用<code> add（）</code>方法将抛出<code> UnsupportedOperationException </code>。
+这些状态对象不允许修改包含的状态。 您可以使用它们来获取状态的实际值，<i>例如</i>使用<code>valueState.get（）</code>，或迭代所包含的<code> <K，V> </code>条目，<i>例如</i>使用<code> mapState.entries（）</code>，但您无法修改它们。 例如，在返回的列表状态上调用<code> add（）</code>方法将抛出<code> UnsupportedOperationException </code>。
 
 </div>
 
@@ -178,7 +180,8 @@ CompletableFuture<S> getKvState(
   <strong>注意:</strong> 客户端是异步的，可以由多个线程共享。 它需要通过<code> QueryableStateClient.shutdown（）</code>在未使用时关闭以释放资源。
 </div>
 
-### 示例
+
+### 示例  
 
 以下示例扩展了“CountWindowAverage”示例（请参阅[使用托管键控状态]({{ site.baseurl }}/dev/stream/state/state.html#using-managed-keyed-state)，使其可查询，并显示如何查询此值：
 
@@ -212,7 +215,7 @@ public class CountWindowAverage extends RichFlatMapFunction<Tuple2<Long, Long>, 
 }
 {% endhighlight %}
 
-一旦在作业中使用后，您可以检索作业ID，然后从这个操作符查询任何键Key的当前状态:
+一旦在作业中使用后，您可以检索作业ID，然后从这个操作符查询任何键Key的当前状态:    
 
 {% highlight java %}
 QueryableStateClient client = new QueryableStateClient(tmHostname, proxyPort);
@@ -234,26 +237,32 @@ resultFuture.thenAccept(response -> {
             e.printStackTrace();
         }
 });
-{% endhighlight %}
+{% endhighlight %}  
 
-## 配置
+
+## 配置   
 
 以下配置参数会影响可查询状态服务器和客户端的行为。
 它们在`QueryableStateOptions`中定义。
 
+
 ### State Server 状态服务器
-* `queryable-state.server.ports`: 可查询状态服务器的服务器端口范围。 如果有多个任务管理器在同一台机器上运行，这对于避免端口冲突很有用。 指定的范围可以是：端口：“9123”，一系列端口：“50100-50200”，或范围和/或点列表：“50100-50200,50300-50400,51234”。 默认端口为9067。
 
-* `queryable-state.server.network-threads`: 接收状态服务器传入请求的网络（事件循环）线程数（0 => #slots）
+*  `queryable-state.server.ports`: 可查询状态服务器的服务器端口范围。 如果有多个任务管理器在同一台机器上运行，这对于避免端口冲突很有用。 指定的范围可以是：端口：“9123”，一系列端口：“50100-50200”，或范围和/或点列表：“50100-50200,50300-50400,51234”。 默认端口为9067。  
 
-* `queryable-state.server.query-threads`: 为状态服务器处理/服务传入请求的线程数（0 => #slots）
+*  `queryable-state.server.network-threads`: 接收状态服务器传入请求的网络（事件循环）线程数（0 => #slots）  
+
+*  `queryable-state.server.query-threads`: 为状态服务器处理/服务传入请求的线程数（0 => #slots）  
+
 
 ### 代理
-* `queryable-state.proxy.ports`: 可查询状态代理的服务器端口范围。 如果有多个任务管理器在同一台机器上运行，这对于避免端口冲突很有用。 指定的范围可以是：端口：“9123”，一系列端口：“50100-50200”，或范围和/或点列表：“50100-50200,50300-50400,51234”。 默认端口为9069。
 
-* `queryable-state.proxy.network-threads`:接收客户端代理的传入请求的网络（事件循环）线程数（0 => #slots）
+*  `queryable-state.proxy.ports`: 可查询状态代理的服务器端口范围。 如果有多个任务管理器在同一台机器上运行，这对于避免端口冲突很有用。 指定的范围可以是：端口：“9123”，一系列端口：“50100-50200”，或范围和/或点列表：“50100-50200,50300-50400,51234”。 默认端口为9069。  
+ 
+*  `queryable-state.proxy.network-threads`:接收客户端代理的传入请求的网络（事件循环）线程数（0 => #slots）  
 
-* `queryable-state.proxy.query-threads`:.处理/服务客户端代理的传入请求的线程数（0 => #slots）。
+*  `queryable-state.proxy.query-threads`:.处理/服务客户端代理的传入请求的线程数（0 => #slots）。  
+
 
 ## 局限性
 
