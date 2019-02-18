@@ -1,6 +1,6 @@
 ---
 title: "Zipping数据集中的元素"
-nav-title: Zipping Elements
+nav-title: Zipping 元素
 nav-parent_id: batch
 nav-pos: 2
 ---

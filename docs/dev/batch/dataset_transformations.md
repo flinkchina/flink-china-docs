@@ -1,6 +1,6 @@
 ---
 title: "数据集转换"
-nav-title: Transformations
+nav-title: 转换
 nav-parent_id: batch
 nav-pos: 1
 ---

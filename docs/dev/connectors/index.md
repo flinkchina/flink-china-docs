@@ -1,7 +1,7 @@
 ---
-title: "Streaming Connectors"
+title: "Streaming连接器"
 nav-id: connectors
-nav-title: Connectors
+nav-title: 连接器
 nav-parent_id: streaming
 nav-pos: 30
 nav-show_overview: true

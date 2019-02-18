@@ -1,6 +1,6 @@
 ---
 title: "自定义序列化托管状态"
-nav-title: "Custom State Serialization"
+nav-title: "自定义状态序列化"
 nav-parent_id: streaming_state
 nav-pos: 7
 ---

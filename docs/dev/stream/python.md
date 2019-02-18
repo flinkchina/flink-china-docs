@@ -1,5 +1,5 @@
 ---
-title: "Python Programming Guide (Streaming)"
+title: "Python编程指南(Streaming)"
 is_beta: true
 nav-title: Python API
 nav-parent_id: streaming
