@@ -1,5 +1,5 @@
 ---
-title: "Joining"
+title: "Joining 连接"
 nav-id: streaming_joins
 nav-show_overview: true
 nav-parent_id: streaming_operators
@@ -27,12 +27,13 @@ under the License.
 * toc
 {:toc}
 
-# Window Join
-A window join joins the elements of two streams that share a common key and lie in the same window. These windows can be defined by using a [window assigner]({{ site.baseurl}}/dev/stream/operators/windows.html#window-assigners) and are evaluated on elements from both of the streams.
+# 窗口Join
 
-The elements from both sides are then passed to a user-defined `JoinFunction` or `FlatJoinFunction` where the user can emit results that meet the join criteria.
+窗口联接联接共享一个公共键并位于同一窗口中的两个流的元素。这些窗口可以使用[Window Assigner]({{ site.baseurl}}/dev/stream/operators/windows.html#window-assigners)定义，并对来自两个流的元素进行评估。
 
-The general usage can be summarized as follows:
+然后将两边的元素传递给用户定义的“joinfunction”或“flatjoinfunction”，用户可以在其中生成满足联接条件的结果。
+
+一般用法总结如下：
 
 {% highlight java %}
 stream.join(otherStream)
@@ -42,18 +43,22 @@ stream.join(otherStream)
     .apply(<JoinFunction>)
 {% endhighlight %}
 
-Some notes on semantics:
-- The creation of pairwise combinations of elements of the two streams behaves like an inner-join, meaning elements from one stream will not be emitted if they don't have a corresponding element from the other stream to be joined with.
-- Those elements that do get joined will have as their timestamp the largest timestamp that still lies in the respective window. For example a window with `[5, 10)` as its boundaries would result in the joined elements having 9 as their timestamp.
+关于语义的一些注释：
 
-In the following section we are going to give an overview over how different kinds of window joins behave using some exemplary scenarios.
+- 两个流元素的成对组合的创建行为类似于内部联接，这意味着如果一个流中的元素没有要联接的另一个流中的对应元素，则不会发出这些元素。
 
-## Tumbling Window Join
-When performing a tumbling window join, all elements with a common key and a common tumbling window are joined as pairwise combinations and passed on to a `JoinFunction` or `FlatJoinFunction`. Because this behaves like an inner join, elements of one stream that do not have elements from another stream in their tumbling window are not emitted!
+- 那些被连接的元素将作为它们的时间戳，最大的时间戳仍然位于各自的窗口中。例如，边界为“[5，10）”的窗口将导致被联接元素的时间戳为9。
+
+
+在下面的部分中，我们将使用一些示例性场景概述不同类型的窗口连接的行为。
+
+## 滚动窗口Join
+在执行滚动窗口联接时，具有公共键和公共滚动窗口的所有元素都作为成对组合进行联接，并传递到“joinfunction”或“flatjoinfunction”。因为它的行为类似于内部连接，所以一个流的元素在其滚动窗口中没有来自另一个流的元素不会被发出
 
 <img src="{{ site.baseurl }}/fig/tumbling-window-join.svg" class="center" style="width: 80%;" />
 
-As illustrated in the figure, we define a tumbling window with the size of 2 milliseconds, which results in windows of the form `[0,1], [2,3], ...`. The image shows the pairwise combinations of all elements in each window which will be passed on to the `JoinFunction`. Note that in the tumbling window `[6,7]` nothing is emitted because no elements exist in the green stream to be joined with the orange elements ⑥ and ⑦.
+
+如图所示，我们定义了一个大小为2毫秒的翻滚窗口，这导致窗口形式为“[0,1]，[2,3]，......”。 该图显示了每个窗口中所有元素的成对组合，这些元素将被传递给`JoinFunction`。 请注意，在翻滚窗口中，“[6,7]”没有发出任何内容，因为绿色流中没有元素与橙色元素⑥和⑦连接。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -100,13 +105,12 @@ orangeStream.join(greenStream)
 </div>
 </div>
 
-## Sliding Window Join
-When performing a sliding window join, all elements with a common key and common sliding window are joined as pairwise combinations and passed on to the `JoinFunction` or `FlatJoinFunction`. Elements of one stream that do not have elements from the other stream in the current sliding window are not emitted! Note that some elements might be joined in one sliding window but not in another!
+## 滑动窗口Join连接
+在执行滑动窗口联接时，具有公共键和公共滑动窗口的所有元素都作为成对组合进行联接，并传递到“joinfunction”或“flatjoinfunction”。在当前滑动窗口中，一个流中没有来自另一个流的元素的元素不会发出！请注意，有些元素可能会连接到一个滑动窗口中，但不会连接到另一个滑动窗口中！
 
 <img src="{{ site.baseurl }}/fig/sliding-window-join.svg" class="center" style="width: 80%;" />
 
-In this example we are using sliding windows with a size of two milliseconds and slide them by one millisecond, resulting in the sliding windows `[-1, 0],[0,1],[1,2],[2,3], …`.<!-- TODO: Can -1 actually exist?--> The joined elements below the x-axis are the ones that are passed to the `JoinFunction` for each sliding window. Here you can also see how for example the orange ② is joined with the green ③ in the window `[2,3]`, but is not joined with anything in the window `[1,2]`.
-
+在这个例子中，我们使用大小为2毫秒的滑动窗口并将它们滑动一毫秒，从而产生滑动窗口`[-1,0]，[0,1]，[1,2]，[2,3] ]，...`。<!--  TODO：实际上可以存在-1吗？--> x轴下面的连接元素是每个滑动窗口传递给`JoinFunction`的元素。 在这里你还可以看到例如橙色②如何与窗口“[2,3]”中的绿色③连接，但是没有与窗口“[1,2]”中的任何东西连接。
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 
@@ -152,12 +156,14 @@ orangeStream.join(greenStream)
 </div>
 </div>
 
-## Session Window Join
-When performing a session window join, all elements with the same key that when _"combined"_ fulfill the session criteria are joined in pairwise combinations and passed on to the `JoinFunction` or `FlatJoinFunction`. Again this performs an inner join, so if there is a session window that only contains elements from one stream, no output will be emitted!
+## 会话窗口Join连接
+
+在执行会话窗口联接时，所有具有与“组合”满足会话条件时相同键的元素将以成对组合的形式联接，并传递到“JoinFunction”或“FlatJoinFunction”。同样，这将执行内部联接，因此如果会话窗口只包含一个流中的元素，则不会发出任何输出！
 
 <img src="{{ site.baseurl }}/fig/session-window-join.svg" class="center" style="width: 80%;" />
 
-Here we define a session window join where each session is divided by a gap of at least 1ms. There are three sessions, and in the first two sessions the joined elements from both streams are passed to the `JoinFunction`. In the third session there are no elements in the green stream, so ⑧ and ⑨ are not joined!
+
+在这里，我们定义一个会话窗口联接，其中每个会话被至少1毫秒的间隔分割。有三个会话，在前两个会话中，来自两个流的联接元素被传递到“joinFunction”。在第三个会话中，绿色流中没有元素，因此⑧和⑨没有连接！
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -205,28 +211,31 @@ orangeStream.join(greenStream)
 </div>
 </div>
 
-# Interval Join
-The interval join joins elements of two streams (we'll call them A & B for now) with a common key and where elements of stream B have timestamps that lie in a relative time interval to timestamps of elements in stream A.
+# Interval Join 区间Join连接
 
+间隔连接使用公共密钥连接两个流的元素（我们现在称它们为A和B），并且流B的元素具有时间戳，该时间戳位于流A中元素的时间戳的相对时间间隔中
 This can also be expressed more formally as
 `b.timestamp ∈ [a.timestamp + lowerBound; a.timestamp + upperBound]` or 
 `a.timestamp + lowerBound <= b.timestamp <= a.timestamp + upperBound`
 
-where a and b are elements of A and B that share a common key. Both the lower and upper bound can be either negative or positive as long as as the lower bound is always smaller or equal to the upper bound. The interval join currently only performs inner joins.
+这也可以更正式地表示为
+` b.timestamp∈[a.timestamp+lowerbound；a.timestamp+upperbound]`或
 
-When a pair of elements are passed to the `ProcessJoinFunction`, they will be assigned with the larger timestamp (which can be accessed via the `ProcessJoinFunction.Context`) of the two elements.
+` a.timestamp+lowerbound<=b.timestamp<=a.timestamp+upperbound`
 
-<span class="label label-info">Note</span> The interval join currently only supports event time.
+其中a和b是共享公共密钥的a和b元素。下界和上界都可以是负数或正数，只要下界总是小于或等于上界。间隔联接当前只执行内部联接。
+
+当一对元素传递到`ProcessJoinFunction`时，它们将被分配两个元素的较大时间戳（可通过`ProcessJoinFunction.Context`访问）。
+
+<span class="label label-info">注意</span> 间隔联接当前只支持事件时间。
 
 <img src="{{ site.baseurl }}/fig/interval-join.svg" class="center" style="width: 80%;" />
 
-In the example above, we join two streams 'orange' and 'green' with a lower bound of -2 milliseconds and an upper bound of +1 millisecond. Be default, these boundaries are inclusive, but `.lowerBoundExclusive()` and `.upperBoundExclusive` can be applied to change the behaviour.
+在上面的例子中，我们连接两个流“橙色”和“绿色”，其下限为-2毫秒，上限为+1毫秒。默认情况下，这些边界是包含的，但是可以应用`.lowerboundExclusive（）`和`.upperboundExclusive`来更改行为。
 
-Using the more formal notation again this will translate to 
+再次使用更正式的符号，这将转化为
 
-`orangeElem.ts + lowerBound <= greenElem.ts <= orangeElem.ts + upperBound`
-
-as indicated by the triangles.
+` OrangeElem.ts+LowerBound<=GreeneLem.ts<=OrangeElem.ts+Upperbound`如三角形所示。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
