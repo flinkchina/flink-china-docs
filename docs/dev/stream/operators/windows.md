@@ -222,7 +222,7 @@ input
 </div>
 
 可以使用`Time.milliseconds（x）`，`Time.seconds（x）`，`Time.minutes（x）`等来指定时间间隔。
-如上一个示例所示，滑动窗口分配器还接受一个可选的`offset 偏移量`参数，该参数可用于更改窗口的对齐方式。 例如，如果没有偏移，每小时滑动30分钟的窗口将与epoch对齐，也就是说，您将得到“`1:00:00.000-1:59:59.999`、`1:30:00.000-2:29:59.999`等窗口。 如果你想改变它，你可以给出一个偏移量。 例如，如果偏移15分钟，则会得到`1：15：00.000  -  2：14：59.999`，`1：45：00.000  -  2：44：59.999`等。偏移量的一个重要用例是将窗口调整到UTC-0以外的时区。例如，在中国，您必须指定`Time.hours(-8)`的偏移量。
+如上一个示例所示，滑动窗口分配器还接受一个可选的`offset 偏移量`参数，该参数可用于更改窗口的对齐方式。 例如，如果没有偏移，每小时滑动30分钟的窗口将与epoch对齐，也就是说，您将得到`1:00:00.000-1:59:59.999`、`1:30:00.000-2:29:59.999`等窗口。 如果你想改变它，你可以给出一个偏移量。 例如，如果偏移15分钟，则会得到`1：15：00.000  -  2：14：59.999`，`1：45：00.000  -  2：44：59.999`等。偏移量的一个重要用例是将窗口调整到UTC-0以外的时区。例如，在中国，您必须指定`Time.hours(-8)`的偏移量。
 
 ### 会话窗口
 
@@ -1057,24 +1057,24 @@ input
 `触发器`决定窗口（由*窗口分配器*形成）何时准备由*window函数*处理。每个`WindowAssigner`都有一个默认的`Trigger`。
 如果默认触发器不符合您的需要，可以使用`trigger（...）`指定自定义触发器。
 
-The trigger interface has five methods that allow a `Trigger` to react to different events:
+触发器接口有五种方法允许`Trigger`对不同的事件做出反应：
 
-* The `onElement()` method is called for each element that is added to a window.
-* The `onEventTime()` method is called when  a registered event-time timer fires.
-* The `onProcessingTime()` method is called when a registered processing-time timer fires.
-* The `onMerge()` method is relevant for stateful triggers and merges the states of two triggers when their corresponding windows merge, *e.g.* when using session windows.
-* Finally the `clear()` method performs any action needed upon removal of the corresponding window.
+*为添加到窗口的每个元素调用`onElement（）`方法。
+*当注册的事件时间计时器触发时，会调用`onEventTime（）`方法。
+*当注册的处理时间计时器触发时，调用`onProcessingTime（）`方法。
+*`onMerge（）`方法与有状态触发器相关，并在它们相应的窗口合并时合并两个触发器的状态，*例如*当使用会话窗口时。
+*最后，`clear（）`方法执行删除相应窗口时所需的任何操作。
 
-Two things to notice about the above methods are:
+关于上述方法需要注意两点：
 
-1) The first three decide how to act on their invocation event by returning a `TriggerResult`. The action can be one of the following:
+1）前三个决定如何通过返回`TriggerResult`来对其调用事件进行操作。该操作可以是以下之一：
 
-* `CONTINUE`: do nothing,
-* `FIRE`: trigger the computation,
-* `PURGE`: clear the elements in the window, and
-* `FIRE_AND_PURGE`: trigger the computation and clear the elements in the window afterwards.
+*`CONTINUE'：什么都不做，
+*`FIRE`：触发计算，
+*`PURGE`：清除窗口中的元素，和
+*`FIRE_AND_PURGE`：触发计算并在之后清除窗口中的元素。
 
-2) Any of these methods can be used to register processing- or event-time timers for future actions.
+2）这些方法中的任何一种都可用于为将来的操作注册处理或事件时间计时器。
 
 ### Fire and Purge
 
@@ -1086,40 +1086,42 @@ Windows with `ReduceFunction`, `AggregateFunction`, or `FoldFunction` simply emi
 When a trigger fires, it can either `FIRE` or `FIRE_AND_PURGE`. While `FIRE` keeps the contents of the window, `FIRE_AND_PURGE` removes its content.
 By default, the pre-implemented triggers simply `FIRE` without purging the window state.
 
-<span class="label label-danger">Attention</span> Purging will simply remove the contents of the window and will leave any potential meta-information about the window and any trigger state intact.
 
-### Default Triggers of WindowAssigners
+一旦触发器确定窗口已准备好进行处理，它就会触发，*即*，它返回“FIRE”或“FIRE_AND_PURGE”。 这是窗口操作员发出当前窗口结果的信号。 给定一个带有`ProcessWindowFunction`的窗口，所有元素都传递给`ProcessWindowFunction`（可能在将它们传递给逐出器后）。 带有“ReduceFunction”，“AggregateFunction”或“FoldFunction”的Windows只会发出急切的聚合结果。
 
-The default `Trigger` of a `WindowAssigner` is appropriate for many use cases. For example, all the event-time window assigners have an `EventTimeTrigger` as
-default trigger. This trigger simply fires once the watermark passes the end of a window.
+当触发器触发时，它可以是“FIRE”或“FIRE_AND_PURGE”。 当`FIRE`保留窗口内容时，`FIRE_AND_PURGE`删除其内容。
+默认情况下，预先实现的触发器只需`FIRE`而不会清除窗口状态。
 
-<span class="label label-danger">Attention</span> The default trigger of the `GlobalWindow` is the `NeverTrigger` which does never fire. Consequently, you always have to define a custom trigger when using a `GlobalWindow`.
+<span class="label label-danger">注意</span> 清除将简单地删除窗口的内容，并将保留有关窗口和任何触发状态的任何潜在元信息。
 
-<span class="label label-danger">Attention</span> By specifying a trigger using `trigger()` you
-are overwriting the default trigger of a `WindowAssigner`. For example, if you specify a
-`CountTrigger` for `TumblingEventTimeWindows` you will no longer get window firings based on the
-progress of time but only by count. Right now, you have to write your own custom trigger if
-you want to react based on both time and count.
+### WindowAssigners的默认触发器
 
-### Built-in and Custom Triggers
+`WindowAssigner`的默认`Trigger`适用于许多用例。 例如，所有事件时间窗口分配器都有一个`EventTimeTrigger`作为默认触发器。 一旦水印通过窗口的末端，该触发器就会触发。
 
-Flink comes with a few built-in triggers.
 
-* The (already mentioned) `EventTimeTrigger` fires based on the progress of event-time as measured by watermarks.
-* The `ProcessingTimeTrigger` fires based on processing time.
-* The `CountTrigger` fires once the number of elements in a window exceeds the given limit.
-* The `PurgingTrigger` takes as argument another trigger and transforms it into a purging one.
+<span class="label label-danger">注意</span> GlobalWindow`的默认触发器是`NeverTrigger`，它永远不会触发。 因此，在使用“GlobalWindow”时，您始终必须定义自定义触发器。
 
-If you need to implement a custom trigger, you should check out the abstract
-{% gh_link /flink-streaming-java/src/main/java/org/apache/flink/streaming/api/windowing/triggers/Trigger.java "Trigger" %} class.
-Please note that the API is still evolving and might change in future versions of Flink.
+<span class="label label-danger">注意</span> 通过使用`trigger（）`指定触发器，您将覆盖`WindowAssigner`的默认触发器。 例如，如果为`TumblingEventTimeWindows`指定`CountTrigger`，您将不再根据时间进度获得窗口激活，而是仅通过计数。 现在，如果你想根据时间和数量做出反应，你必须编写自己的自定义触发器。
 
-## Evictors
+### 内置和自定义触发器
 
-Flink’s windowing model allows specifying an optional `Evictor` in addition to the `WindowAssigner` and the `Trigger`.
-This can be done using the `evictor(...)` method (shown in the beginning of this document). The evictor has the ability
-to remove elements from a window *after* the trigger fires and *before and/or after* the window function is applied.
-To do so, the `Evictor` interface has two methods:
+Flink附带了一些内置触发器。
+
+*（已提及）`EventTimeTrigger`根据水印测量的事件时间进度触发。    
+* `ProcessingTimeTrigger`根据处理时间触发。    
+* 一旦窗口中的元素数量超过给定限制，`CountTrigger`就会触发。    
+* `PurgingTrigger`将另一个触发器作为参数，并将其转换为清除触发器。    
+
+如果您需要实现自定义触发器，您应该查看摘要{% gh_link /flink-streaming-java/src/main/java/org/apache/flink/streaming/api/windowing/triggers/Trigger.java "Trigger" %}类。
+请注意，API仍在不断发展，可能会在Flink的未来版本中发生变化
+
+## Evictors 逐出器
+
+
+除了“WindowAssigner”和“Trigger”之外，Flink的窗口模型还允许指定一个可选的“Evictor”。
+这可以使用`evictor（...）`方法（在本文档的开头显示）来完成。 在应用窗口函数*之前和/或之后*之后，逐出器可以在触发器触发之后从窗口*中移除元素。
+为此，`Evictor`接口有两种方法：
+
 
     /**
      * Optionally evicts elements. Called before windowing function.
@@ -1141,51 +1143,34 @@ To do so, the `Evictor` interface has two methods:
      */
     void evictAfter(Iterable<TimestampedValue<T>> elements, int size, W window, EvictorContext evictorContext);
 
-The `evictBefore()` contains the eviction logic to be applied before the window function, while the `evictAfter()`
-contains the one to be applied after the window function. Elements evicted before the application of the window
-function will not be processed by it.
 
+`evictBefore（）`包含要在窗口函数之前应用的驱逐逻辑，而`evictAfter（）`包含在窗口函数之后应用的驱逐逻辑。 在应用窗口函数之前被逐出的元素将不会被它处理。
 Flink comes with three pre-implemented evictors. These are:
 
-* `CountEvictor`: keeps up to a user-specified number of elements from the window and discards the remaining ones from
-the beginning of the window buffer.
-* `DeltaEvictor`: takes a `DeltaFunction` and a `threshold`, computes the delta between the last element in the
-window buffer and each of the remaining ones, and removes the ones with a delta greater or equal to the threshold.
-* `TimeEvictor`: takes as argument an `interval` in milliseconds and for a given window, it finds the maximum
-timestamp `max_ts` among its elements and removes all the elements with timestamps smaller than `max_ts - interval`.
+Flink附带三个预先实现的驱逐者。 这些是：  
+* `CountEvictor`：从窗口保持用户指定数量的元素，并从窗口缓冲区的开头丢弃剩余的元素。
+* `DeltaEvictor`：取一个'DeltaFunction`和一个`threshold`，计算窗口缓冲区中最后一个元素与其余每个元素之间的差值，并删除delta大于或等于阈值的值。
+* `TimeEvictor`：以毫秒为单位作为参数的“interval”，对于给定的窗口，它在其元素中找到最大时间戳“max_ts”，并删除时间戳小于`max_ts - interval`的所有元素。
 
-<span class="label label-info">Default</span> By default, all the pre-implemented evictors apply their logic before the
-window function.
+<span class="label label-info">默认</span> 默认情况下，所有预先实现的evictors在窗口函数之前应用它们的逻辑。
 
-<span class="label label-danger">Attention</span> Specifying an evictor prevents any pre-aggregation, as all the
-elements of a window have to be passed to the evictor before applying the computation.
+<span class="label label-danger">注意</span> 指定一个逐出器可以防止任何预聚合，就像所有的一样
+在应用计算之前，必须将窗口的元素传递给逐出器。
 
-<span class="label label-danger">Attention</span> Flink provides no guarantees about the order of the elements within
-a window. This implies that although an evictor may remove elements from the beginning of the window, these are not
-necessarily the ones that arrive first or last.
+<span class="label label-danger">注意</span> Flink无法保证窗口中元素的顺序。这意味着，尽管一个evictor可以从窗口的开始删除元素，但这些元素不一定是最先到达或最后到达的元素。
 
+## Allowed Lateness 允许的延迟
 
-## Allowed Lateness
+使用* event-time *窗口时，可能会发生元素迟到，*即Flink用于跟踪事件时间进度的水印已经超过了元素所属窗口的结束时间戳。请参阅[event time]({{ site.baseurl }}/dev/event_time.html)，尤其是[late elements]({{ site.baseurl }}/dev/event_time.html#late-elements)，以便进行更全面的讨论Flink如何处理活动时间。
 
-When working with *event-time* windowing, it can happen that elements arrive late, *i.e.* the watermark that Flink uses to
-keep track of the progress of event-time is already past the end timestamp of a window to which an element belongs. See
-[event time]({{ site.baseurl }}/dev/event_time.html) and especially [late elements]({{ site.baseurl }}/dev/event_time.html#late-elements) for a more thorough
-discussion of how Flink deals with event time.
+默认情况下，当水印超过窗口末尾时，会删除延迟元素。但是，Flink允许为窗口运算符指定最大*允许延迟*。允许延迟指定元素在被删除之前可以延迟多少时间，其默认值为0。
+在水印已经通过窗口结束但在通过窗口结束加上允许的延迟之前到达的元素仍然添加到窗口中。根据所使用的触发器，延迟但未丢弃的元素可能会导致窗口再次触发。这是`EventTimeTrigger`的情况。
 
-By default, late elements are dropped when the watermark is past the end of the window. However,
-Flink allows to specify a maximum *allowed lateness* for window operators. Allowed lateness
-specifies by how much time elements can be late before they are dropped, and its default value is 0.
-Elements that arrive after the watermark has passed the end of the window but before it passes the end of
-the window plus the allowed lateness, are still added to the window. Depending on the trigger used,
-a late but not dropped element may cause the window to fire again. This is the case for the `EventTimeTrigger`.
+为了使这项工作，Flink保持窗口的状态，直到他们允许的延迟到期。一旦发生这种情况，Flink将删除窗口并删除其状态，如[Window Lifecycle](#window-lifecycle) 部分所述。
 
-In order to make this work, Flink keeps the state of windows until their allowed lateness expires. Once this happens, Flink removes the window and deletes its state, as
-also described in the [Window Lifecycle](#window-lifecycle) section.
+<span class="label label-info">默认</span> 默认情况下，允许的延迟设置为“0”。 也就是说，到达水印后面的元素将被丢弃。
 
-<span class="label label-info">Default</span> By default, the allowed lateness is set to
-`0`. That is, elements that arrive behind the watermark will be dropped.
-
-You can specify an allowed lateness like this:
+您可以指定允许的延迟，如下所示：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1213,17 +1198,13 @@ input
 </div>
 </div>
 
-<span class="label label-info">Note</span> When using the `GlobalWindows` window assigner no
-data is ever considered late because the end timestamp of the global window is `Long.MAX_VALUE`.
+<span class="label label-info">注意</span> 当使用`GlobalWindows`窗口分配器时，没有数据被认为是迟到的，因为全局窗口的结束时间戳是“Long.MAX_VALUE”。
 
-### Getting late data as a side output
+### 将延迟数据作为一个侧面side 或副输出
 
-Using Flink's [side output]({{ site.baseurl }}/dev/stream/side_output.html) feature you can get a stream of the data
-that was discarded as late.
+使用Flink的[side output]({{ site.baseurl }}/dev/stream/side_output.html)功能，您可以获得最近被丢弃的数据流。
 
-You first need to specify that you want to get late data using `sideOutputLateData(OutputTag)` on
-the windowed stream. Then, you can get the side-output stream on the result of the windowed
-operation:
+首先需要在窗口化流上使用`sideOutputLateData（OutputTag）`指定要获取延迟数据。 然后，您可以在窗口操作的结果上获取侧输出流：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1261,52 +1242,31 @@ val lateStream = result.getSideOutput(lateOutputTag)
 </div>
 </div>
 
-### Late elements considerations
+### Late elements considerations 延迟元素考虑
 
-When specifying an allowed lateness greater than 0, the window along with its content is kept after the watermark passes
-the end of the window. In these cases, when a late but not dropped element arrives, it could trigger another firing for the
-window. These firings are called `late firings`, as they are triggered by late events and in contrast to the `main firing`
-which is the first firing of the window. In case of session windows, late firings can further lead to merging of windows,
-as they may "bridge" the gap between two pre-existing, unmerged windows.
+当指定允许的延迟大于0时，窗口及其内容将在水印通过窗口结尾后保留。在这些情况下，当一个迟来但未掉落的元素到达时，它可能会触发另一个窗口的触发。这些触发被称为“延迟触发”，因为它们是由延迟事件触发的，与第一次触发窗口的“主触发”不同。在会话窗口的情况下，延迟触发可能会进一步导致窗口合并，因为它们可能会“弥合”两个预先存在的未合并窗口之间的间隙。
 
-<span class="label label-info">Attention</span> You should be aware that the elements emitted by a late firing should be treated as updated results of a previous computation, i.e., your data stream will contain multiple results for the same computation. Depending on your application, you need to take these duplicated results into account or deduplicate them.
+<span class="label label-info">注意</span> 您应该知道，后期触发发出的元素应该被视为先前计算的更新结果，即，您的数据流将包含同一计算的多个结果。 根据您的应用程序，您需要考虑这些重复的结果或对其进行重复数据删除。
 
-## Working with window results
+## 使用窗口结果
 
-The result of a windowed operation is again a `DataStream`, no information about the windowed
-operations is retained in the result elements so if you want to keep meta-information about the
-window you have to manually encode that information in the result elements in your
-`ProcessWindowFunction`. The only relevant information that is set on the result elements is the
-element *timestamp*. This is set to the maximum allowed timestamp of the processed window, which
-is *end timestamp - 1*, since the window-end timestamp is exclusive. Note that this is true for both
-event-time windows and processing-time windows. i.e. after a windowed operations elements always
-have a timestamp, but this can be an event-time timestamp or a processing-time timestamp. For
-processing-time windows this has no special implications but for event-time windows this together
-with how watermarks interact with windows enables
-[consecutive windowed operations](#consecutive-windowed-operations) with the same window sizes. We
-will cover this after taking a look how watermarks interact with windows.
+窗口操作的结果又是一个`DataStream`，没有关于窗口操作的信息保留在结果元素中，所以如果你想保留关于窗口的元信息，你必须在你的结果元素中手动编码这些信息。 `ProcessWindowFunction`。在结果元素上设置的唯一相关信息是元素* timestamp *。这被设置为处理窗口的最大允许时间戳，其中
+是*结束时间戳 -  1 *，因为窗口结束时间戳是独占的。请注意，事件时间窗口和处理时间窗口都是如此。即，在窗口化操作元素之后总是具有时间戳，但是这可以是事件时间时间戳或处理时间时间戳。对于处理时间窗口，这没有特别的含义，但对于事件时间窗口，这与水印与窗口交互的方式一起启用具有相同窗口大小的[连续窗口操作](#consecutive-windowed-operations) 。在看了水印如何与窗口交互后，我们将介绍这一点。
 
-### Interaction of watermarks and windows
+### 水印与窗口的交互
 
-Before continuing in this section you might want to take a look at our section about
-[event time and watermarks]({{ site.baseurl }}/dev/event_time.html).
+在继续本节之前，您可能想看看我们关于[事件时间和水印]({{ site.baseurl }}/dev/event_time.html)的部分。
 
-When watermarks arrive at the window operator this triggers two things:
+当水印到达窗口运算符时，这会触发两件事：
 
- - the watermark triggers computation of all windows where the maximum timestamp (which is
- *end-timestamp - 1*) is smaller than the new watermark
- - the watermark is forwarded (as is) to downstream operations
+-水印触发计算最大时间戳（即*结束时间戳-1*）小于新水印的所有窗口。
+-水印被转发（原样）到下游操作
 
-Intuitively, a watermark "flushes" out any windows that would be considered late in downstream
-operations once they receive that watermark.
+直观地说，一旦收到水印，水印就会“清除”下游操作中后期会考虑的任何窗口。
 
-### Consecutive windowed operations
+### 连续窗口的操作
 
-As mentioned before, the way the timestamp of windowed results is computed and how watermarks
-interact with windows allows stringing together consecutive windowed operations. This can be useful
-when you want to do two consecutive windowed operations where you want to use different keys but
-still want elements from the same upstream window to end up in the same downstream window. Consider
-this example:
+如前所述，计算窗口化结果的时间戳的方式以及水印与窗口的交互方式允许将连续的窗口化操作串接在一起。当您希望执行两个连续的窗口化操作时，如果您希望使用不同的键，但仍然希望来自相同上游窗口的元素以相同下游窗口结束，则这一点非常有用。考虑这个例子：
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1341,18 +1301,17 @@ val globalResults = resultsPerKey
 </div>
 </div>
 
-In this example, the results for time window `[0, 5)` from the first operation will also end up in
-time window `[0, 5)` in the subsequent windowed operation. This allows calculating a sum per key
-and then calculating the top-k elements within the same window in the second operation.
+在这个例子中，第一次操作的时间窗口“[0,5）”的结果也将在随后的窗口化操作中以时间窗口“[0,5)”`结束。 这允许计算每个键的和，然后在第二个操作中计算同一窗口内的前k个元素(top-k)。
 
-## Useful state size considerations
+## 有用的状态大小考虑
 
-Windows can be defined over long periods of time (such as days, weeks, or months) and therefore accumulate very large state. There are a couple of rules to keep in mind when estimating the storage requirements of your windowing computation:
+Windows可以在很长一段时间内（例如几天，几周或几个月）定义，因此可以累积非常大的状态。在估算窗口计算的存储要求时，需要记住几条规则：
 
-1. Flink creates one copy of each element per window to which it belongs. Given this, tumbling windows keep one copy of each element (an element belongs to exactly one window unless it is dropped late). In contrast, sliding windows create several of each element, as explained in the [Window Assigners](#window-assigners) section. Hence, a sliding window of size 1 day and slide 1 second might not be a good idea.
+1. Flink为每个窗口创建一个每个元素的副本。鉴于此，翻滚窗口保留每个元素的一个副本（一个元素恰好属于一个窗口，除非它被延迟）。相反，滑动窗口会创建每个元素的几个，如[Window Assigners](#window-assigners) 部分所述。因此，尺寸为1天且滑动1秒的滑动窗口可能不是一个好主意。
 
-2. `ReduceFunction`, `AggregateFunction`, and `FoldFunction` can significantly reduce the storage requirements, as they eagerly aggregate elements and store only one value per window. In contrast, just using a `ProcessWindowFunction` requires accumulating all elements.
+2.`ReduceFunction`，`AggregateFunction`和`FoldFunction`可以显着降低存储要求，因为它们急切地聚合元素并且每个窗口只存储一个值。相反，只需使用`ProcessWindowFunction`就需要累积所有元素。
 
-3. Using an `Evictor` prevents any pre-aggregation, as all the elements of a window have to be passed through the evictor before applying the computation (see [Evictors](#evictors)).
+3.使用“Evictor”可以防止任何预聚合，因为在应用计算之前，窗口的所有元素都必须通过逐出器（参见[Evictors](#evictors)）。
+
 
 {% top %}
