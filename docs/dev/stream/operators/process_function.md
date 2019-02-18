@@ -1,6 +1,6 @@
 ---
 title: "过程函数(低级别的算子)"
-nav-title: "Process Function"
+nav-title: "过程函数Process Function"
 nav-parent_id: streaming_operators
 nav-pos: 35
 ---

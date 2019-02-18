@@ -1,5 +1,5 @@
 ---
-title: "Operators操作符(算子)"
+title: "算子"
 nav-id: streaming_operators
 nav-show_overview: true
 nav-parent_id: streaming
