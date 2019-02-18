@@ -155,68 +155,59 @@ Flink中用于衡量事件时间进度的机制是**水印**。
 
 请注意，事件时间由新生成的流元素（或多个元素）继承，这些元素来自生成它们的事件或触发创建这些元素的水印。
 
-## Watermarks in Parallel Streams
+## 并行流中的水印
 
-Watermarks are generated at, or directly after, source functions. Each parallel subtask of a source function usually
-generates its watermarks independently. These watermarks define the event time at that particular parallel source.
+在源函数处或之后生成水印。 源函数的每个并行子任务通常独立地生成其水印。 这些水印定义了该特定并行源的事件时间。
+水印是在源source函数处或之后直接生成的。源source函数的每个并行子任务通常独立生成其水印。这些水印定义了特定并行源source的事件时间。
 
-As the watermarks flow through the streaming program, they advance the event time at the operators where they arrive. Whenever an
-operator advances its event time, it generates a new watermark downstream for its successor operators.
-
-Some operators consume multiple input streams; a union, for example, or operators following a *keyBy(...)* or *partition(...)* function.
-Such an operator's current event time is the minimum of its input streams' event times. As its input streams
-update their event times, so does the operator.
-
-The figure below shows an example of events and watermarks flowing through parallel streams, and operators tracking event time.
-
-<img src="{{ site.baseurl }}/fig/parallel_streams_watermarks.svg" alt="Parallel data streams and operators with events and watermarks" class="center" width="80%" />
-
-Note that the Kafka source supports per-partition watermarking, which you can read more about [here]({{ site.baseurl }}/dev/event_timestamps_watermarks.html#timestamps-per-kafka-partition).
+当水印流经流式程序时，它们会在他们到达的算子处推进事件时间。每当一个算子推进它的事件时间，它就会在下游为它的后续算子生成一个新的水印。
 
 
-## Late Elements
+一些操作符使用多个输入流;例如，在*keyBy(…)*或*partition(…)*函数后面的union运算符。
+此类操作符的当前事件时间是其输入流的事件时间的最小值。当它的输入流更新它们的事件时间时，操作符也会更新。
 
-It is possible that certain elements will violate the watermark condition, meaning that even after the *Watermark(t)* has occurred,
-more elements with timestamp *t' <= t* will occur. In fact, in many real world setups, certain elements can be arbitrarily
-delayed, making it impossible to specify a time by which all elements of a certain event timestamp will have occurred.
-Furthermore, even if the lateness can be bounded, delaying the watermarks by too much is often not desirable, because it
-causes too much delay in the evaluation of event time windows.
+下图显示了一个事件和水印流经并行流的示例，以及跟踪事件时间的算子。
+<img src="{{ site.baseurl }}/fig/parallel_streams_watermarks.svg" alt="具有事件和水印的并行数据流和算子" class="center" width="80%" />
 
-For this reason, streaming programs may explicitly expect some *late* elements. Late elements are elements that
-arrive after the system's event time clock (as signaled by the watermarks) has already passed the time of the late element's
-timestamp. See [Allowed Lateness]({{ site.baseurl }}/dev/stream/operators/windows.html#allowed-lateness) for more information on how to work
-with late elements in event time windows.
+请注意Kafka源支持每个分区的水印，您可以在这里阅读更多关于[此处]({{ site.baseurl }}/dev/event_timestamps_watermarks.html#timestamps-per-kafka-partition)的信息。
 
-## Idling sources
+## Late Elements 延迟元素
 
-Currently, with pure event time watermarks generators, watermarks can not progress if there are no elements
-to be processed. That means in case of gap in the incoming data, event time will not progress and for
-example the window operator will not be triggered and thus existing windows will not be able to produce any
-output data.
+某些元素可能会违反水印条件，这意味着即使在*Watermark(t)*出现之后，还会出现更多带有时间戳*t' <= t*的元素。事实上，在许多现实世界的设置中，某些元素可以被任意延迟，因此不可能指定某个事件时间戳的所有元素发生的时间。
+此外，即使延迟是有界的，将水印延迟太多通常也是不可取的，因为它会在事件时间窗的计算中造成太多的延迟。
 
-To circumvent this one can use periodic watermark assigners that don't only assign based on
-element timestamps. An example solution could be an assigner that switches to using current processing time
-as the time basis after not observing new events for a while.
 
-Sources can be marked as idle using `SourceFunction.SourceContext#markAsTemporarilyIdle`. For details please refer to the Javadoc of
-this method as well as `StreamStatus`.
+由于这个原因，流程序可能会显式地期望一些*延迟*元素。延迟元素是在系统的事件时间时钟（由水印表示）已经超过延迟元素时间戳的时间之后到达的元素。参见[允许延迟]({{ site.baseurl }}/dev/stream/operators/windows.html#allowed-lateness)获取有关如何在事件时间窗口中处理延迟元素的更多信息。
 
-## Debugging Watermarks
+## 空闲Source源
 
-Please refer to the [Debugging Windows & Event Time]({{ site.baseurl }}/monitoring/debugging_event_time.html) section for debugging
-watermarks at runtime.
+目前，对于纯事件时间水印生成器，如果没有要处理的元素，则水印无法进行处理。 这意味着在输入数据存在间隙的情况下，事件时间将不会进展，例如窗口操作符将不会被触发，因此现有窗口将无法生成任何输出数据。
 
-## How operators are processing watermarks
+为了避免这种情况，我们可以使用定期水印分配器，它们不仅仅基于元素时间戳进行分配。示例解决方案可以是在不观察新事件一段时间之后切换到使用当前处理时间作为时间基础的分配器。
 
-As a general rule, operators are required to completely process a given watermark before forwarding it downstream. For example,
-`WindowOperator` will first evaluate which windows should be fired, and only after producing all of the output triggered by
-the watermark will the watermark itself be sent downstream. In other words, all elements produced due to occurrence of a watermark
-will be emitted before the watermark.
+可以使用`SourceFunction.SourceContext#markAsTemporarilyIdle`将source源标记为空闲。有关详细信息，请参阅此方法的javadoc和`StreamStatus`
+
+
+## 调试水印
+
+有关在运行时调试水印的信息，请参阅[调试窗口和事件时间]({{ site.baseurl }}/monitoring/debugging_event_time.html)部分。
+
+## 算子如何处理水印
+
+一般来说，在将给定的水印转发到下游之前，算子需要对其进行完全处理。例如，`WindowOperator`将首先计算应触发哪些窗口，并且只有在生成由水印触发的所有输出之后，水印本身才会被发送到下游。换句话说，由于水印的出现而产生的所有元素都将在水印之前发出
+
 
 The same rule applies to `TwoInputStreamOperator`. However, in this case the current watermark of the operator is defined as
 the minimum of both of its inputs.
 
 The details of this behavior are defined by the implementations of the `OneInputStreamOperator#processWatermark`,
 `TwoInputStreamOperator#processWatermark1` and `TwoInputStreamOperator#processWatermark2` methods.
+
+
+同样的规则适用于`TwoInputStreamOperator`。 但是，在这种情况下，操作员的当前水印被定义为其两个输入的最小值。
+
+此行为的详细信息由`OneInputStreamOperator＃processWatermark`，`TwoInputStreamOperator＃processWatermark1`和`TwoInputStreamOperator#processWatermark2`方法的实现定义。
+
+
 
 {% top %}
