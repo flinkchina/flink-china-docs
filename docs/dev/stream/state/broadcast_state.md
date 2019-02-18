@@ -126,13 +126,6 @@ public abstract class KeyedBroadcastProcessFunction<KS, IN1, IN2, OUT> {
 }
 {% endhighlight %}
 
-The first thing to notice is that both functions require the implementation of the `processBroadcastElement()` method 
-for processing elements in the broadcast side and the `processElement()` for elements in the non-broadcasted side. 
-
-The two methods differ in the context they are provided. The non-broadcast side has a `ReadOnlyContext`, while the 
-broadcasted side has a `Context`. 
-
-
 首先要注意的是，两个函数都需要实现`processBroadcastElement（）`方法来处理广播端的元素，并且`processElement（）`用于非广播端的元素。
 这两种方法在提供的上下文中有所不同。 非广播方具有“ReadOnlyContext”，而广播方具有“Context”。
 

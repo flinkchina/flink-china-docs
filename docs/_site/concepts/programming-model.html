@@ -777,7 +777,7 @@ under the License.
 
     
     
-<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/state/checkpointing.html">检查点</a></li>
+<li><a href="//ci.apache.org/projects/flink/flink-docs-master/dev/stream/state/checkpointing.html">检查点机制</a></li>
     
   
 
@@ -3622,7 +3622,7 @@ This alignment also allows Flink to redistribute the state and adjust the stream
 
 <h2 id="checkpoints-for-fault-tolerance">Checkpoints for Fault Tolerance</h2>
 
-<p>Flink implements fault tolerance using a combination of <strong>stream replay</strong> and <strong>检查点</strong>. A
+<p>Flink implements fault tolerance using a combination of <strong>stream replay</strong> and <strong>检查点机制</strong>. A
 checkpoint is related to a specific point in each of the input streams along with the corresponding state for each
 of the operators. A streaming dataflow can be resumed from a checkpoint while maintaining consistency <em>(exactly-once
 processing semantics)</em> by restoring the state of the operators and replaying the events from the
