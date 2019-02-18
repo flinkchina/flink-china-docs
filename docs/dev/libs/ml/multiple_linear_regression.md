@@ -91,7 +91,7 @@ MultipleLinearRegression predicts for all subtypes of `Vector` the corresponding
 
     <tbody>
       <tr>
-        <td><strong>Iterations</strong></td>
+        <td><strong>迭代</strong></td>
         <td>
           <p>
             The maximum number of iterations. (Default value: <strong>10</strong>)

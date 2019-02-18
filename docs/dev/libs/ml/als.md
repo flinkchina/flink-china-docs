@@ -99,7 +99,7 @@ The alternating least squares implementation can be controlled by the following 
         </td>
       </tr>
       <tr>
-        <td><strong>Iterations</strong></td>
+        <td><strong>迭代</strong></td>
         <td>
           <p>
             The maximum number of iterations.

@@ -425,7 +425,7 @@ all_data_stream = splited_stream.select("even", "odd")
             continuously update a model. The following code starts with a stream and applies
             the iteration body continuously. Elements that are greater than 0 are sent back
             to the feedback channel, and the rest of the elements are forwarded downstream.
-            See <a href="#iterations">iterations</a> for a complete description.
+            See <a href="#iterations">迭代</a> for a complete description.
         {% highlight java %}
 class MinusOne(MapFunction):
     def map(self, value):

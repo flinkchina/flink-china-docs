@@ -109,7 +109,7 @@ The SVM implementation can be controlled by the following parameters:
     </td>
   </tr>
   <tr>
-    <td><strong>Iterations</strong></td>
+    <td><strong>迭代</strong></td>
     <td>
       <p>
         Defines the maximum number of iterations of the outer loop method.
