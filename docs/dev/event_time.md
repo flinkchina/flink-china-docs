@@ -196,18 +196,8 @@ Flink中用于衡量事件时间进度的机制是**水印**。
 
 一般来说，在将给定的水印转发到下游之前，算子需要对其进行完全处理。例如，`WindowOperator`将首先计算应触发哪些窗口，并且只有在生成由水印触发的所有输出之后，水印本身才会被发送到下游。换句话说，由于水印的出现而产生的所有元素都将在水印之前发出
 
-
-The same rule applies to `TwoInputStreamOperator`. However, in this case the current watermark of the operator is defined as
-the minimum of both of its inputs.
-
-The details of this behavior are defined by the implementations of the `OneInputStreamOperator#processWatermark`,
-`TwoInputStreamOperator#processWatermark1` and `TwoInputStreamOperator#processWatermark2` methods.
-
-
 同样的规则适用于`TwoInputStreamOperator`。 但是，在这种情况下，操作员的当前水印被定义为其两个输入的最小值。
 
 此行为的详细信息由`OneInputStreamOperator＃processWatermark`，`TwoInputStreamOperator＃processWatermark1`和`TwoInputStreamOperator#processWatermark2`方法的实现定义。
-
-
 
 {% top %}
