@@ -23,10 +23,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink is compatible with Apache Hadoop MapReduce interfaces and therefore allows
-reusing code that was implemented for Hadoop MapReduce.
-
-You can:
+Flink与Apache Hadoop MapReduce接口兼容，因此允许重用Hadoop MapReduce实现的代码。
+你可以：
 
 - use Hadoop's `Writable` [data types](index.html#data-types) in Flink programs.
 - use any Hadoop `InputFormat` as a [DataSource](index.html#data-sources).
@@ -34,13 +32,11 @@ You can:
 - use a Hadoop `Mapper` as [FlatMapFunction](dataset_transformations.html#flatmap).
 - use a Hadoop `Reducer` as [GroupReduceFunction](dataset_transformations.html#groupreduce-on-grouped-dataset).
 
-This document shows how to use existing Hadoop MapReduce code with Flink. Please refer to the
-[Connecting to other systems]({{ site.baseurl }}/dev/batch/connectors.html) guide for reading from Hadoop supported file systems.
-
+本文档展示了如何使用Flink使用现有的Hadoop MapReduce代码。请参考[连接到其他系统]({{ site.baseurl }}/dev/batch/connectors.html)从Hadoop支持的文件系统中读取的指南。
 * This will be replaced by the TOC
 {:toc}
 
-### Project Configuration
+### 项目配置
 
 Support for Hadoop input/output formats is part of the `flink-java` and
 `flink-scala` Maven modules that are always required when writing Flink jobs.
@@ -64,14 +60,14 @@ and Reducers.
 </dependency>
 {% endhighlight %}
 
-### Using Hadoop Data Types
+### 使用Hadoop数据类型
 
 Flink supports all Hadoop `Writable` and `WritableComparable` data types
 out-of-the-box. You do not need to include the Hadoop Compatibility dependency,
 if you only want to use your Hadoop data types. See the
 [Programming Guide](index.html#data-types) for more details.
 
-### Using Hadoop InputFormats
+### 使用Hadoop InputFormats
 
 To use Hadoop `InputFormats` with Flink the format must first be wrapped
 using either `readHadoopFile` or `createHadoopInput` of the
@@ -120,7 +116,7 @@ val input: DataSet[(LongWritable, Text)] =
 
 </div>
 
-### Using Hadoop OutputFormats
+### 使用Hadoop OutputFormats
 
 Flink provides a compatibility wrapper for Hadoop `OutputFormats`. Any class
 that implements `org.apache.hadoop.mapred.OutputFormat` or extends
@@ -174,7 +170,7 @@ hadoopResult.output(hadoopOF)
 
 </div>
 
-### Using Hadoop Mappers and Reducers
+### 使用Hadoop Mapper和Reducer
 
 Hadoop Mappers are semantically equivalent to Flink's [FlatMapFunctions](dataset_transformations.html#flatmap) and Hadoop Reducers are equivalent to Flink's [GroupReduceFunctions](dataset_transformations.html#groupreduce-on-grouped-dataset). Flink provides wrappers for implementations of Hadoop MapReduce's `Mapper` and `Reducer` interfaces, i.e., you can reuse your Hadoop Mappers and Reducers in regular Flink programs. At the moment, only the Mapper and Reduce interfaces of Hadoop's mapred API (`org.apache.hadoop.mapred`) are supported.
 
@@ -208,7 +204,7 @@ DataSet<Tuple2<Text, LongWritable>> result = text
 
 **Please note:** The Reducer wrapper works on groups as defined by Flink's [groupBy()](dataset_transformations.html#transformations-on-grouped-dataset) operation. It does not consider any custom partitioners, sort or grouping comparators you might have set in the `JobConf`.
 
-### Complete Hadoop WordCount Example
+### 完整的Hadoop WordCount示例
 
 The following example shows a complete WordCount implementation using Hadoop data types, Input- and OutputFormats, and Mapper and Reducer implementations.
 
