@@ -1,5 +1,5 @@
 ---
-title: "State Backends"
+title: "状态后端"
 nav-parent_id: streaming_state
 nav-pos: 5
 ---
@@ -22,13 +22,14 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink provides different state backends that specify how and where state is stored.
+Flink提供了不同的状态后端，用于指定状态的存储方式和位置。
 
-State can be located on Java’s heap or off-heap. Depending on your state backend, Flink can also manage the state for the application, meaning Flink deals with the memory management (possibly spilling to disk if necessary) to allow applications to hold very large state. By default, the configuration file *flink-conf.yaml* determines the state backend for all Flink jobs.
+State可以位于Java的堆上或堆外。 根据您的状态后端，Flink还可以管理应用程序的状态，这意味着Flink处理内存管理（如有必要，可能会溢出到磁盘），以允许应用程序保持非常大的状态。 默认情况下，配置文件*flink-conf.yaml*确定所有flink作业的状态后端
 
-However, the default state backend can be overridden on a per-job basis, as shown below.
+但是，可以基于每个作业覆盖默认状态后端，如下所示。
 
-For more information about the available state backends, their advantages, limitations, and configuration parameters see the corresponding section in [Deployment & Operations]({{ site.baseurl }}/ops/state/state_backends.html).
+有关可用状态后端及其优点、限制和配置参数的详细信息，请参阅[部署和运维]({{ site.baseurl }}/ops/state/state_backends.html)中的相应部分。
+
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
