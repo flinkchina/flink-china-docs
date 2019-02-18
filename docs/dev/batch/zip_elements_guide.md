@@ -31,11 +31,6 @@ under the License.
 {:toc}
 
 ### Zip with a Dense Index
-`zipWithIndex` assigns consecutive labels to the elements, receiving a data set as input and returning a new data set of `(unique id, initial value)` 2-tuples.
-This process requires two passes, first counting then labeling elements, and cannot be pipelined due to the synchronization of counts.
-The alternative `zipWithUniqueId` works in a pipelined fashion and is preferred when a unique labeling is sufficient.
-For example, the following code:
-
 
 ` zipwithindex`为元素分配连续标签，接收数据集作为输入，并返回一个新的数据集`(unique id, initial value)` 2-元组。
 

@@ -1,5 +1,5 @@
 ---
-title: "Hadoop Compatibility"
+title: "兼容Hadoop"
 is_beta: true
 nav-parent_id: batch
 nav-pos: 7
