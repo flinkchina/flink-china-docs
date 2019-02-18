@@ -1,5 +1,5 @@
 ---
-title: "Zipping Elements in a DataSet"
+title: "Zipping数据集中的元素"
 nav-title: Zipping Elements
 nav-parent_id: batch
 nav-pos: 2
@@ -23,8 +23,9 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-In certain algorithms, one may need to assign unique identifiers to data set elements.
-This document shows how {% gh_link /flink-java/src/main/java/org/apache/flink/api/java/utils/DataSetUtils.java "DataSetUtils" %} can be used for that purpose.
+
+在某些算法中，可能需要为数据集元素分配唯一标识符。
+本文档说明了如何将{% gh_link /flink-java/src/main/java/org/apache/flink/api/java/utils/DataSetUtils.java "DataSetUtils" %} 用于此目的。
 
 * This will be replaced by the TOC
 {:toc}
@@ -35,6 +36,14 @@ This process requires two passes, first counting then labeling elements, and can
 The alternative `zipWithUniqueId` works in a pipelined fashion and is preferred when a unique labeling is sufficient.
 For example, the following code:
 
+
+` zipwithindex`为元素分配连续标签，接收数据集作为输入，并返回一个新的数据集`(unique id, initial value)` 2-元组。
+
+这个过程需要两个过程，第一个是计数，然后是标记元素，由于计数的同步，所以不能进行流水线操作。
+
+备选方案`zipWithUniqueId`以流水线方式工作，当唯一标签足够时，它是首选。
+
+例如，以下代码：
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -81,15 +90,15 @@ env.execute()
 
 </div>
 
-may yield the tuples: (0,G), (1,H), (2,A), (3,B), (4,C), (5,D), (6,E), (7,F)
+可以产生元组：(0,G), (1,H), (2,A), (3,B), (4,C), (5,D), (6,E), (7,F)
 
-[Back to top](#top)
+[回到顶部](#top)
 
 ### Zip with a Unique Identifier
-In many cases one may not need to assign consecutive labels.
-`zipWithUniqueId` works in a pipelined fashion, speeding up the label assignment process. This method receives a data set as input and returns a new data set of `(unique id, initial value)` 2-tuples.
-For example, the following code:
 
+在许多情况下，可能不需要分配连续标签。
+`zipWithUniqueId`以流水线方式工作，加快了标签分配过程。 该方法接收数据集作为输入，并返回一个新的数据集`(unique id, initial value)`2元组。
+例如，以下代码：
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -121,7 +130,7 @@ env.execute()
 
 </div>
 
-may yield the tuples: (0,G), (1,A), (2,H), (3,B), (5,C), (7,D), (9,E), (11,F)
+可以产生元组: (0,G), (1,A), (2,H), (3,B), (5,C), (7,D), (9,E), (11,F)
 
 [Back to top](#top)
 
