@@ -1,5 +1,5 @@
 ---
-title: "Parallel Execution"
+title: "并行执行"
 nav-parent_id: execution
 nav-pos: 30
 ---
@@ -37,14 +37,13 @@ to performance.
 * toc
 {:toc}
 
-## Setting the Parallelism
+## 设置并行度
 
-The parallelism of a task can be specified in Flink on different levels:
+在Flink中Task的并行度可以在不同层次指定
 
-### Operator Level
+### 算子层面
 
-The parallelism of an individual operator, data source, or data sink can be defined by calling its
-`setParallelism()` method.  For example, like this:
+可以通过调用其`setParallelism()`方法来定义单个操作符、数据源或数据接收器的并行性。例如，像这样:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -80,17 +79,11 @@ env.execute("Word Count Example")
 </div>
 </div>
 
-### Execution Environment Level
+### 执行环境层面
 
-As mentioned [here]({{ site.baseurl }}/dev/api_concepts.html#anatomy-of-a-flink-program) Flink
-programs are executed in the context of an execution environment. An
-execution environment defines a default parallelism for all operators, data sources, and data sinks
-it executes. Execution environment parallelism can be overwritten by explicitly configuring the
-parallelism of an operator.
+如前所述[此处]({{ site.baseurl }}/dev/api_concepts.html#anatomy-of-a-flink-program) 。Flink程序是在一个执行环境的上下文中执行的。执行环境为它执行的所有操作符、数据源和数据接收器定义了默认的并行性。可以通过显式配置操作符的并行性来覆盖执行环境的并行性。
 
-The default parallelism of an execution environment can be specified by calling the
-`setParallelism()` method. To execute all operators, data sources, and data sinks with a parallelism
-of `3`, set the default parallelism of the execution environment as follows:
+执行环境的默认并行性可以通过调用`setParallelism()`方法来指定。若要并行度为“3”执行所有运算符、数据源和数据接收器，则执行环境的默认并行度设置如下:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -123,19 +116,18 @@ env.execute("Word Count Example")
 </div>
 </div>
 
-### Client Level
-
-The parallelism can be set at the Client when submitting jobs to Flink. The
-Client can either be a Java or a Scala program. One example of such a Client is
-Flink's Command-line Interface (CLI).
-
-For the CLI client, the parallelism parameter can be specified with `-p`. For
-example:
-
-    ./bin/flink run -p 10 ../examples/*WordCount-java*.jar
+### 客户端层面
 
 
-In a Java/Scala program, the parallelism is set as follows:
+
+当向Flink提交作业时，可以在客户机上设置并行度。客户机可以是Java程序，也可以是Scala程序。这种客户机的一个例子是Flink的命令行界面(CLI)。
+
+对于CLI客户机，并行度参数可以用“-p”指定。例如:
+
+    ``` ./bin/flink run -p 10 ../examples/*WordCount-java*.jar ```
+
+
+在Java/Scala程序中，并行度设置如下:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -177,13 +169,12 @@ try {
 </div>
 
 
-### System Level
+### 系统层面
 
-A system-wide default parallelism for all execution environments can be defined by setting the
-`parallelism.default` property in `./conf/flink-conf.yaml`. See the
-[Configuration]({{ site.baseurl }}/ops/config.html) documentation for details.
 
-## Setting the Maximum Parallelism
+可以通过在`./conf/flink-conf.yaml`中设置`parallelism.default`属性来定义所有执行环境的系统默认并行性。。详细信息请参阅[配置]({{ site.baseurl }}/ops/config.html) 文档
+
+## 设置最大并行度
 
 The maximum parallelism can be set in places where you can also set a parallelism
 (except client level and system level). Instead of calling `setParallelism()` you call
@@ -192,10 +183,11 @@ The maximum parallelism can be set in places where you can also set a parallelis
 The default setting for the maximum parallelism is roughly `operatorParallelism + (operatorParallelism / 2)` with
 a lower bound of `127` and an upper bound of `32768`.
 
-<span class="label label-danger">Attention</span> Setting the maximum parallelism to a very large
-value can be detrimental to performance because some state backends have to keep internal data
-structures that scale with the number of key-groups (which are the internal implementation mechanism for
-rescalable state).
+最大并行度可以在您还可以设置并行度的地方设置(客户端级别和系统级别除外)。不是调用 `setParallelism()`，而是调用`setMaxParallelism()` 来设置最大的并行度。
 
+最大并行度的默认设置大致为`operatorParallelism + (operatorParallelism / 2)`，下界为“127”，上界为“32768”。
+
+<span class="label label-danger">注意</span>
+将最大并行度设置为一个非常大的值可能不利于性能，因为一些状态后端必须保持内部数据结构，该结构与键组的数量成比例(键组是可伸缩状态的内部实现机制)。
 
 {% top %}
