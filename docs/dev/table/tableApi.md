@@ -22,16 +22,16 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The Table API is a unified, relational API for stream and batch processing. Table API queries can be run on batch or streaming input without modifications. The Table API is a super set of the SQL language and is specially designed for working with Apache Flink. The Table API is a language-integrated API for Scala and Java. Instead of specifying queries as String values as common with SQL, Table API queries are defined in a language-embedded style in Java or Scala with IDE support like autocompletion and syntax validation. 
+Table API是用于流和批处理的统一关系API。表API查询可以在批量或流式输入上运行而无需修改。 Table API是SQL语言的超级集合，专门用于Apache Flink。 Table API是Scala和Java的语言集成API。 Table API查询不是像SQL中常见的那样将查询指定为String值，而是在Java或Scala中以嵌入语言的样式定义，并支持自动完成和语法验证等IDE支持。
 
-The Table API shares many concepts and parts of its API with Flink's SQL integration. Have a look at the [Common Concepts & API]({{ site.baseurl }}/dev/table/common.html) to learn how to register tables or to create a `Table` object. The [Streaming Concepts](./streaming) pages discuss streaming specific concepts such as dynamic tables and time attributes.
+Table API与Flink的SQL集成共享其API的许多概念和部分。查看[Common Concepts＆API]({{ site.baseurl }}/dev/table/common.html)以了解如何注册表或创建`Table`对象。 [Streaming Concepts](./streaming)页面讨论了流特定的概念，例如动态表和时间属性。
 
-The following examples assume a registered table called `Orders` with attributes `(a, b, c, rowtime)`. The `rowtime` field is either a logical [time attribute](./streaming/time_attributes.html) in streaming or a regular timestamp field in batch.
+以下示例假设一个名为`Orders`的已注册表，其属性为`（a，b，c，rowtime）`。 `rowtime`字段是流式传输中的逻辑[时间属性](./streaming/time_attributes.html)或批量的常规时间戳字段。
 
 * This will be replaced by the TOC
 {:toc}
 
-Overview & Examples
+概览 & 示例
 -----------------------------
 
 The Table API is available for Scala and Java. The Scala Table API leverages on Scala expressions, the Java Table API is based on strings which are parsed and converted into equivalent expressions.
@@ -141,12 +141,12 @@ Since the Table API is a unified API for batch and streaming data, both example 
 
 {% top %}
 
-Operations
+算子
 ----------
 
 The Table API supports the following operations. Please note that not all operations are available in both batch and streaming yet; they are tagged accordingly.
 
-### Scan, Projection, and Filter
+### 扫描，投影，过滤(Scan, Projection, and Filter)
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -304,7 +304,7 @@ val result = orders.where('b === "red")
 
 {% top %}
 
-### Aggregations
+### 聚合 Aggregations
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -550,7 +550,7 @@ val result = orders.distinct()
 
 {% top %}
 
-### Joins
+### 连接 Joins
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1200,7 +1200,7 @@ val result3: Table = in.orderBy('a.asc).offset(10).fetch(5)
 </div>
 </div>
 
-### Insert
+### 插入 Insert
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -1267,7 +1267,7 @@ orders.insertInto("OutOrders")
 
 {% top %}
 
-### Group Windows
+### 组窗口 Group Windows
 
 Group window aggregates group rows into finite groups based on time or row-count intervals and evaluate aggregation functions once per group. For batch tables, windows are a convenient shortcut to group records by time intervals.
 
@@ -1341,7 +1341,7 @@ val table = input
 
 The `Window` parameter defines how rows are mapped to windows. `Window` is not an interface that users can implement. Instead, the Table API provides a set of predefined `Window` classes with specific semantics, which are translated into underlying `DataStream` or `DataSet` operations. The supported window definitions are listed below.
 
-#### Tumble (Tumbling Windows)
+#### 滚动 Tumble (Tumbling Windows)
 
 A tumbling window assigns rows to non-overlapping, continuous windows of fixed length. For example, a tumbling window of 5 minutes groups rows in 5 minutes intervals. Tumbling windows can be defined on event-time, processing-time, or on a row-count.
 
@@ -1399,7 +1399,7 @@ Tumbling windows are defined by using the `Tumble` class as follows:
 </div>
 </div>
 
-#### Slide (Sliding Windows)
+#### 滑动 Slide (Sliding Windows)
 
 A sliding window has a fixed size and slides by a specified slide interval. If the slide interval is smaller than the window size, sliding windows are overlapping. Thus, rows can be assigned to multiple windows. For example, a sliding window of 15 minutes size and 5 minute slide interval assigns each row to 3 different windows of 15 minute size, which are evaluated in an interval of 5 minutes. Sliding windows can be defined on event-time, processing-time, or on a row-count.
 
@@ -1461,7 +1461,7 @@ Sliding windows are defined by using the `Slide` class as follows:
 </div>
 </div>
 
-#### Session (Session Windows)
+#### 会话 Session (Session Windows)
 
 Session windows do not have a fixed size but their bounds are defined by an interval of inactivity, i.e., a session window is closes if no event appears for a defined gap period. For example a session window with a 30 minute gap starts when a row is observed after 30 minutes inactivity (otherwise the row would be added to an existing window) and is closed if no row is added within 30 minutes. Session windows can work on event-time or processing-time.
 
@@ -1610,7 +1610,8 @@ The `OverWindow` defines a range of rows over which aggregates are computed. `Ov
 
 **Note:** Currently, all aggregation functions in the same `select()` call must be computed of the same over window.
 
-#### Unbounded Over Windows
+#### 无界 Unbounded Over Windows
+
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -1645,7 +1646,7 @@ The `OverWindow` defines a range of rows over which aggregates are computed. `Ov
 </div>
 </div>
 
-#### Bounded Over Windows
+#### 有界 Bounded Over Windows
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -1682,7 +1683,7 @@ The `OverWindow` defines a range of rows over which aggregates are computed. `Ov
 
 {% top %}
 
-Data Types
+数据类型
 ----------
 
 The Table API is built on top of Flink's DataSet and DataStream APIs. Internally, it also uses Flink's `TypeInformation` to define data types. Fully supported types are listed in `org.apache.flink.table.api.Types`. The following table summarizes the relation between Table API types, SQL types, and the resulting Java class.
@@ -1717,7 +1718,7 @@ Generic types are treated as a black box and can be passed on or processed by [u
 
 {% top %}
 
-Expression Syntax
+表达式语法
 -----------------
 
 Some of the operators in previous sections expect one or more expressions. Expressions can be specified using an embedded Scala DSL or as Strings. Please refer to the examples above to learn how expressions can be specified.

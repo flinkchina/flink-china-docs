@@ -1,5 +1,5 @@
 ---
-title: "User-defined Functions"
+title: "用户自定义函数"
 nav-parent_id: tableapi
 nav-pos: 50
 ---
@@ -22,24 +22,24 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-User-defined functions are an important feature, because they significantly extend the expressiveness of queries.
+用户定义的函数是一个重要的特性，因为它们极大地扩展了查询的表现力。
 
 * This will be replaced by the TOC
 {:toc}
 
-Register User-Defined Functions
+注册用户定义函数
 -------------------------------
-In most cases, a user-defined function must be registered before it can be used in an query. It is not necessary to register functions for the Scala Table API. 
 
-Functions are registered at the `TableEnvironment` by calling a `registerFunction()` method. When a user-defined function is registered, it is inserted into the function catalog of the `TableEnvironment` such that the Table API or SQL parser can recognize and properly translate it. 
+在大多数情况下，必须先注册用户定义的函数，然后才能在查询中使用它。 不需要为Scala Table API注册函数。
 
-Please find detailed examples of how to register and how to call each type of user-defined function 
-(`ScalarFunction`, `TableFunction`, and `AggregateFunction`) in the following sub-sessions.
+函数通过调用`registerFunction（）`方法在`TableEnvironment`中注册。 当注册用户定义的函数时，它将被插入到`TableEnvironment`的函数目录中，以便Table API或SQL解析器可以识别并正确转换它。
 
+请查看如何注册以及如何调用每种类型的用户定义函数的详细示例
+（`ScalarFunction`，`TableFunction`和`AggregateFunction`）在以下子会话中。
 
 {% top %}
 
-Scalar Functions
+标量函数 Scalar Functions
 ----------------
 
 If a required scalar function is not contained in the built-in functions, it is possible to define custom, user-defined scalar functions for both the Table API and SQL. A user-defined scalar functions maps zero, one, or multiple scalar values to a new scalar value.
@@ -134,7 +134,7 @@ object TimestampModifier extends ScalarFunction {
 
 {% top %}
 
-Table Functions
+Table函数
 ---------------
 
 Similar to a user-defined scalar function, a user-defined table function takes zero, one, or multiple scalar values as input parameters. However in contrast to a scalar function, it can return an arbitrary number of rows as output instead of a single value. The returned rows may consist of one or more columns. 
@@ -266,7 +266,7 @@ class CustomTypeSplit extends TableFunction[Row] {
 {% top %}
 
 
-Aggregation Functions
+Aggregation函数
 ---------------------
 
 User-Defined Aggregate Functions (UDAGGs) aggregate a table (one ore more rows with one or more attributes) to a scalar value. 
@@ -655,7 +655,7 @@ tEnv.sqlQuery("SELECT user, wAvg(points, level) AS avgPoints FROM userScores GRO
 
 {% top %}
 
-Best Practices for Implementing UDFs
+实现UDF的最佳实践
 ------------------------------------
 
 The Table API and SQL code generation internally tries to work with primitive values as much as possible. A user-defined function can introduce much overhead through object creation, casting, and (un)boxing. Therefore, it is highly recommended to declare parameters and result types as primitive types instead of their boxed classes. `Types.DATE` and `Types.TIME` can also be represented as `int`. `Types.TIMESTAMP` can be represented as `long`. 
@@ -664,7 +664,7 @@ We recommended that user-defined functions should be written by Java instead of 
 
 {% top %}
 
-Integrating UDFs with the Runtime
+将UDF与运行时集成
 ---------------------------------
 
 Sometimes it might be necessary for a user-defined function to get global runtime information or do some setup/clean-up work before the actual work. User-defined functions provide `open()` and `close()` methods that can be overridden and provide similar functionality as the methods in `RichFunction` of DataSet or DataStream API.
