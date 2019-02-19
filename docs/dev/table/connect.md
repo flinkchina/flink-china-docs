@@ -1,5 +1,5 @@
 ---
-title: "Connect to External Systems"
+title: "Table&SQL连接到外部系统"
 nav-parent_id: tableapi
 nav-pos: 19
 ---
@@ -22,23 +22,24 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink's Table API & SQL programs can be connected to other external systems for reading and writing both batch and streaming tables. A table source provides access to data which is stored in external systems (such as a database, key-value store, message queue, or file system). A table sink emits a table to an external storage system. Depending on the type of source and sink, they support different formats such as CSV, Parquet, or ORC.
 
-This page describes how to declare built-in table sources and/or table sinks and register them in Flink. After a source or sink has been registered, it can be accessed by Table API & SQL statements.
+Flink的Table API和SQL程序可以连接到其他外部系统，以便读取和写入批处理表和流表。 表源提供对存储在外部系统（例如数据库，键值存储，消息队列或文件系统）中的数据的访问。 表接收器将表发送到外部存储系统。 根据源和接收器的类型，它们支持不同的格式，如CSV，Parquet或ORC。
 
-<span class="label label-danger">Attention</span> If you want to implement your own *custom* table source or sink, have a look at the [user-defined sources & sinks page](sourceSinks.html).
+本页介绍如何声明内置表源和/或表接收器，并在Flink中注册它们。 注册源或接收器后，可以通过Table API和SQL语句访问它。
+
+<span class="label label-danger">注意</span>如果要实现自己的*custom*表源或接收器，请查看[用户定义的源和接收器页面](sourceSinks.html)。
 
 * This will be replaced by the TOC
 {:toc}
 
-Dependencies
+依赖
 ------------
 
-The following tables list all available connectors and formats. Their mutual compatibility is tagged in the corresponding sections for [table connectors](connect.html#table-connectors) and [table formats](connect.html#table-formats). The following tables provide dependency information for both projects using a build automation tool (such as Maven or SBT) and SQL Client with SQL JAR bundles.
+下表列出了所有可用的连接器和格式。 它们的相互兼容性在[table connectors](connect.html#table-connectors)和[table formats](connect.html#table-formats)的相应部分中标记。 下表提供了使用构建自动化工具（如Maven或SBT）和带有SQL JAR包的SQL Client的两个项目的依赖关系信息。
 
 {% if site.is_stable %}
 
-### Connectors
+### 连接器
 
 | Name              | Version             | Maven dependency             | SQL Client JAR         |
 | :---------------- | :------------------ | :--------------------------- | :----------------------|
@@ -50,7 +51,7 @@ The following tables list all available connectors and formats. Their mutual com
 | Apache Kafka      | 0.11                | `flink-connector-kafka-0.11` | [Download](http://central.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka-0.11{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-kafka-0.11{{site.scala_version_suffix}}-{{site.version}}.jar) |
 | Apache Kafka      | 0.11+ (`universal`) | `flink-connector-kafka`      | [Download](http://central.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-kafka{{site.scala_version_suffix}}-{{site.version}}.jar) |
 
-### Formats
+### Formats 格式
 
 | Name              | Maven dependency             | SQL Client JAR         |
 | :---------------- | :--------------------------- | :--------------------- |
@@ -60,16 +61,18 @@ The following tables list all available connectors and formats. Their mutual com
 
 {% else %}
 
-These tables are only available for stable releases.
+这些表仅适用于稳定版本。
 
 {% endif %}
 
 {% top %}
 
-Overview
+
+概览
 --------
 
-Beginning from Flink 1.6, the declaration of a connection to an external system is separated from the actual implementation.
+
+从Flink 1.6开始，与外部系统的连接声明与实际实现分开。
 
 Connections can be specified either
 
@@ -228,7 +231,7 @@ If no factory can be found or multiple factories match for the given properties,
 
 {% top %}
 
-Table Schema
+Table Schema模式
 ------------
 
 The table schema defines the names and types of columns similar to the column definitions of a SQL `CREATE TABLE` statement. In addition, one can specify how columns are mapped from and to fields of the format in which the table data is encoded. The origin of a field might be important if the name of the column should differ from the input/output format. For instance, a column `user_name` should reference the field `$$-user-name` from a JSON format. Additionally, the schema is needed to map types from an external system to Flink's representation. In case of a table sink, it ensures that only data with valid schema is written to an external system.
@@ -297,7 +300,7 @@ Time attributes are essential when working with unbounded streaming tables. Ther
 
 For more information about time handling in Flink and especially event-time, we recommend the general [event-time section](streaming/time_attributes.html).
 
-### Rowtime Attributes
+### Rowtime属性
 
 In order to control the event-time behavior for tables, Flink provides predefined timestamp extractors and watermark strategies.
 
@@ -337,8 +340,9 @@ rowtime:
     type: from-field
     from: "ts_field"                 # required: original field name in the input
 
-# Converts the assigned timestamps from a DataStream API record into the rowtime attribute
-# and thus preserves the assigned timestamps from the source.
+# 将分配的时间戳从DataStream API记录转换为rowtime属性
+# 从而保留来自源的指定时间戳
+
 rowtime:
   timestamps:
     type: from-source
@@ -384,15 +388,15 @@ rowtime:
   watermarks:
     type: periodic-ascending
 
-# Sets a built-in watermark strategy for rowtime attributes which are out-of-order by a bounded time interval.
-# Emits watermarks which are the maximum observed timestamp minus the specified delay.
+# 为rowtime属性设置内置水印策略，这些属性在有界时间间隔内是无序的。
+# 发出水印，该水印是观察到的最大时间戳减去指定的延迟。
 rowtime:
   watermarks:
     type: periodic-bounded
     delay: ...                # required: delay in milliseconds
 
-# Sets a built-in watermark strategy which indicates the watermarks should be preserved from the
-# underlying DataStream API and thus preserves the assigned watermarks from the source.
+# 设置内置水印策略，该策略指示应从基础数据流API中保留水印，从而从源中保留指定的水印。
+
 rowtime:
   watermarks:
     type: from-source
@@ -402,7 +406,7 @@ rowtime:
 
 Make sure to always declare both timestamps and watermarks. Watermarks are required for triggering time-based operations.
 
-### Type Strings
+### 类型字符串
 
 Because type information is only available in a programming language, the following type strings are supported for being defined in a YAML file:
 
@@ -435,7 +439,7 @@ ANY<class, serialized>           # used for type information that is not support
 
 {% top %}
 
-Update Modes
+更新mode模式
 ------------
 
 For streaming queries, it is required to declare how to perform the [conversion between a dynamic table and an external connector](streaming/dynamic_tables.html#continuous-queries). The *update mode* specifies which kind of messages should be exchanged with the external system:
@@ -469,14 +473,14 @@ See also the [general streaming concepts documentation](streaming/dynamic_tables
 
 {% top %}
 
-Table Connectors
+Table连接器
 ----------------
 
 Flink provides a set of connectors for connecting to external systems.
 
 Please note that not all connectors are available in both batch and streaming yet. Furthermore, not every streaming connector supports every streaming mode. Therefore, each connector is tagged accordingly. A format tag indicates that the connector requires a certain type of format.
 
-### File System Connector
+### 文件系统连接器
 
 <span class="label label-primary">Source: Batch</span>
 <span class="label label-primary">Source: Streaming Append Mode</span>
@@ -511,7 +515,7 @@ The file system connector itself is included in Flink and does not require an ad
 
 <span class="label label-danger">Attention</span> File system sources and sinks for streaming are only experimental. In the future, we will support actual streaming use cases, i.e., directory monitoring and bucket output.
 
-### Kafka Connector
+### Kafka连接器
 
 <span class="label label-primary">Source: Streaming Append Mode</span>
 <span class="label label-primary">Sink: Streaming Append Mode</span>
@@ -594,7 +598,7 @@ Make sure to add the version-specific Kafka dependency. In addition, a correspon
 
 {% top %}
 
-### Elasticsearch Connector
+### Elasticsearch连接器
 
 <span class="label label-primary">Sink: Streaming Append Mode</span>
 <span class="label label-primary">Sink: Streaming Upsert Mode</span>
@@ -699,14 +703,14 @@ connector:
 
 {% top %}
 
-Table Formats
+Table Formats格式
 -------------
 
 Flink provides a set of table formats that can be used with table connectors.
 
 A format tag indicates the format type for matching with a connector.
 
-### CSV Format
+### CSV格式
 
 The CSV format allows to read and write comma-separated rows.
 
@@ -750,7 +754,7 @@ The CSV format is included in Flink and does not require additional dependencies
 
 <span class="label label-danger">Attention</span> The CSV format for writing rows is limited at the moment. Only a custom field delimiter is supported as optional parameter.
 
-### JSON Format
+### JSON格式
 
 <span class="label label-info">Format: Serialization Schema</span>
 <span class="label label-info">Format: Deserialization Schema</span>
@@ -892,7 +896,7 @@ Simple references that link to a common definition in the document are supported
 Make sure to add the JSON format as a dependency.
 
 
-### Apache Avro Format
+### Apache Avro格式
 
 <span class="label label-info">Format: Serialization Schema</span>
 <span class="label label-info">Format: Deserialization Schema</span>
@@ -977,7 +981,7 @@ Make sure to add the Apache Avro dependency.
 
 {% top %}
 
-Further TableSources and TableSinks
+进一步的TableSources和TableSinks
 -----------------------------------
 
 The following table sources and sinks have not yet been migrated (or have not been migrated entirely) to the new unified interfaces.

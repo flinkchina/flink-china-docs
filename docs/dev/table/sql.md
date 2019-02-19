@@ -22,18 +22,21 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-SQL queries are specified with the `sqlQuery()` method of the `TableEnvironment`. The method returns the result of the SQL query as a `Table`. A `Table` can be used in [subsequent SQL and Table API queries](common.html#mixing-table-api-and-sql), be [converted into a DataSet or DataStream](common.html#integration-with-datastream-and-dataset-api), or [written to a TableSink](common.html#emit-a-table)). SQL and Table API queries can be seamlessly mixed and are holistically optimized and translated into a single program.
 
-In order to access a table in a SQL query, it must be [registered in the TableEnvironment](common.html#register-tables-in-the-catalog). A table can be registered from a [TableSource](common.html#register-a-tablesource), [Table](common.html#register-a-table), [DataStream, or DataSet](common.html#register-a-datastream-or-dataset-as-table). Alternatively, users can also [register external catalogs in a TableEnvironment](common.html#register-an-external-catalog) to specify the location of the data sources.
+SQL查询是使用`TableEnvironment`的`sqlQuery（）`方法指定的。 该方法将SQL查询的结果作为“Table”返回。 `table`可用于[后续SQL和表API查询](common.html#mixing-table-api-and-sql)，[转换为DataSet或DataStream](common.html#integration-with-datastream-and-dataset-api)，或[写入TableSink](common.html#emit-a-table)）。 SQL和Table API查询可以无缝混合，并进行整体优化并转换为单个程序。
 
-For convenience `Table.toString()` automatically registers the table under a unique name in its `TableEnvironment` and returns the name. Hence, `Table` objects can be directly inlined into SQL queries (by string concatenation) as shown in the examples below.
 
-**Note:** Flink's SQL support is not yet feature complete. Queries that include unsupported SQL features cause a `TableException`. The supported features of SQL on batch and streaming tables are listed in the following sections.
+
+为了访问SQL查询中的表，它必须[在TableEnvironment中注册](common.html#register-tables-in-the-catalog)。 可以从[TableSource](common.html#register-a-tablesource)，[Table](common.html#register-a-table)，[DataStream或DataSet](common.html#register-a-datastream-or-dataset-as-table)。 或者，用户也可以[在TableEnvironment中注册外部目录](common.html#register-an-external-catalog)来指定数据源的位置。
+
+为方便起见，`Table.toString（）`自动在其`TableEnvironment`中以唯一名称注册表并返回名称。 因此，`Table`对象可以直接内联到SQL查询中（通过字符串连接），如下面的示例所示。
+
+**注意:** Flink的SQL支持尚未完成。 包含不受支持的SQL功能的查询会导致`TableException`。 以下部分列出了批处理和流表上SQL的受支持功能。
 
 * This will be replaced by the TOC
 {:toc}
 
-Specifying a Query
+指定查询
 ------------------
 
 The following examples show how to specify a SQL queries on registered and inlined tables.
@@ -106,7 +109,7 @@ tableEnv.sqlUpdate(
 
 {% top %}
 
-Supported Syntax
+支持的语法
 ----------------
 
 Flink parses SQL using [Apache Calcite](https://calcite.apache.org/docs/reference.html), which supports standard ANSI SQL. DDL statements are not supported by Flink.
@@ -252,10 +255,10 @@ String literals must be enclosed in single quotes (e.g., `SELECT 'Hello World'`)
 
 {% top %}
 
-Operations
+算子
 --------------------
 
-### Scan, Projection, and Filter
+### Scan, Projection, and Filter 扫描、投影和过滤
 
 <div markdown="1">
 <table class="table table-bordered">
@@ -310,7 +313,7 @@ SELECT PRETTY_PRINT(user) FROM Orders
 
 {% top %}
 
-### Aggregations
+### 聚合 Aggregations 
 
 <div markdown="1">
 <table class="table table-bordered">
@@ -434,7 +437,7 @@ GROUP BY users
 
 {% top %}
 
-### Joins
+### 连接 Joins
 
 <div markdown="1">
 <table class="table table-bordered">
@@ -736,7 +739,7 @@ LIMIT 3
 
 {% top %}
 
-### Insert
+### 插入 Insert
 
 <div markdown="1">
 <table class="table table-bordered">
@@ -769,7 +772,7 @@ FROM Orders
 
 {% top %}
 
-### Group Windows
+### Group窗口
 
 Group windows are defined in the `GROUP BY` clause of a SQL query. Just like queries with regular `GROUP BY` clauses, queries with a `GROUP BY` clause that includes a group window function compute a single result row per group. The following group windows functions are supported for SQL on batch and streaming tables.
 
@@ -797,13 +800,13 @@ Group windows are defined in the `GROUP BY` clause of a SQL query. Just like que
   </tbody>
 </table>
 
-#### Time Attributes
+#### 时间属性
 
 For SQL queries on streaming tables, the `time_attr` argument of the group window function must refer to a valid time attribute that specifies the processing time or event time of rows. See the [documentation of time attributes](streaming/time_attributes.html) to learn how to define time attributes.
 
 For SQL on batch tables, the `time_attr` argument of the group window function must be an attribute of type `TIMESTAMP`.
 
-#### Selecting Group Window Start and End Timestamps
+#### 选择组窗口的开始和结束时间戳
 
 The start and end timestamps of group windows as well as time attributes can be selected with the following auxiliary functions:
 
@@ -942,7 +945,7 @@ val result4 = tableEnv.sqlQuery(
 
 {% top %}
 
-### Pattern Recognition
+### 模式识别 Pattern Recognition 
 
 <div markdown="1">
 <table class="table table-bordered">
@@ -988,7 +991,7 @@ MATCH_RECOGNIZE (
 
 {% top %}
 
-Data Types
+数据类型
 ----------
 
 The SQL runtime is built on top of Flink's DataSet and DataStream APIs. Internally, it also uses Flink's `TypeInformation` to define data types. Fully supported types are listed in `org.apache.flink.table.api.Types`. The following table summarizes the relation between SQL Types, Table API types, and the resulting Java class.
@@ -1023,7 +1026,7 @@ Generic types are treated as a black box and can be passed on or processed by [u
 
 {% top %}
 
-Reserved Keywords
+保留关键字
 -----------------
 
 Although not every SQL feature is implemented yet, some string combinations are already reserved as keywords for future use. If you want to use one of the following strings as a field name, make sure to surround them with backticks (e.g. `` `value` ``, `` `count` ``).

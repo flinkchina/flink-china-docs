@@ -1,5 +1,5 @@
 ---
-title: "SQL Client"
+title: "SQL客户端"
 nav-parent_id: tableapi
 nav-pos: 100
 is_beta: true
@@ -24,18 +24,19 @@ under the License.
 -->
 
 
-Flink’s Table & SQL API makes it possible to work with queries written in the SQL language, but these queries need to be embedded within a table program that is written in either Java or Scala. Moreover, these programs need to be packaged with a build tool before being submitted to a cluster. This more or less limits the usage of Flink to Java/Scala programmers.
+Flink的Table＆SQL API可以处理用SQL语言编写的查询，但这些查询需要嵌入用Java或Scala编写的表程序中。 而且，这些程序需要在提交到集群之前使用构建工具打包。 这或多或少地限制了Flink对Java / Scala程序员的使用。
 
-The *SQL Client* aims to provide an easy way of writing, debugging, and submitting table programs to a Flink cluster without a single line of Java or Scala code. The *SQL Client CLI* allows for retrieving and visualizing real-time results from the running distributed application on the command line.
+*SQL Client*旨在提供一种简单的方法来编写，调试和提交表程序到Flink集群，而无需单行Java或Scala代码。 *SQL Client CLI*允许在命令行上检索和可视化运行的分布式应用程序的实时结果。
 
-<a href="{{ site.baseurl }}/fig/sql_client_demo.gif"><img class="offset" src="{{ site.baseurl }}/fig/sql_client_demo.gif" alt="Animated demo of the Flink SQL Client CLI running table programs on a cluster" width="80%" /></a>
+<a href="{{ site.baseurl }}/fig/sql_client_demo.gif"><img class="offset" src="{{ site.baseurl }}/fig/sql_client_demo.gif" alt="动态演示Flink SQL客户端CLI在集群上运行表程序" width="80%" /></a>
 
-<span class="label label-danger">Attention</span> The SQL Client is in an early development phase. Even though the application is not production-ready yet, it can be a quite useful tool for prototyping and playing around with Flink SQL. In the future, the community plans to extend its functionality by providing a REST-based [SQL Client Gateway](sqlClient.html#limitations--future).
+<span class="label label-danger">注意</span> The SQL Client is in an early development phase. Even though the application is not production-ready yet, it can be a quite useful tool for prototyping and playing around with Flink SQL. In the future, the community plans to extend its functionality by providing a REST-based [SQL Client Gateway](sqlClient.html#limitations--future).
+SQL客户端处于早期开发阶段。 即使应用程序还没有生产就绪，但它可以是一个非常有用的工具，用于原型设计和使用Flink SQL。 在未来，社区计划通过提供基于REST的[SQL客户端网关](sqlClient.html#limitations--future)来扩展其功能。
 
 * This will be replaced by the TOC
 {:toc}
 
-Getting Started
+开始
 ---------------
 
 This section describes how to setup and run your first Flink SQL program from the command-line.
@@ -46,7 +47,7 @@ The SQL Client is bundled in the regular Flink distribution and thus runnable ou
 ./bin/start-cluster.sh
 {% endhighlight %}
 
-### Starting the SQL Client CLI
+### 启动SQL客户端CLI
 
 The SQL Client scripts are also located in the binary directory of Flink. [In the future](sqlClient.html#limitations--future), a user will have two possibilities of starting the SQL Client CLI either by starting an embedded standalone process or by connecting to a remote SQL Client Gateway. At the moment only the `embedded` mode is supported. You can start the CLI by calling:
 
@@ -56,7 +57,7 @@ The SQL Client scripts are also located in the binary directory of Flink. [In th
 
 By default, the SQL Client will read its configuration from the environment file located in `./conf/sql-client-defaults.yaml`. See the [configuration part](sqlClient.html#environment-files) for more information about the structure of environment files.
 
-### Running SQL Queries
+### 运行SQL查询
 
 Once the CLI has been started, you can use the `HELP` command to list all available SQL statements. For validating your setup and cluster connection, you can enter your first SQL query and press the `Enter` key to execute it:
 
@@ -114,7 +115,7 @@ After a query is defined, it can be submitted to the cluster as a long-running, 
 
 {% top %}
 
-Configuration
+配置
 -------------
 
 The SQL Client can be started with the following optional CLI commands. They are discussed in detail in the subsequent paragraphs.
@@ -155,7 +156,7 @@ Mode "embedded" submits Flink jobs from the local machine.
 
 {% top %}
 
-### Environment Files
+### 环境文件
 
 A SQL query needs a configuration environment in which it is executed. The so-called *environment files* define available table sources and sinks, external catalogs, user-defined functions, and other properties required for execution and deployment.
 
@@ -189,7 +190,7 @@ tables:
     type: view
     query: "SELECT MyField2 FROM MyTableSource"
 
-# Define user-defined functions here.
+# 在这里定义用户定义的函数。
 
 functions:
   - name: myUDF
@@ -199,8 +200,7 @@ functions:
       - 7.6
       - false
 
-# Execution properties allow for changing the behavior of a table program.
-
+# 执行允许更改表程序行为的属性。
 execution:
   type: streaming                   # required: execution mode either 'batch' or 'streaming'
   result-mode: table                # required: either 'table' or 'changelog'
@@ -215,7 +215,8 @@ execution:
   restart-strategy:                 # optional: restart strategy
     type: fallback                  #   "fallback" to global restart strategy by default
 
-# Deployment properties allow for describing the cluster to which table programs are submitted to.
+# 部署允许描述表程序提交到的集群的属性
+
 
 deployment:
   response-timeout: 5000
@@ -238,7 +239,7 @@ Depending on the use case, a configuration can be split into multiple files. The
 CLI commands > session environment file > defaults environment file
 {% endhighlight %}
 
-#### Restart Strategies
+#### 重启策略
 
 Restart strategies control how Flink jobs are restarted in case of a failure. Similar to [global restart strategies]({{ site.baseurl }}/dev/restart_strategies.html) for a Flink cluster, a more fine-grained restart configuration can be declared in an environment file.
 
@@ -270,7 +271,7 @@ execution:
 
 {% top %}
 
-### Dependencies
+### 依赖
 
 The SQL Client does not require to setup a Java project using Maven or SBT. Instead, you can pass the dependencies as regular JAR files that get submitted to the cluster. You can either specify each JAR file separately (using `--jar`) or define entire library directories (using `--library`). For connectors to external systems (such as Apache Kafka) and corresponding data formats (such as JSON), Flink provides **ready-to-use JAR bundles**. These JAR files can be downloaded for each release from the Maven central repository.
 
@@ -327,7 +328,7 @@ Both `connector` and `format` allow to define a property version (which is curre
 
 {% top %}
 
-### User-defined Functions
+### 用户定义的函数
 
 The SQL Client allows users to create custom, user-defined functions to be used in SQL queries. Currently, these functions are restricted to be defined programmatically in Java/Scala classes.
 
@@ -354,7 +355,7 @@ functions:
 
 Make sure that the order and types of the specified parameters strictly match one of the constructors of your function class.
 
-#### Constructor Parameters
+#### 构造器参数
 
 Depending on the user-defined function, it might be necessary to parameterize the implementation before using it in SQL statements.
 
@@ -410,7 +411,7 @@ This process can be recursively performed until all the constructor parameters a
 
 {% top %}
 
-Detached SQL Queries
+分离的SQL查询
 --------------------
 
 In order to define end-to-end SQL pipelines, SQL's `INSERT INTO` statement can be used for submitting long-running, detached queries to a Flink cluster. These queries produce their results into an external system instead of the SQL Client. This allows for dealing with higher parallelism and larger amounts of data. The CLI itself does not have any control over a detached query after submission.
@@ -466,7 +467,7 @@ Web interface: http://localhost:8081
 
 {% top %}
 
-SQL Views
+SQL视图
 ---------
 
 Views allow to define virtual tables from SQL queries. The view definition is parsed and validated immediately. However, the actual execution happens when the view is accessed during the submission of a general `INSERT INTO` or `SELECT` statement.
@@ -508,7 +509,7 @@ DROP VIEW MyNewView;
 
 {% top %}
 
-Temporal Tables
+时态表
 ---------------
 
 A [temporal table](./streaming/temporal_tables.html) allows for a (parameterized) view on a changing history table that returns the content of a table at a specific point in time. This is especially useful for joining a table with the content of another table at a particular timestamp. More information can be found in the [temporal table joins](./streaming/joins.html#join-with-a-temporal-table) page.
@@ -550,7 +551,7 @@ As shown in the example, definitions of table sources, views, and temporal table
 
 {% top %}
 
-Limitations & Future
+局限与未来
 --------------------
 
 The current SQL Client implementation is in a very early development stage and might change in the future as part of the bigger Flink Improvement Proposal 24 ([FLIP-24](https://cwiki.apache.org/confluence/display/FLINK/FLIP-24+-+SQL+Client)). Feel free to join the discussion and open issue about bugs and features that you find useful.

@@ -1,5 +1,5 @@
 ---
-title: "User-defined Sources & Sinks"
+title: "用户定义的源&接收器"
 nav-parent_id: tableapi
 nav-pos: 40
 ---
@@ -22,18 +22,18 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-A `TableSource` provides access to data which is stored in external systems (database, key-value store, message queue) or files. After a [TableSource is registered in a TableEnvironment](common.html#register-a-tablesource) it can be accessed by [Table API](tableApi.html) or [SQL](sql.html) queries.
+“TableSource”提供对存储在外部系统（数据库，键值存储，消息队列）或文件中的数据的访问。在[TableSource在TableEnvironment中注册](common.html#register-a-tablesource)之后，可以通过[Table API](tableApi.html)或[SQL](sql.html)查询来访问它。
 
-A `TableSink` [emits a Table](common.html#emit-a-table) to an external storage system, such as a database, key-value store, message queue, or file system (in different encodings, e.g., CSV, Parquet, or ORC).
+一个`TableSink` [发出emits一个表](common.html#register-a-tablesource)到外部存储系统，例如数据库，键值存储，消息队列或文件系统（用不同的编码，例如CSV ，Parquet或ORC）。
 
-A `TableFactory` allows for separating the declaration of a connection to an external system from the actual implementation. A table factory creates configured instances of table sources and sinks from normalized, string-based properties. The properties can be generated programmatically using a `Descriptor` or via YAML configuration files for the [SQL Client](sqlClient.html).
+`TableFactory`允许将与外部系统的连接声明与实际实现分开。表工厂从规范化的基于字符串的属性创建表源和接收器的已配置实例。可以使用“描述符”或[SQL客户端](sqlClient.html)的YAML配置文件以编程方式生成属性。
 
-Have a look at the [common concepts and API](common.html) page for details how to [register a TableSource](common.html#register-a-tablesource) and how to [emit a Table through a TableSink](common.html#emit-a-table). See the [built-in sources, sinks, and formats](connect.html) page for examples how to use factories.
+查看[常见概念和API](common.html)页面，详细了解如何[注册TableSource](common.html#register-a-tablesource)以及如何[通过TableSink发出表格](common.html#emit-a-table)。有关如何使用工厂的示例，请参阅[内置源，接收器和格式](connect.html) 页面。
 
 * This will be replaced by the TOC
 {:toc}
 
-Define a TableSource
+定义TableSource
 --------------------
 
 A `TableSource` is a generic interface that gives Table API and SQL queries access to data stored in an external system. It provides the schema of the table and the records that are mapped to rows with the table's schema. Depending on whether the `TableSource` is used in a streaming or batch query, the records are produced as a `DataSet` or `DataStream`. 
@@ -81,7 +81,7 @@ The `TableSource` interface separates the logical table schema from the physical
 
 However, some types, such as Tuple or CaseClass types, do support custom field names. If a `TableSource` returns a `DataStream` or `DataSet` of a type with fixed field names, it can implement the `DefinedFieldMapping` interface to map field names from the table schema to field names of the physical return type.
 
-### Defining a BatchTableSource
+### 定义BatchTableSource
 
 The `BatchTableSource` interface extends the `TableSource` interface and defines one additional method:
 
@@ -109,7 +109,7 @@ BatchTableSource[T] extends TableSource[T] {
 
 {% top %}
 
-### Defining a StreamTableSource
+### 定义StreamTableSource
 
 The `StreamTableSource` interface extends the `TableSource` interface and defines one additional method: 
 
@@ -137,13 +137,13 @@ StreamTableSource[T] extends TableSource[T] {
 
 {% top %}
 
-### Defining a TableSource with Time Attributes
+### 定义带有时间属性的TableSource
 
 Time-based operations of streaming [Table API](tableApi.html#group-windows) and [SQL](sql.html#group-windows) queries, such as windowed aggregations or joins, require explicitly specified [time attributes](streaming/time_attributes.html).
 
 A `TableSource` defines a time attribute as a field of type `Types.SQL_TIMESTAMP` in its table schema. In contrast to all regular fields in the schema, a time attribute must not be matched to a physical field in the return type of the table source. Instead, a `TableSource` defines a time attribute by implementing a certain interface.
 
-#### Defining a Processing Time Attribute
+#### 定义处理时间(Processing Time)属性
 
 [Processing time attributes](streaming/time_attributes.html#processing-time) are commonly used in streaming queries. A processing time attribute returns the current wall-clock time of the operator that accesses it. A `TableSource` defines a processing time attribute by implementing the `DefinedProctimeAttribute` interface. The interface looks as follows:
 
@@ -171,7 +171,7 @@ DefinedProctimeAttribute {
 
 <span class="label label-danger">Attention</span> Both `StreamTableSource` and `BatchTableSource` can implement `DefinedProctimeAttribute` and define a processing time attribute. In case of a `BatchTableSource` the processing time field is initialized with the current timestamp during the table scan.
 
-#### Defining a Rowtime Attribute
+#### 定义Rowtime属性
 
 [Rowtime attributes](streaming/time_attributes.html#event-time) are attributes of type `TIMESTAMP` and handled in a unified way in stream and batch queries.
 
@@ -212,7 +212,7 @@ DefinedRowtimeAttributes {
 
 <span class="label label-danger">Attention</span> Both, `StreamTableSource` and `BatchTableSource`, can implement `DefinedRowtimeAttributes` and define a rowtime attribute. In either case, the rowtime field is extracted using the `TimestampExtractor`. Hence, a `TableSource` that implements `StreamTableSource` and `BatchTableSource` and defines a rowtime attribute provides exactly the same data to streaming and batch queries.
 
-##### Provided Timestamp Extractors
+##### 提供时间戳提取器
 
 Flink provides `TimestampExtractor` implementations for common use cases.
 
@@ -223,7 +223,7 @@ The following `TimestampExtractor` implementations are currently available:
 
 A custom `TimestampExtractor` can be defined by implementing the corresponding interface.
 
-##### Provided Watermark Strategies
+##### 提供水印策略
 
 Flink provides `WatermarkStrategy` implementations for common use cases.
 
@@ -237,7 +237,8 @@ A custom `WatermarkStrategy` can be defined by implementing the corresponding in
 
 {% top %}
 
-### Defining a TableSource with Projection Push-Down
+###  使用向下投影(Projection Push-Down)定义TableSource
+
 
 A `TableSource` supports projection push-down by implementing the `ProjectableTableSource` interface. The interface defines a single method:
 
@@ -289,7 +290,7 @@ NestedFieldsProjectableTableSource[T] {
 
 {% top %}
 
-### Defining a TableSource with Filter Push-Down
+### 使用向下筛选(Filter Push-Down)定义TableSource
 
 The `FilterableTableSource` interface adds support for filter push-down to a `TableSource`. A `TableSource` extending this interface is able to filter records such that the returned `DataStream` or `DataSet` returns fewer records.
 
@@ -324,7 +325,7 @@ FilterableTableSource[T] {
 
 {% top %}
 
-Define a TableSink
+定义TableSink
 ------------------
 
 A `TableSink` specifies how to emit a `Table` to an external system or location. The interface is generic such that it can support different storage locations and formats. There are different table sinks for batch tables and streaming tables.
@@ -365,7 +366,7 @@ TableSink[T] {
 
 The `TableSink#configure` method is called to pass the schema of the Table (field names and types) to emit to the `TableSink`. The method must return a new instance of the TableSink which is configured to emit the provided Table schema.
 
-### BatchTableSink
+### 批处理表Sink BatchTableSink
 
 Defines an external `TableSink` to emit a batch table.
 
@@ -393,7 +394,7 @@ BatchTableSink[T] extends TableSink[T] {
 
 {% top %}
 
-### AppendStreamTableSink
+### 追加流表Sink AppendStreamTableSink
 
 Defines an external `TableSink` to emit a streaming table with only insert changes.
 
@@ -423,7 +424,7 @@ If the table is also modified by update or delete changes, a `TableException` wi
 
 {% top %}
 
-### RetractStreamTableSink
+### 回收流表Sink RetractStreamTableSink 
 
 Defines an external `TableSink` to emit a streaming table with insert, update, and delete changes.
 
@@ -457,7 +458,7 @@ The table will be converted into a stream of accumulate and retraction messages 
 
 {% top %}
 
-### UpsertStreamTableSink
+### 更新插入流表Sink UpsertStreamTableSink 
 
 Defines an external `TableSink` to emit a streaming table with insert, update, and delete changes.
 
@@ -503,7 +504,7 @@ A message with true boolean field is an upsert message for the configured key. A
 
 {% top %}
 
-Define a TableFactory
+定义TableFactory
 ---------------------
 
 A `TableFactory` allows to create different table-related instances from string-based properties. All available factories are called for matching to the given set of properties and a corresponding factory class.
@@ -636,7 +637,7 @@ class MySystemTableSourceFactory extends StreamTableSourceFactory[Row] {
 
 {% top %}
 
-### Use a TableFactory in the SQL Client
+### 在SQL客户端中使用TableFactory
 
 In a SQL Client environment file, the previously presented factory could be declared as:
 
@@ -662,7 +663,7 @@ connector.debug=true
 
 {% top %}
 
-### Use a TableFactory in the Table & SQL API
+### 在Table和SQL API中使用TableFactory
 
 For a type-safe, programmatic approach with explanatory Scaladoc/Javadoc, the Table & SQL API offers descriptors in `org.apache.flink.table.descriptors` that translate into string-based properties. See the [built-in descriptors](connect.html) for sources, sinks, and formats as a reference.
 

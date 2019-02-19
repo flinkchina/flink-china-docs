@@ -1,5 +1,5 @@
 ---
-title: "Built-In Functions"
+title: "内置函数"
 nav-parent_id: tableapi
 nav-pos: 31
 ---
@@ -22,19 +22,20 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink Table API & SQL provides users with a set of built-in functions for data transformations. This page gives a brief overview of them.
-If a function that you need is not supported yet, you can implement a <a href="udfs.html">user-defined function</a>.
-If you think that the function is general enough, please <a href="https://issues.apache.org/jira/secure/CreateIssue!default.jspa">open a Jira issue</a> for it with a detailed description.
+Flink Table API和SQL为用户提供了一组用于数据转换的内置函数。 本页简要概述了它们。
+如果尚不支持您需要的功能，则可以实施<a href="udfs.html">用户定义的功能</a>。
+如果您认为该功能足够通用，请详细 <a href="https://issues.apache.org/jira/secure/CreateIssue!default.jspa">打开Jira问题</a> 描述。
 
 * This will be replaced by the TOC
 {:toc}
 
-Scalar Functions
+Scalar Functions 标量函数
 ----------------
 
-The scalar functions take zero, one or more values as the input and return a single value as the result.
+标量函数将零，一个或多个值作为输入，并返回单个值作为结果。
 
-### Comparison Functions
+
+### 比较函数
 
 <div class="codetabs" markdown="1">
 
@@ -679,7 +680,7 @@ ANY1.notBetween(ANY2, ANY3)
 
 {% top %}
 
-### Logical Functions
+### 逻辑函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -983,7 +984,7 @@ BOOLEAN.isNotFalse
 
 {% top %}
 
-### Arithmetic Functions
+### 数学计算函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -2405,7 +2406,7 @@ STRING.hex()
 
 {% top %}
 
-### String Functions
+### 字符串函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -3199,7 +3200,7 @@ STRING.toBase64()
 
 {% top %}
 
-### Temporal Functions
+### 时间函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -4086,7 +4087,7 @@ timestampDiff(TIMEPOINTUNIT, TIMEPOINT1, TIMEPOINT2)
 
 {% top %}
 
-### Conditional Functions
+### 条件函数
 
 <div class="codetabs" markdown="1">
 
@@ -4212,7 +4213,7 @@ BOOLEAN.?(VALUE1, VALUE2)
 
 {% top %}
 
-### Type Conversion Functions
+### 类型转换函数
 
 <div class="codetabs" markdown="1">
 
@@ -4295,7 +4296,7 @@ ANY.cast(TYPE)
 
 {% top %}
 
-### Collection Functions
+### 集合函数
 
 <div class="codetabs" markdown="1">
 
@@ -4505,7 +4506,7 @@ MAP.at(ANY)
 </div>
 
 
-### Value Construction Functions
+### 值构造函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -4673,7 +4674,7 @@ NUMERIC.rows
 
 {% top %}
 
-### Value Access Functions
+### 值访问函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -4791,7 +4792,7 @@ ANY.flatten()
 
 {% top %}
 
-### Grouping Functions
+### 组函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -4857,7 +4858,7 @@ GROUPING_ID(expression1 [, expression2]* )
 </div>
 </div>
 
-### Hash Functions
+### 哈希函数
 
 <div class="codetabs" markdown="1">
 <div data-lang="SQL" markdown="1">
@@ -5136,7 +5137,7 @@ STRING.sha2(INT)
 
 {% top %}
 
-### Auxiliary Functions
+### 辅助函数
 
 <div class="codetabs" markdown="1">
 
@@ -5205,7 +5206,7 @@ ANY.as(NAME1, NAME2, ...)
 
 </div>
 
-Aggregate Functions
+Aggregate 聚合函数
 -------------------
 
 The aggregate functions take an expression across all the rows as the input and return a single aggregated value as the result. 
@@ -5617,7 +5618,7 @@ FIELD.collect
 
 {% top %}
 
-Date Format Specifiers
+日期格式指定符
 ----------------------
 
 The following table lists specifiers for date format functions.
@@ -5734,7 +5735,8 @@ The following table lists specifiers for date format functions.
 
 {% top %}
 
-Time Interval and Point Unit Specifiers
+
+时间间隔和点单位说明符(Time Interval and Point Unit Specifiers)
 ---------------------------------------
 
 The following table lists specifiers for time interval and time point units. 
