@@ -1,5 +1,5 @@
 ---
-title: "监控Checkpointing检查点"
+title: "监控检查点"
 nav-parent_id: monitoring
 nav-pos: 4
 ---

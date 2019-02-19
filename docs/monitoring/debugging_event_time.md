@@ -1,5 +1,5 @@
 ---
-title: "调试Windows & Event Time"
+title: "调试窗口&事件时间"
 nav-parent_id: monitoring
 nav-pos: 13
 ---

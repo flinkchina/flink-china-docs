@@ -17,5 +17,4 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-This folder contains the documentation in the category
-**Debugging & Monitoring**.
+此文件夹包含类别**调试&监控**中的文档。

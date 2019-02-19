@@ -22,17 +22,9 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-This section describes how the parallel execution of programs can be configured in Flink. A Flink
-program consists of multiple tasks (transformations/operators, data sources, and sinks). A task is split into
-several parallel instances for execution and each parallel instance processes a subset of the task's
-input data. The number of parallel instances of a task is called its *parallelism*.
+本节描述如何在Flink中配置程序的并行执行。Flink程序由多个任务(转换/操作符、数据源和接收器)组成。一个任务被分成几个并行实例来执行，每个并行实例处理任务输入数据的一个子集。一个任务的并行实例的数量称为它的“并行性”。
 
-If you want to use [savepoints]({{ site.baseurl }}/ops/state/savepoints.html) you should also consider
-setting a maximum parallelism (or `max parallelism`). When restoring from a savepoint you can
-change the parallelism of specific operators or the whole program and this setting specifies
-an upper bound on the parallelism. This is required because Flink internally partitions state
-into key-groups and we cannot have `+Inf` number of key-groups because this would be detrimental
-to performance.
+如果您想使用[savepoints]({{ site.baseurl }}/ops/state/savepoints.html)。您还应该考虑设置最大并行度(或“最大并行度”)。当从保存点恢复时，您可以更改特定操作符或整个程序的并行性，该设置指定了并行性的上限。这是必需的，因为Flink在内部将状态划分为键组，而我们不能有`+Inf`数量的键组，因为这将不利于性能。
 
 * toc
 {:toc}

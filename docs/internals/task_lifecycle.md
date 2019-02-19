@@ -1,6 +1,6 @@
 ---
 title:  "Task生命周期"
-nav-title: Task Lifecycle
+nav-title: Task生命周期 
 nav-parent_id: internals
 nav-pos: 5
 ---
