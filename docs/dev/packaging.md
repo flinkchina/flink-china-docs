@@ -1,6 +1,6 @@
 ---
-title: "Program Packaging and Distributed Execution"
-nav-title: Program Packaging
+title: "打包程序和分发执行"
+nav-title: 打包程序
 nav-parent_id: execution
 nav-pos: 20
 ---
@@ -24,54 +24,27 @@ under the License.
 -->
 
 
-As described earlier, Flink programs can be executed on
-clusters by using a `remote environment`. Alternatively, programs can be packaged into JAR Files
-(Java Archives) for execution. Packaging the program is a prerequisite to executing them through the
-[command line interface]({{ site.baseurl }}/ops/cli.html).
+如前所述，Flink程序可以通过使用`远程环境`在集群上执行。或者，可以将程序打包到JAR文件(Java archive)中执行。打包程序是通过[命令行接口]({{ site.baseurl }}/ops/cli.html)。
+### 打包程序
 
-### Packaging Programs
+要支持通过命令行或web接口从打包JAR文件执行，程序必须使用`StreamExecutionEnvironment.getExecutionEnvironment()`获得的环境。当JAR被提交到命令行或web界面时，这个环境将充当集群的环境。如果Flink程序的调用方式与通过这些接口调用的方式不同，那么环境的行为将类似于本地环境。
 
-To support execution from a packaged JAR file via the command line or web interface, a program must
-use the environment obtained by `StreamExecutionEnvironment.getExecutionEnvironment()`. This environment
-will act as the cluster's environment when the JAR is submitted to the command line or web
-interface. If the Flink program is invoked differently than through these interfaces, the
-environment will act like a local environment.
-
-To package the program, simply export all involved classes as a JAR file. The JAR file's manifest
-must point to the class that contains the program's *entry point* (the class with the public
-`main` method). The simplest way to do this is by putting the *main-class* entry into the
-manifest (such as `main-class: org.apache.flinkexample.MyProgram`). The *main-class* attribute is
-the same one that is used by the Java Virtual Machine to find the main method when executing a JAR
-files through the command `java -jar pathToTheJarFile`. Most IDEs offer to include that attribute
-automatically when exporting JAR files.
+要打包该程序，只需将所有涉及的类导出为JAR文件。JAR文件的清单必须指向包含程序的*入口点*的类(具有公共`main`方法的类)。最简单的方法是将*main-class*条目放入清单中(例如`main-class: org.apache.flinkexample.MyProgram`)。*main-class*属性与Java虚拟机在执行JAR时用于查找main方法的属性相同文件通过命令`java -jar pathToTheJarFile`。大多数IDE在导出JAR文件时自动包含该属性。
 
 
-### Packaging Programs through Plans
+### 通过计划打包程序
 
-Additionally, we support packaging programs as *Plans*. Instead of defining a program in the main
-method and calling
-`execute()` on the environment, plan packaging returns the *Program Plan*, which is a description of
-the program's data flow. To do that, the program must implement the
-`org.apache.flink.api.common.Program` interface, defining the `getPlan(String...)` method. The
-strings passed to that method are the command line arguments. The program's plan can be created from
-the environment via the `ExecutionEnvironment#createProgramPlan()` method. When packaging the
-program's plan, the JAR manifest must point to the class implementing the
-`org.apache.flink.api.common.Program` interface, instead of the class with the main method.
+此外，我们支持包装程序*计划*。 计划打包不是在main方法中定义程序并在环境中调用`execute（）`，而是返回* Program Plan *，它是程序数据流的描述。 为此，程序必须实现`org.apache.flink.api.common.Program`接口，定义`getPlan（String ...）`方法。 传递给该方法的字符串是命令行参数。 可以通过`ExecutionEnvironment#createProgramPlan()`方法从环境创建程序的计划。 打包程序的计划时，JAR清单必须指向实现`org.apache.flink.api.common.Program` 接口的类，而不是使用main方法的类。
 
+### 总结
 
-### Summary
+调用打包程序的总体过程如下:
 
-The overall procedure to invoke a packaged program is as follows:
+1. JAR的清单将搜索一个*main-class*或*program-class*属性。如果找到这两个属性，则*program-class*属性优先于*main-class*属性。命令行和web接口都支持一个参数，以便在JAR清单不包含任何属性的情况下手动传递入口点类名。
 
-1. The JAR's manifest is searched for a *main-class* or *program-class* attribute. If both
-attributes are found, the *program-class* attribute takes precedence over the *main-class*
-attribute. Both the command line and the web interface support a parameter to pass the entry point
-class name manually for cases where the JAR manifest contains neither attribute.
+2. 如果入口点类实现了`org.apache.flink.api.common.Program`，那么系统调用“getPlan(String…)”方法来获得要执行的程序计划。
 
-2. If the entry point class implements the `org.apache.flink.api.common.Program`, then the system
-calls the `getPlan(String...)` method to obtain the program plan to execute.
+3. 如果入口点类没有实现`org.apache.flink.api.common.Program` 接口，系统将调用该类的主方法。
 
-3. If the entry point class does not implement the `org.apache.flink.api.common.Program` interface,
-the system will invoke the main method of the class.
 
 {% top %}
