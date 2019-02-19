@@ -22,26 +22,26 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink can run on a single machine, even in a single Java Virtual Machine. This allows users to test and debug Flink programs locally. This section gives an overview of the local execution mechanisms.
+Flink可以在一台机器上运行，甚至可以在一台Java虚拟机上运行。这允许用户在本地测试和调试Flink程序。本节概述本地执行机制。
 
-The local environments and executors allow you to run Flink programs in a local Java Virtual Machine, or with within any JVM as part of existing programs. Most examples can be launched locally by simply hitting the "Run" button of your IDE.
+本地环境和执行程序允许您在本地Java虚拟机中运行Flink程序，或者在任何JVM中作为现有程序的一部分运行Flink程序。大多数示例都可以通过单击IDE的“Run”按钮在本地启动。
 
-There are two different kinds of local execution supported in Flink. The `LocalExecutionEnvironment` is starting the full Flink runtime, including a JobManager and a TaskManager. These include memory management and all the internal algorithms that are executed in the cluster mode.
+Flink支持两种不同的本地执行。LocalExecutionEnvironment将启动完整的Flink运行时，包括JobManager和TaskManager。这些包括内存管理和在集群模式下执行的所有内部算法。
 
-The `CollectionEnvironment` is executing the Flink program on Java collections. This mode will not start the full Flink runtime, so the execution is very low-overhead and lightweight. For example a `DataSet.map()`-transformation will be executed by applying the `map()` function to all elements in a Java list.
+`CollectionEnvironment`在Java集合上执行Flink程序。这种模式不会启动完整的Flink运行时，因此执行的开销非常低，而且轻量级。例如，`DataSet.map()` -转换将通过将 `map()`函数应用到Java列表中的所有元素来执行。
 
 * TOC
 {:toc}
 
 
-## Debugging
+## 调试
 
-If you are running Flink programs locally, you can also debug your program like any other Java program. You can either use `System.out.println()` to write out some internal variables or you can use the debugger. It is possible to set breakpoints within `map()`, `reduce()` and all the other methods.
-Please also refer to the [debugging section]({{ site.baseurl }}/dev/batch/index.html#debugging) in the Java API documentation for a guide to testing and local debugging utilities in the Java API.
+如果您在本地运行Flink程序，您还可以像调试其他Java程序一样调试您的程序。可以使用`System.out.println()` 写出一些内部变量，也可以使用调试器。可以在`map()`, `reduce()` 和所有其他方法中设置断点。
+也请参考[调试部分]({{ site.baseurl }}/dev/batch/index.html#debugging)，以获取Java API中测试和本地调试实用程序的指南。
 
-## Maven Dependency
+## Maven依赖
 
-If you are developing your program in a Maven project, you have to add the `flink-clients` module using this dependency:
+如果你在Maven项目中开发你的程序，你必须使用这个依赖项添加`flink-clients`模块:
 
 {% highlight xml %}
 <dependency>
@@ -51,7 +51,7 @@ If you are developing your program in a Maven project, you have to add the `flin
 </dependency>
 {% endhighlight %}
 
-## Local Environment
+## 本地环境
 
 The `LocalEnvironment` is a handle to local execution for Flink programs. Use it to run a program within a local JVM - standalone or embedded in other programs.
 
@@ -89,13 +89,13 @@ final ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment(con
 
 *Note:* The local execution environments do not start any web frontend to monitor the execution.
 
-## Collection Environment
+## Collection环境
 
-The execution on Java Collections using the `CollectionEnvironment` is a low-overhead approach for executing Flink programs. Typical use-cases for this mode are automated tests, debugging and code re-use.
+使用`CollectionEnvironment`在Java集合上执行是一种执行Flink程序的低开销方法。这种模式的典型用例是自动化测试、调试和代码重用。
 
-Users can use algorithms implemented for batch processing also for cases that are more interactive. A slightly changed variant of a Flink program could be used in a Java Application Server for processing incoming requests.
+用户可以使用为批处理实现的算法，也可以使用更具交互性的情况。在Java应用服务器中，可以使用稍微更改过的Flink程序变体来处理传入的请求。
 
-**Skeleton for Collection-based execution**
+**基于集合执行的代码骨架**
 
 {% highlight java %}
 public static void main(String[] args) throws Exception {
@@ -120,8 +120,7 @@ public static void main(String[] args) throws Exception {
 }
 {% endhighlight %}
 
-The `flink-examples-batch` module contains a full example, called `CollectionExecutionExample`.
+`flink-examples-batch`模块包含一个完整的示例，称为“CollectionExecutionExample”。
 
-Please note that the execution of the collection-based Flink programs is only possible on small data, which fits into the JVM heap. The execution on collections is not multi-threaded, only one thread is used.
-
+请注意，基于集合的Flink程序只能在适合JVM堆的小数据上执行。集合上的执行不是多线程的，只使用一个线程。
 {% top %}
