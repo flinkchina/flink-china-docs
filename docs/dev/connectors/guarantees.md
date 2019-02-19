@@ -1,6 +1,6 @@
 ---
-title: "Fault Tolerance Guarantees of Data Sources and Sinks"
-nav-title: Fault Tolerance Guarantees
+title: "数据源和接收器的容错保证"
+nav-title: 容错保障
 nav-parent_id: connectors
 nav-pos: 0
 ---
@@ -23,14 +23,11 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink's fault tolerance mechanism recovers programs in the presence of failures and
-continues to execute them. Such failures include machine hardware failures, network failures,
-transient program failures, etc.
+Flink的容错机制在出现故障时恢复程序并继续执行它们。这些故障包括机器硬件故障、网络故障、暂态程序故障等。
 
-Flink can guarantee exactly-once state updates to user-defined state only when the source participates in the
-snapshotting mechanism. The following table lists the state update guarantees of Flink coupled with the bundled connectors.
+Flink只在源参与快照机制时才能保证对用户定义的状态进行一次精确的exactly-once状态更新。下表列出了与绑定连接器耦合的Flink的状态更新保证。
 
-Please read the documentation of each connector to understand the details of the fault tolerance guarantees.
+请阅读每个连接器的文档，以了解容错保证的细节。
 
 <table class="table table-bordered">
   <thead>
@@ -79,9 +76,7 @@ Please read the documentation of each connector to understand the details of the
   </tbody>
 </table>
 
-To guarantee end-to-end exactly-once record delivery (in addition to exactly-once state semantics), the data sink needs
-to take part in the checkpointing mechanism. The following table lists the delivery guarantees (assuming exactly-once
-state updates) of Flink coupled with bundled sinks:
+为了保证端到端精确一次的记录传递(除了精确一次exactly-once的状态语义)，数据接收器需要参与检查点机制。下表列出了与绑定接收器耦合的Flink的交付保证(假设只进行一次状态更新exactly-once):
 
 <table class="table table-bordered">
   <thead>
