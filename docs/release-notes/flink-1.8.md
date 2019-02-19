@@ -1,5 +1,5 @@
 ---
-title: "Release Notes - Flink 1.8"
+title: "Flink1.8发布说明"
 ---
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -20,6 +20,6 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-These release notes discuss important aspects, such as configuration, behavior, or dependencies, that changed between Flink 1.7 and Flink 1.8. Please read these notes carefully if you are planning to upgrade your Flink version to 1.8. 
+这些发布说明讨论了在Flink 1.7和Flink 1.8之间发生变化的重要方面，如配置、行为或依赖关系。如果您打算将Flink版本升级到1.8，请仔细阅读这些说明。
 
 {% top %}

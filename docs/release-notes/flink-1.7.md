@@ -1,5 +1,5 @@
 ---
-title: "Release Notes - Flink 1.7"
+title: "Flink1.7发布说明"
 ---
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -20,14 +20,14 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-These release notes discuss important aspects, such as configuration, behavior, or dependencies, that changed between Flink 1.6 and Flink 1.7. Please read these notes carefully if you are planning to upgrade your Flink version to 1.7.
+这些发行说明讨论了Flink 1.6和Flink 1.7之间发生变化的重要方面，例如配置，行为或依赖性。 如果您计划将Flink版本升级到1.7，请仔细阅读这些说明。
 
-### Scala 2.12 support
+### Scala 2.12支持
 
-When using Scala `2.12` you might have to add explicit type annotations in places where they were not required when using Scala `2.11`.
-This is an excerpt from the `TransitiveClosureNaive.scala` example in the Flink code base that shows the changes that could be required.
+在使用Scala ' 2.12 '时，您可能需要在使用Scala ' 2.11 '时不需要的地方添加显式类型注释。
+这是摘自`TransitiveClosureNaive.scala`。Flink代码库中的scala示例，展示了可能需要的更改。
 
-Previous code:
+以前的代码:
 ```
 val terminate = prevPaths
  .coGroup(nextPaths)
@@ -40,7 +40,8 @@ val terminate = prevPaths
 }
 ```
 
-With Scala `2.12` you have to change it to:
+用Scala ' 2.12 '你必须把它改为:
+
 ```
 val terminate = prevPaths
  .coGroup(nextPaths)
@@ -57,64 +58,81 @@ The reason for this is that Scala `2.12` changes how lambdas are implemented.
 They now use the lambda support using SAM interfaces introduced in Java 8.
 This makes some method calls ambiguous because now both Scala-style lambdas and SAMs are candidates for methods were it was previously clear which method would be invoked.
 
-### State evolution
+原因是Scala“2.12”改变了lambda的实现方式。
+他们现在使用Java 8中引入的SAM接口来使用lambda支持。
+这使得一些方法调用不明确，因为现在Scala样式的lambdas和SAM都是方法的候选者，因为之前已经清楚调用了哪个方法。
 
-Before Flink 1.7, serializer snapshots were implemented as a `TypeSerializerConfigSnapshot` (which is now deprecated, and will eventually be removed in the future to be fully replaced by the new `TypeSerializerSnapshot` interface introduced in 1.7).
-Moreover, the responsibility of serializer schema compatibility checks lived within the `TypeSerializer`, implemented in the `TypeSerializer#ensureCompatibility(TypeSerializerConfigSnapshot)` method. 
+### State演进
 
-To be future-proof and to have flexibility to migrate your state serializers and schema, it is highly recommended to migrate from the old abstractions. 
-Details and migration guides can be found [here](https://ci.apache.org/projects/flink/flink-docs-master/dev/stream/state/custom_serialization.html).
+在Flink 1.7之前，序列化器快照被实现为一个`TypeSerializerConfigSnapshot`(现在已被弃用，将来将被删除，完全由1.7中引入的新接口 `TypeSerializerSnapshot` 替代)。
+此外，序列化器模式兼容性检查的职责位于`TypeSerializer`方法中，该方法是在`TypeSerializer#ensureCompatibility(TypeSerializerConfigSnapshot)`方法中实现的。
 
-### Removal of the legacy mode
+为了避免将来的问题，并具有迁移状态序列化器和模式的灵活性，强烈建议从旧的抽象迁移。
+详细信息和迁移指南可以在[这里](https://ci.apache.org/projects/flink/flink-docs-master/dev/stream/state/custom_serialization.html)找到。
+
+### 移除遗留legacy模式
 
 Flink no longer supports the legacy mode.
 If you depend on this, then please use Flink `1.6.x`.
 
-### Savepoints being used for recovery
+
+Flink不再支持遗留模式。
+如果您依赖于此，那么请使用Flink `1.6.x`。
+
+### 用于恢复的保存点
 
 Savepoints are now used while recovering.
 Previously when using exactly-once sink one could get into problems with duplicate output data when a failure occurred after a savepoint was taken but before the next checkpoint occurred.
 This results in the fact that savepoints are no longer exclusively under the control of the user.
 Savepoint should not be moved nor deleted if there was no newer checkpoint or savepoint taken.
 
-### MetricQueryService runs in separate thread pool
+现在在恢复时使用保存点。
+以前使用完全一次接收器时，如果在保存点被捕之后但在下一个检查点发生之前发生故障，则可能会出现重复输出数据的问题。
+这导致保存点不再完全受用户控制。
+如果没有更新的检查点或保存点，则不应移动或删除保存点。
 
-The metric query service runs now in its own `ActorSystem`.
-It needs consequently to open a new port for the query services to communicate with each other.
-The [query service port]({{site.baseurl}}/ops/config.html#metrics-internal-query-service-port) can be configured in `flink-conf.yaml`.
+### MetricQueryService在单独的线程池中运行
 
-### Granularity of latency metrics
 
-The default granularity for latency metrics has been modified.
-To restore the previous behavior users have to explicitly set the [granularity]({{site.baseurl}}/ops/config.html#metrics-latency-granularity) to `subtask`.
+metric查询服务现在在它自己的“ActorSystem”中运行。
+因此，它需要为查询服务打开一个新的端口来彼此通信。
+可以在“flink-conf.yaml”中配置[查询服务端口]({{site.baseurl}}/ops/config.html#metrics-internal-query-service-port)。
 
-### Latency marker activation
+### 延迟指标度量的粒度
 
-Latency metrics are now disabled by default, which will affect all jobs that do not explicitly set the `latencyTrackingInterval` via `ExecutionConfig#setLatencyTrackingInterval`.
-To restore the previous default behavior users have to configure the [latency interval]({{site.baseurl}}/ops/config.html#metrics-latency-interval) in `flink-conf.yaml`.
+延迟度量的默认粒度已经修改。
+要恢复以前的行为，用户必须显式地将[粒度granularity]({{site.baseurl}}/ops/config.html#metrics-latency-granularity)设置为`subtask。
 
-### Relocation of Hadoop's Netty dependency
+### 延迟标记激活
+
+延迟指标现在默认是禁用的，这将影响所有没有通过`ExecutionConfig#setLatencyTrackingInterval`显式设置 `latencyTrackingInterval`的作业。
+要恢复以前的默认行为，用户必须在 `flink-conf.yaml`中配置[延迟间隔]({{site.baseurl}}/ops/config.html#metrics-latency-interval) 。
+
+### Hadoop的Netty依赖项的重新定位
 
 We now also relocate Hadoop's Netty dependency from `io.netty` to `org.apache.flink.hadoop.shaded.io.netty`.
 You can now bundle your own version of Netty into your job but may no longer assume that `io.netty` is present in the `flink-shaded-hadoop2-uber-*.jar` file.
 
-### Local recovery fixed
+我们现在还将Hadoop的Netty依赖从`io.netty`重定位到`org.apache.flink.hadoop.shaded.io.netty`。
+您现在可以将自己的Netty版本捆绑到您的工作中，但可能不再认为`flink-shaded-hadoop2-uber-*.jar`文件中存在`io.netty`。
 
-With the improvements to Flink's scheduling, it can no longer happen that recoveries require more slots than before if local recovery is enabled.
-Consequently, we encourage our users to enable [local recovery]({{site.baseurl}}/ops/config.html#state-backend-local-recovery) in `flink-conf.yaml`.
+### Local recovery fixed  本地恢复已修复
 
-### Support for multi slot TaskManagers
+随着Flink调度的改进，如果启用了本地恢复，恢复所需的插槽不会比以前更多。
+因此，我们鼓励用户在`flink-conf.yaml`中启用[local recovery]({{site.baseurl}}/ops/config.html#state-backend-local-recovery)。
 
-Flink now properly supports `TaskManagers` with multiple slots.
-Consequently, `TaskManagers` can now be started with an arbitrary number of slots and it is no longer recommended to start them with a single slot.
+### 支持多插槽任务管理器
 
-### StandaloneJobClusterEntrypoint generates JobGraph with fixed JobID
+Flink现在支持带有多个插槽的“TaskManagers任务管理器”。
+因此，“TaskManagers任务管理器”现在可以用任意数量的插槽启动，不再建议用单个插槽启动它们。
+
+### StandaloneJobClusterEntrypoint生成具有固定JobID的JobGraph
 
 The `StandaloneJobClusterEntrypoint`, which is launched by the script `standalone-job.sh` and used for the job-mode container images, now starts all jobs with a fixed `JobID`.
 Thus, in order to run a cluster in HA mode, one needs to set a different [cluster id]({{site.baseurl}}/ops/config.html#high-availability-cluster-id) for each job/cluster. 
 
 <!-- Should be removed once FLINK-10911 is fixed -->
-### Scala shell does not work with Scala 2.12
+### Scala shell不支持Scala 2.12(注意:FLINK-10911修复后应删除)
 
 Flink's Scala shell does not work with Scala 2.12.
 Therefore, the module `flink-scala-shell` is not being released for Scala 2.12.
@@ -122,7 +140,7 @@ Therefore, the module `flink-scala-shell` is not being released for Scala 2.12.
 See [FLINK-10911](https://issues.apache.org/jira/browse/FLINK-10911) for more details.  
 
 <!-- Remove once FLINK-10712 has been fixed -->
-### Limitations of failover strategies
+### 故障转移策略的局限性(注：FLINK-10712修复后已删除)
 Flink's non-default failover strategies are still a very experimental feature which come with a set of limitations.
 You should only use this feature if you are executing a stateless streaming job.
 In any other cases, it is highly recommended to remove the config option `jobmanager.execution.failover-strategy` from your `flink-conf.yaml` or set it to `"full"`.
@@ -135,11 +153,13 @@ See [FLINK-10880](https://issues.apache.org/jira/browse/FLINK-10880) for more de
 The over window `preceding` clause is now optional.
 It defaults to `UNBOUNDED` if not specified.
 
-### OperatorSnapshotUtil writes v2 snapshots
+###  OperatorSnapshotUtil写入v2快照
 
-Snapshots created with `OperatorSnapshotUtil` are now written in the savepoint format `v2`.
+使用`OperatorSnapshotUtil`创建的快照现在以保存点格式`v2`写入。
 
-### SBT projects and the MiniClusterResource
+
+### SBT项目和MiniClusterResource
+
 
 If you have a `sbt` project which uses the `MiniClusterResource`, you now have to add the `flink-runtime` test-jar dependency explicitly via:
 
