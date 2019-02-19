@@ -1,5 +1,5 @@
 ---
-title: "Execution Configuration"
+title: "执行的配置"
 nav-parent_id: execution
 nav-pos: 10
 ---
@@ -22,8 +22,9 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The `StreamExecutionEnvironment` contains the `ExecutionConfig` which allows to set job specific configuration values for the runtime.
-To change the defaults that affect all jobs, see [Configuration]({{ site.baseurl }}/ops/config.html).
+
+`StreamExecutionEnvironment` 包含`ExecutionConfig`，它允许为运行时设置特定于作业的配置值。
+要更改影响所有作业的默认值，请参见[Configuration]({{ site.baseurl }}/ops/config.html)。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -40,7 +41,7 @@ var executionConfig = env.getConfig
 </div>
 </div>
 
-The following configuration options are available: (the default is bold)
+可以使用以下配置选项:(默认为粗体)
 
 - **`enableClosureCleaner()`** / `disableClosureCleaner()`. The closure cleaner is enabled by default. The closure cleaner removes unneeded references to the surrounding class of anonymous functions inside Flink programs.
 With the closure cleaner disabled, it might happen that an anonymous user function is referencing the surrounding class, which is usually not Serializable. This will lead to exceptions by the serializer.
@@ -75,12 +76,13 @@ With the closure cleaner disabled, it might happen that an anonymous user functi
 
 - `registerPojoType(Class<?> type)` Registers the given type with the serialization stack. If the type is eventually serialized as a POJO, then the type is registered with the POJO serializer. If the type ends up being serialized with Kryo, then it will be registered at Kryo to make sure that only tags are written. If a type is not registered with Kryo, its entire class-name will be serialized with every instance, leading to much higher I/O costs.
 
-Note that types registered with `registerKryoType()` are not available to Flink's Kryo serializer instance.
+
+请注意，用`registerKryoType()`注册的类型对Flink的kryo序列化程序实例不可用。
 
 - `disableAutoTypeRegistration()` Automatic type registration is enabled by default. The automatic type registration is registering all types (including sub-types) used by usercode with Kryo and the POJO serializer.
 
 - `setTaskCancellationInterval(long interval)` Sets the interval (in milliseconds) to wait between consecutive attempts to cancel a running task. When a task is canceled a new thread is created which periodically calls `interrupt()` on the task thread, if the task thread does not terminate within a certain time. This parameter refers to the time between consecutive calls to `interrupt()` and is set by default to **30000** milliseconds, or **30 seconds**.
 
-The `RuntimeContext` which is accessible in `Rich*` functions through the `getRuntimeContext()` method also allows to access the `ExecutionConfig` in all user defined functions.
+可以通过`getRuntimeContext（）`方法在`Rich *`函数中访问的`RuntimeContext`也允许在所有用户定义的函数中访问`ExecutionConfig`。
 
 {% top %}
