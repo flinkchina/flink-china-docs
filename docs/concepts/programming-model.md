@@ -99,6 +99,10 @@ Windows窗口可以是*时间驱动的*(例如:每隔30s)或*数据驱动的*(�
 
 <img src="../fig/windows.svg" alt="时间和计数窗口" class="offset" width="80%" />
 
+(**译者注**: Flink支持基于时间窗口操作，也支持基于数据的窗口操作，如上图所示：
+基于时间的窗口操作，在每个相同的时间间隔对Stream中的记录进行处理，通常各个时间间隔内的窗口操作处理的记录数不固定；而基于数据驱动的窗口操作，可以在Stream中选择固定数量的记录作为一个窗口，对该窗口中的记录进行处理。
+有关窗口操作的不同类型，可以分为如下几种：倾斜窗口（Tumbling Windows，记录没有重叠）、滑动窗口（Slide Windows，记录有重叠）、会话窗口（Session Windows）)
+
 更多窗口案例可以在 [博客文章](https://flink.apache.org/news/2015/12/04/Introducing-windows.html)中学习.
 更多[window 窗口相关文档](../dev/stream/operators/windows.html)。
 
