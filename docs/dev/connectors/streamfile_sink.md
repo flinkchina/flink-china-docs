@@ -1,6 +1,6 @@
 ---
-title: "Streaming File Sink"
-nav-title: Streaming File Sink
+title: "流文件接收器"
+nav-title: 流文件接收器
 nav-parent_id: connectors
 nav-pos: 5
 ---
@@ -25,37 +25,23 @@ under the License.
 
 This connector provides a Sink that writes partitioned files to filesystems
 supported by the [Flink `FileSystem` abstraction]({{ site.baseurl}}/ops/filesystems.html).
+这个连接器提供了一个接收器，用于将分区文件写到由[Flink ' FileSystem '抽象]({{ site.baseurl}}/ops/filesystems.html)支持的文件系统中。
+<span class="label label-danger">重要提示</span>:对于S3，“streamingfilesink”只支持[Hadoop-based](https://hadoop.apache.org/)文件系统实现，而不支持基于[Presto](https://prestodb.io/)的实现。如果您的作业使用`StreamingFileSink` 写入S3，但您希望使用基于presto的文件来进行检查点设置，建议显式使用*"s3a://"*（用于hadoop）作为接收器目标路径的方案，并使用*"s3p://"*进行检查点设置（用于presto）。对两个水槽使用*"s3://"*。
 
-<span class="label label-danger">Important Note</span>: For S3, the `StreamingFileSink` 
-supports only the [Hadoop-based](https://hadoop.apache.org/) FileSystem implementation, not
-the implementation based on [Presto](https://prestodb.io/). In case your job uses the 
-`StreamingFileSink` to write to S3 but you want to use the Presto-based one for checkpointing,
-it is advised to use explicitly *"s3a://"* (for Hadoop) as the scheme for the target path of
-the sink and *"s3p://"* for checkpointing (for Presto). Using *"s3://"* for both the sink
-and checkpointing may lead to unpredictable behavior, as both implementations "listen" to that scheme.
+检查点可能会导致不可预知的行为，因为这两个实现都“监听”了该方案。
 
-Since in streaming the input is potentially infinite, the streaming file sink writes data
-into buckets. The bucketing behaviour is configurable but a useful default is time-based
-bucketing where we start writing a new bucket every hour and thus get
-individual files that each contain a part of the infinite output stream.
+由于在流式处理中，输入可能是无限的，因此流式文件接收器将数据写入存储桶。bucketing行为是可配置的，但是一个有用的默认值是基于时间的bucketing，我们开始每小时编写一个新的bucket，从而获得每个bucket包含无限输出流的一部分的单个文件。
 
-Within a bucket, we further split the output into smaller part files based on a
-rolling policy. This is useful to prevent individual bucket files from getting
-too big. This is also configurable but the default policy rolls files based on
-file size and a timeout, *i.e* if no new data was written to a part file. 
+在一个桶中，我们根据滚动策略将输出进一步拆分为较小的部分文件。这有助于防止单个bucket文件变得太大。这也是可配置的，但是默认策略根据文件大小和超时来滚动文件，*即*如果没有新数据写入到零件文件中。
 
-The `StreamingFileSink` supports both row-wise encoding formats and
-bulk-encoding formats, such as [Apache Parquet](http://parquet.apache.org).
+`StreamingFileSink`既支持行编码格式，也支持大容量编码格式，例如[Apache Parquet](http://parquet.apache.org)。
 
-#### Using Row-encoded Output Formats
+####  使用行编码Row-encoded的输出格式
 
-The only required configuration are the base path where we want to output our
-data and an
-[Encoder]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/api/common/serialization/Encoder.html)
-that is used for serializing records to the `OutputStream` for each file.
 
-Basic usage thus looks like this:
+唯一需要的配置是我们想要输出数据的基本路径和一个[编码器]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/api/common/serialization/Encoder.html)，用于将记录序列化为每个文件的`OutputStream`。
 
+基本用法如下:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -92,35 +78,17 @@ input.addSink(sink)
 </div>
 </div>
 
-This will create a streaming sink that creates hourly buckets and uses a
-default rolling policy. The default bucket assigner is
-[DateTimeBucketAssigner]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/bucketassigners/DateTimeBucketAssigner.html)
-and the default rolling policy is
-[DefaultRollingPolicy]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/rollingpolicies/DefaultRollingPolicy.html).
-You can specify a custom
-[BucketAssigner]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/BucketAssigner.html)
-and
-[RollingPolicy]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/RollingPolicy.html)
-on the sink builder. Please check out the JavaDoc for
-[StreamingFileSink]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/StreamingFileSink.html)
-for more configuration options and more documentation about the workings and
-interactions of bucket assigners and rolling policies.
+这将创建一个流式接收器，用于创建每小时存储桶并使用默认滚动策略。默认存储分配器是[DateTimeBucketAssigner]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/bucketassigners/DateTimeBucketAssigner.html)，默认滚动策略为[ DefaultRollingPolicy]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/rollingpolicies/DefaultRollingPolicy.html)。
+您可以指定自定义[BucketAssigner]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/BucketAssigner.html)和[RollingPolicy]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/RollingPolicy.html)。请查看JavaDoc for [StreamingFileSink]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/streaming/api/functions/sink/filesystem/StreamingFileSink.html)
+有关桶分配器和滚动策略的工作和交互的更多配置选项和更多文档。
+#### 使用Bulk-encoded输出格式
 
-#### Using Bulk-encoded Output Formats
+在上面的例子中，我们使用了一个可以单独编码或序列化每个记录的“编码器”。 流式文件接收器还支持批量编码的输出格式，例如[Apache Parquet](http://parquet.apache.org)。 要使用这些，而不是`StreamingFileSink.forRowFormat（）`，你将使用`StreamingFileSink.forBulkFormat（）`并指定一个`BulkWriter.Factory`。
 
-In the above example we used an `Encoder` that can encode or serialize each
-record individually. The streaming file sink also supports bulk-encoded output
-formats such as [Apache Parquet](http://parquet.apache.org). To use these,
-instead of `StreamingFileSink.forRowFormat()` you would use
-`StreamingFileSink.forBulkFormat()` and specify a `BulkWriter.Factory`.
-
-[ParquetAvroWriters]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/formats/parquet/avro/ParquetAvroWriters.html)
-has static methods for creating a `BulkWriter.Factory` for various types.
+[ParquetAvroWriters]({{ site.javadocs_baseurl }}/api/java/org/apache/flink/formats/parquet/avro/ParquetAvroWriters.html)具有静态方法，用于为各种类型创建`BulkWriter.Factory`
 
 <div class="alert alert-info">
-    <b>IMPORTANT:</b> Bulk-encoding formats can only be combined with the
-    `OnCheckpointRollingPolicy`, which rolls the in-progress part file on
-    every checkpoint.
+    <b>重要的:</b> Bulk-encoding 编码格式只能与“OnCheckpointRollingPolicy”组合使用，该策略在每个检查点上滚动正在处理的部分文件。
 </div>
 
 {% top %}
