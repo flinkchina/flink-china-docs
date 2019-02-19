@@ -1,6 +1,6 @@
 ---
-title:  "命令行接口"
-nav-title: CLI
+title:  "CLI命令行接口"
+nav-title: CLI命令行接口
 nav-parent_id: ops
 nav-pos: 6
 ---
@@ -23,200 +23,184 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink provides a Command-Line Interface (CLI) to run programs that are packaged
-as JAR files, and control their execution.  The CLI is part
-of any Flink setup, available in local single node setups and in
-distributed setups. It is located under `<flink-home>/bin/flink`
-and connects by default to the running Flink master (JobManager) that was
-started from the same installation directory.
+Flink提供命令行接口(CLI)来运行打包为JAR文件的程序，并控制它们的执行。CLI是任何Flink设置的一部分，可以在本地单节点设置和分布式设置中使用。它位于`<flink-home>/bin/flink`下，默认连接到从相同安装目录启动的运行中的Flink master (JobManager)。
 
-The command line can be used to
+命令行可以用于
 
-- submit jobs for execution,
-- cancel a running job,
-- provide information about a job,
-- list running and waiting jobs,
-- trigger and dispose savepoints, and
-- modify a running job
+- 提交作业执行，
+- 取消正在运行的作业，
+- 提供有关作业的信息，
+- 列出正在运行和正在等待的作业，
+- 触发和释放保存点，
+- 修改正在运行的作业
 
-A prerequisite to using the command line interface is that the Flink
-master (JobManager) has been started (via
-`<flink-home>/bin/start-cluster.sh`) or that a YARN environment is
-available.
+
+使用命令行接口的先决条件是Flink master (JobManager)已经启动(通过`<flink-home>/bin/start-cluster.sh`)，或者YARN环境是可用的。
 
 * This will be replaced by the TOC
 {:toc}
 
-## Examples
+## 示例
 
--   Run example program with no arguments:
+-   不带参数运行示例程序:
 
         ./bin/flink run ./examples/batch/WordCount.jar
 
--   Run example program with arguments for input and result files:
+-   运行带有输入和结果文件参数的示例程序:
 
         ./bin/flink run ./examples/batch/WordCount.jar \
                              --input file:///home/user/hamlet.txt --output file:///home/user/wordcount_out
 
--   Run example program with parallelism 16 and arguments for input and result files:
+-   运行并行性为16的示例程序以及输入文件和结果文件的参数:
 
         ./bin/flink run -p 16 ./examples/batch/WordCount.jar \
                              --input file:///home/user/hamlet.txt --output file:///home/user/wordcount_out
 
--   Run example program with flink log output disabled:
+-   在禁用Flink日志输出的情况下运行示例程序:
 
             ./bin/flink run -q ./examples/batch/WordCount.jar
 
--   Run example program in detached mode:
+-   以分离模式运行示例程序:
 
             ./bin/flink run -d ./examples/batch/WordCount.jar
 
--   Run example program on a specific JobManager:
+-   在指定的JobManager上运行示例程序::
 
         ./bin/flink run -m myJMHost:8081 \
                                ./examples/batch/WordCount.jar \
                                --input file:///home/user/hamlet.txt --output file:///home/user/wordcount_out
 
--   Run example program with a specific class as an entry point:
+-   以指定的类作为入口点运行示例程序:
 
         ./bin/flink run -c org.apache.flink.examples.java.wordcount.WordCount \
                                ./examples/batch/WordCount.jar \
                                --input file:///home/user/hamlet.txt --output file:///home/user/wordcount_out
 
--   Run example program using a [per-job YARN cluster]({{site.baseurl}}/ops/deployment/yarn_setup.html#run-a-single-flink-job-on-hadoop-yarn) with 2 TaskManagers:
-
+-   使用带有两个TaskManagers的[per-job YARN集群]({{site.baseurl}}/ops/deployment/yarn_setup.html#run-a-single-flink-job-on-hadoop-yarn)运行示例程序:
         ./bin/flink run -m yarn-cluster -yn 2 \
                                ./examples/batch/WordCount.jar \
                                --input hdfs:///user/hamlet.txt --output hdfs:///user/wordcount_out
 
--   Display the optimized execution plan for the WordCount example program as JSON:
+-   将wordcount示例程序的优化执行计划显示为json：
 
         ./bin/flink info ./examples/batch/WordCount.jar \
                                 --input file:///home/user/hamlet.txt --output file:///home/user/wordcount_out
 
--   List scheduled and running jobs (including their JobIDs):
+-   列出计划的和正在运行的作业（包括Job作业ID）:
 
         ./bin/flink list
 
--   List scheduled jobs (including their JobIDs):
+-   列出计划Job作业（包括其作业ID）:
 
         ./bin/flink list -s
 
--   List running jobs (including their JobIDs):
+-   列出正在运行的Job作业（包括作业ID）:
 
         ./bin/flink list -r
 
--   List all existing jobs (including their JobIDs):
+-   列出所有现有作业（包括其作业ID）：
 
         ./bin/flink list -a
 
--   List running Flink jobs inside Flink YARN session:
+-   列出在Flink YARN会话中运行的Flink作业:
 
         ./bin/flink list -m yarn-cluster -yid <yarnApplicationID> -r
 
--   Cancel a job:
+-   取消Job作业:
 
         ./bin/flink cancel <jobID>
 
--   Cancel a job with a savepoint:
+-   Cancel a job with a savepoint 使用保存点取消作业:
 
         ./bin/flink cancel -s [targetDirectory] <jobID>
 
--   Stop a job (streaming jobs only):
+-   停止Job作业(仅流Job作业):
 
         ./bin/flink stop <jobID>
         
--   Modify a running job (streaming jobs only):
+-   修改正在运行的作业(仅流作业):
 
         ./bin/flink modify <jobID> -p <newParallelism>
 
 
-**NOTE**: The difference between cancelling and stopping a (streaming) job is the following:
+**注意**: 取消和停止(流)作业的区别如下:
 
-On a cancel call, the operators in a job immediately receive a `cancel()` method call to cancel them as
-soon as possible.
-If operators are not not stopping after the cancel call, Flink will start interrupting the thread periodically
-until it stops.
+在取消调用时，作业中的操作人员会立即收到一个' cancel() '方法调用，以便尽快取消它们。
+如果操作人员在取消调用后没有停止，Flink将开始周期性地中断线程，直到线程停止。
 
-A "stop" call is a more graceful way of stopping a running streaming job. Stop is only available for jobs
-which use sources that implement the `StoppableFunction` interface. When the user requests to stop a job,
-all sources will receive a `stop()` method call. The job will keep running until all sources properly shut down.
-This allows the job to finish processing all inflight data.
+“停止”调用是停止正在运行的流作业的更优雅的方法。Stop仅对使用实现“StoppableFunction”接口的源的作业可用。当用户请求停止作业时，所有源都将收到一个' stop() '方法调用。作业将继续运行，直到所有源正确关闭为止。
+这允许作业完成所有飞行数据的处理。
 
-### Savepoints
+### 保存点
 
-[Savepoints]({{site.baseurl}}/ops/state/savepoints.html) are controlled via the command line client:
+[保存点]({{site.baseurl}}/ops/state/savepoints.html) 通过命令行客户端进行控制:
 
-#### Trigger a Savepoint
+#### 触发保存点
 
 {% highlight bash %}
 ./bin/flink savepoint <jobId> [savepointDirectory]
 {% endhighlight %}
 
-This will trigger a savepoint for the job with ID `jobId`, and returns the path of the created savepoint. You need this path to restore and dispose savepoints.
+这将触发ID为`jobId`的作业的保存点，并返回创建的保存点的路径。您需要此路径来恢复和释放保存点。
+此外，您还可以选择指定一个目标文件系统目录来存储保存点。该目录需要由JobManager访问。
+如果不指定目标目录，则需要[配置一个默认目录]({{site.baseurl}}/ops/state/savepoints.html#configuration)。否则，触发保存点将失败。
 
-
-Furthermore, you can optionally specify a target file system directory to store the savepoint in. The directory needs to be accessible by the JobManager.
-
-If you don't specify a target directory, you need to have [configured a default directory]({{site.baseurl}}/ops/state/savepoints.html#configuration). Otherwise, triggering the savepoint will fail.
-
-#### Trigger a Savepoint with YARN
+#### 在Yarn中触发保存点
 
 {% highlight bash %}
 ./bin/flink savepoint <jobId> [savepointDirectory] -yid <yarnAppId>
 {% endhighlight %}
 
-This will trigger a savepoint for the job with ID `jobId` and YARN application ID `yarnAppId`, and returns the path of the created savepoint.
+这将用ID `jobId` 和YARN应用程序ID`yarnAppId`触发作业的保存点，并返回创建的保存点的路径。
 
-Everything else is the same as described in the above **Trigger a Savepoint** section.
+其他所有内容都与上面的**触发保存点**节中描述的相同。
 
-#### Cancel with a savepoint
+#### Cancel with a savepoint 使用保存点取消
 
-You can atomically trigger a savepoint and cancel a job.
+您可以自动触发保存点并取消作业。
 
 {% highlight bash %}
 ./bin/flink cancel -s [savepointDirectory] <jobID>
 {% endhighlight %}
 
-If no savepoint directory is configured, you need to configure a default savepoint directory for the Flink installation (see [Savepoints]({{site.baseurl}}/ops/state/savepoints.html#configuration)).
+如果没有配置保存点目录，您需要为Flink安装配置一个默认的保存点目录(参见[保存点]({{site.baseurl}}/ops/state/savepoints.html#configuration))。
 
-The job will only be cancelled if the savepoint succeeds.
+只有保存点成功，作业才会被取消。
 
-#### Restore a savepoint
+#### 恢复保存点
 
 {% highlight bash %}
 ./bin/flink run -s <savepointPath> ...
 {% endhighlight %}
 
-The run command has a savepoint flag to submit a job, which restores its state from a savepoint. The savepoint path is returned by the savepoint trigger command.
+run命令有一个保存点标志，用于提交作业，作业将从保存点恢复其状态。保存点触发命令返回保存点路径。
 
-By default, we try to match all savepoint state to the job being submitted. If you want to allow to skip savepoint state that cannot be restored with the new job you can set the `allowNonRestoredState` flag. You need to allow this if you removed an operator from your program that was part of the program when the savepoint was triggered and you still want to use the savepoint.
+默认情况下，我们尝试将所有保存点状态与提交的作业匹配。如果您希望跳过新作业无法恢复的保存点状态，可以设置`allowNonRestoredState`标志。如果在触发保存点时从程序中删除了属于程序的操作符，并且仍然希望使用保存点，则需要允许这样做。
 
 {% highlight bash %}
 ./bin/flink run -s <savepointPath> -n ...
 {% endhighlight %}
 
-This is useful if your program dropped an operator that was part of the savepoint.
-
-#### Dispose a savepoint
+如果您的程序删除了作为保存点一部分的操作符，这将非常有用。
+#### 去除保存点 Dispose
 
 {% highlight bash %}
 ./bin/flink savepoint -d <savepointPath>
 {% endhighlight %}
 
-Disposes the savepoint at the given path. The savepoint path is returned by the savepoint trigger command.
+在给定路径去除保存点。 savepoint trigger命令返回保存点路径。
 
-If you use custom state instances (for example custom reducing state or RocksDB state), you have to specify the path to the program JAR with which the savepoint was triggered in order to dispose the savepoint with the user code class loader:
+如果使用自定义状态实例（例如自定义还原状态或RocksDB状态），则必须指定触发保存点的程序JAR的路径，以便使用用户代码类加载器处置保存点：
 
 {% highlight bash %}
 ./bin/flink savepoint -d <savepointPath> -j <jarFile>
 {% endhighlight %}
 
-Otherwise, you will run into a `ClassNotFoundException`.
+否则，您将遇到`ClassNotFoundException`。
 
-## Usage
+## 语法
 
-The command line syntax is as follows:
+命令行语法如下：
 
 {% highlight bash %}
 ./flink <ACTION> [OPTIONS] [ARGUMENTS]
