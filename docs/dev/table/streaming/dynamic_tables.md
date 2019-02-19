@@ -1,5 +1,5 @@
 ---
-title: "Dynamic Tables"
+title: "动态表"
 nav-parent_id: streaming_tableapi
 nav-pos: 1
 ---
@@ -22,17 +22,17 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-SQL and the relational algebra have not been designed with streaming data in mind. As a consequence, there are few conceptual gaps between relational algebra (and SQL) and stream processing.
+SQL和关系代数并没有考虑到流数据。因此，在关系代数（和SQL）和流处理之间几乎没有概念上的差距。
 
-This page discusses these differences and explains how Flink can achieve the same semantics on unbounded data as a regular database engine on bounded data.
+本页讨论了这些差异，并解释了Flink如何在无边界数据上实现与常规数据库引擎在有边界数据上相同的语义。
 
 * This will be replaced by the TOC
 {:toc}
 
-Relational Queries on Data Streams
+数据流上的关系查询
 ----------------------------------
 
-The following table compares traditional relational algebra and stream processing with respect to input data, execution, and output results.
+下表比较了传统的关系代数和流处理，包括输入数据、执行和输出结果。
 
 <table class="table table-bordered">
 	<tr>
@@ -63,7 +63,8 @@ The connection between eager view maintenance and SQL queries on streams becomes
 
 With these points in mind, we introduce following concept of *Dynamic tables* in the next section.
 
-Dynamic Tables &amp; Continuous Queries
+
+动态表&amp; 连续查询(Dynamic Tables Continuous Queries)
 ---------------------------------------
 
 *Dynamic tables* are the core concept of Flink's Table API and SQL support for streaming data. In contrast to the static tables that represent batch data, dynamic tables are changing over time. They can be queried like static batch tables. Querying dynamic tables yields a *Continuous Query*. A continuous query never terminates and produces a dynamic table as result. The query continuously updates its (dynamic) result table to reflect the changes on its (dynamic) input tables. Essentially, a continuous query on a dynamic table is very similar to a query that defines a materialized view.
@@ -92,7 +93,7 @@ In the following, we will explain the concepts of dynamic tables and continuous 
 ]
 {% endhighlight %}
 
-Defining a Table on a Stream
+在流上定义表
 ----------------------------
 
 In order to process a stream with a relational query, it has to be converted into a `Table`. Conceptually, each record of the stream is interpreted as an `INSERT` modification on the resulting table. Essentially, we are building a table from an `INSERT`-only changelog stream.
@@ -103,9 +104,10 @@ The following figure visualizes how the stream of click event (left-hand side) i
 <img alt="Append mode" src="{{ site.baseurl }}/fig/table-streaming/append-mode.png" width="60%">
 </center>
 
-**Note:** A table which is defined on a stream is internally not materialized.
+**Note:** 在流上定义的表在内部未实现。
+A table which is defined on a stream is internally not materialized.
 
-### Continuous Queries
+### 连续查询 Continuous Queries
 ----------------------
 
 A continuous query is evaluated on a dynamic table and produces a new dynamic table as result. In contrast to a batch query, a continuous query never terminates and updates its result table according to the updates on its input tables. At any point in time, the result of a continuous query is semantically equivalent to the result of the same query being executed in batch mode on a snapshot of the input tables.
@@ -128,7 +130,8 @@ The second query is similar to the first one but groups the `clicks` table in ad
 
 As before, the input table `clicks` is shown on the left. The query continuously computes results every hour and updates the result table. The clicks table contains four rows with timestamps (`cTime`) between `12:00:00` and `12:59:59`. The query computes two results rows from this input (one for each `user`) and appends them to the result table. For the next window between `13:00:00` and `13:59:59`, the `clicks` table contains three rows, which results in another two rows being appended to the result table. The result table is updated, as more rows are appended to `clicks` over time.
 
-### Update and Append Queries
+
+### 更新和追加查询 Update and Append Queries
 
 Although the two example queries appear to be quite similar (both compute a grouped count aggregate), they differ in one important aspect:
 - The first query updates previously emitted results, i.e., the changelog stream that defines the result table contains `INSERT` and `UPDATE` changes.
@@ -138,7 +141,7 @@ Whether a query produces an append-only table or an updated table has some impli
 - Queries that produce update changes usually have to maintain more state (see the following section).
 - The conversion of an append-only table into a stream is different from the conversion of an updated table (see the [Table to Stream Conversion](#table-to-stream-conversion) section).
 
-### Query Restrictions
+### 查询限制
 
 Many, but not all, semantically valid queries can be evaluated as continuous queries on streams. Some queries are too expensive to compute, either due to the size of state that they need to maintain or because computing updates is too expensive.
 
@@ -161,7 +164,7 @@ FROM (
 
 The [Query Configuration](query_configuration.html) page discusses parameters to control the execution of continuous queries. Some parameters can be used to trade the size of maintained state for result accuracy.
 
-Table to Stream Conversion
+表到流转换
 --------------------------
 
 A dynamic table can be continuously modified by `INSERT`, `UPDATE`, and `DELETE` changes just like a regular database table. It might be a table with a single row, which is constantly updated, an insert-only table without `UPDATE` and `DELETE` modifications, or anything in between.

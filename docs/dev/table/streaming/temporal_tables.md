@@ -22,14 +22,16 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Temporal Tables represent a concept of a (parameterized) view on a changing history table that returns the content of a table at a specific point in time.
 
-Flink can keep track of the changes applied to an underlying append-only table and allows for accessing the table's content at a certain point in time within a query.
+时态表表示更改历史记录表上的（参数化）视图的概念，该表返回特定时间点的表的内容。
+
+Flink可以跟踪应用于基础附加表的更改，并允许在查询中的特定时间点访问表的内容。
+
 
 * This will be replaced by the TOC
 {:toc}
 
-Motivation
+动机 Motivation
 ----------
 
 Let's assume that we have the following table `RatesHistory`.
@@ -80,7 +82,7 @@ In the above example `currency` would be a primary key for `RatesHistory` table 
 
 In Flink, a temporal table is represented by a *Temporal Table Function*.
 
-Temporal Table Functions
+时态表函数 Temporal Table Functions
 ------------------------
 
 In order to access the data in a temporal table, one must pass a [time attribute](time_attributes.html) that determines the version of the table that will be returned.
@@ -116,7 +118,7 @@ The example above was used to provide an intuition about what the function `Rate
 
 See also the page about [joins for continuous queries](joins.html) for more information about how to join with a temporal table.
 
-### Defining Temporal Table Function
+### 定义时态表函数
 
 The following code snippet illustrates how to create a temporal table function from an append-only table.
 

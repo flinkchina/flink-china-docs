@@ -1,5 +1,5 @@
 ---
-title: "Streaming Concepts"
+title: "流概念"
 nav-id: streaming_tableapi
 nav-parent_id: tableapi
 nav-pos: 10
@@ -25,20 +25,19 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink's [Table API](../tableApi.html) and [SQL support](../sql.html) are unified APIs for batch and stream processing.
-This means that Table API and SQL queries have the same semantics regardless whether their input is bounded batch input or unbounded stream input.
-Because the relational algebra and SQL were originally designed for batch processing,
-relational queries on unbounded streaming input are not as well understood as relational queries on bounded batch input.
+Flink的[Table API](../tableApi.html)和[SQL支持](../sql.html) 是用于批处理和流处理的统一API。
+这意味着Table API和SQL查询具有相同的语义，无论它们的输入是有界批量输入还是无界流输入。
+因为关系代数和SQL最初是为批处理而设计的，所以关于无界流输入的关系查询不像有界批输入上的关系查询那样容易理解。
 
-The following pages explain concepts, practical limitations, and stream-specific configuration parameters of Flink's relational APIs on streaming data.
+以下页面解释了Flink关于流数据的关系API的概念，实际限制和特定于流的配置参数。
 
-Where to go next?
+下一步
 -----------------
 
-* [Dynamic Tables]({{ site.baseurl }}/dev/table/streaming/dynamic_tables.html): Describes the concept of dynamic tables.
-* [Time attributes]({{ site.baseurl }}/dev/table/streaming/time_attributes.html): Explains time attributes and how time attributes are handled in Table API & SQL.
-* [Joins in Continuous Queries]({{ site.baseurl }}/dev/table/streaming/joins.html): Different supported types of Joins in Continuous Queries.
-* [Temporal Tables]({{ site.baseurl }}/dev/table/streaming/temporal_tables.html): Describes the Temporal Table concept.
-* [Query configuration]({{ site.baseurl }}/dev/table/streaming/query_configuration.html): Lists Table API & SQL specific configuration options.
+* [动态 Tables]({{ site.baseurl }}/dev/table/streaming/dynamic_tables.html): 描述动态表的概念
+* [时间属性]({{ site.baseurl }}/dev/table/streaming/time_attributes.html): 说明时间属性以及如何在表API和SQL中处理时间属性。
+* [连续查询中的Joins]({{ site.baseurl }}/dev/table/streaming/joins.html):持续查询中支持的不同连接类型。
+* [临时表Tables]({{ site.baseurl }}/dev/table/streaming/temporal_tables.html): 描述临时表概念.
+* [查询配置]({{ site.baseurl }}/dev/table/streaming/query_configuration.html): 列出表API和SQL特定的配置选项。
 
 {% top %}

@@ -1,5 +1,5 @@
 ---
-title: "Time Attributes"
+title: "时间属性"
 nav-parent_id: streaming_tableapi
 nav-pos: 2
 ---
@@ -22,20 +22,21 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Flink is able to process streaming data based on different notions of *time*. 
 
-- *Processing time* refers to the system time of the machine (also known as "wall-clock time") that is executing the respective operation.
-- *Event time* refers to the processing of streaming data based on timestamps which are attached to each row. The timestamps can encode when an event happened.
-- *Ingestion time* is the time that events enter Flink; internally, it is treated similarly to event time.
+Flink能够根据*time*的不同概念处理流数据。
 
-For more information about time handling in Flink, see the introduction about [Event Time and Watermarks]({{ site.baseurl }}/dev/event_time.html).
+ -  *处理时间*是指执行相应操作的机器的系统时间（也称为“挂钟时间”）。
+ -  *事件时间*是指基于附加到每一行的时间戳处理流数据。 时间戳可以在事件发生时进行编码。
+ -  *摄取时间*是事件进入Flink的时间; 在内部，它与事件时间类似地对待。
 
-This page explains how time attributes can be defined for time-based operations in Flink's Table API & SQL.
+有关Flink中时间处理的更多信息，请参阅[事件时间和水印]({{ site.baseurl }}/dev/event_time.html)的介绍。
+
+本页介绍了如何在Flink的Table API和SQL中为基于时间的操作定义时间属性。
 
 * This will be replaced by the TOC
 {:toc}
 
-Introduction to Time Attributes
+时间属性的介绍
 -------------------------------
 
 Time-based operations such as windows in both the [Table API]({{ site.baseurl }}/dev/table/tableApi.html#group-windows) and [SQL]({{ site.baseurl }}/dev/table/sql.html#group-windows) require information about the notion of time and its origin. Therefore, tables can offer *logical time attributes* for indicating time and accessing corresponding timestamps in table programs.
@@ -71,14 +72,14 @@ env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime) // default
 </div>
 </div>
 
-Processing time
+处理时间 Processing time
 ---------------
 
 Processing time allows a table program to produce results based on the time of the local machine. It is the simplest notion of time but does not provide determinism. It neither requires timestamp extraction nor watermark generation.
 
 There are two ways to define a processing time attribute.
 
-### During DataStream-to-Table Conversion
+### 在DataStream到表转换期间
 
 The processing time attribute is defined with the `.proctime` property during schema definition. The time attribute must only extend the physical schema by an additional logical field. Thus, it can only be defined at the end of the schema definition.
 
@@ -105,7 +106,7 @@ val windowedTable = table.window(Tumble over 10.minutes on 'UserActionTime as 'u
 </div>
 </div>
 
-### Using a TableSource
+### 使用TableSource
 
 The processing time attribute is defined by a `TableSource` that implements the `DefinedProctimeAttribute` interface. The logical time attribute is appended to the physical schema defined by the return type of the `TableSource`.
 
@@ -177,7 +178,7 @@ val windowedTable = tEnv
 </div>
 </div>
 
-Event time
+事件时间
 ----------
 
 Event time allows a table program to produce results based on the time that is contained in every record. This allows for consistent results even in case of out-of-order events or late events. It also ensures replayable results of the table program when reading records from persistent storage.
@@ -188,7 +189,7 @@ In order to handle out-of-order events and distinguish between on-time and late 
 
 An event time attribute can be defined either during DataStream-to-Table conversion or by using a TableSource.
 
-### During DataStream-to-Table Conversion
+### 在DataStream到表转换期间
 
 The event time attribute is defined with the `.rowtime` property during schema definition. [Timestamps and watermarks]({{ site.baseurl }}/dev/event_time.html) must have been assigned in the `DataStream` that is converted.
 
@@ -254,7 +255,7 @@ val windowedTable = table.window(Tumble over 10.minutes on 'UserActionTime as 'u
 </div>
 </div>
 
-### Using a TableSource
+### 使用TableSource
 
 The event time attribute is defined by a `TableSource` that implements the `DefinedRowtimeAttributes` interface. The `getRowtimeAttributeDescriptors()` method returns a list of `RowtimeAttributeDescriptor` for describing the final name of a time attribute, a timestamp extractor to derive the values of the attribute, and the watermark strategy associated with the attribute.
 

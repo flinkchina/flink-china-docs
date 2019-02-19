@@ -1,5 +1,5 @@
 ---
-title: "Joins in Continuous Queries"
+title: "连续查询中的Join"
 nav-parent_id: streaming_tableapi
 nav-pos: 3
 ---
@@ -22,16 +22,17 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Joins are a common and well-understood operation in batch data processing to connect the rows of two relations. However, the semantics of joins on [dynamic tables](dynamic_tables.html) are much less obvious or even confusing.
 
-Because of that, there are a couple of ways to actually perform a join using either Table API or SQL.
+Join连接是批处理数据处理中常见且易于理解的操作，用于连接两个关系的行。 但是，[动态表](dynamic_tables.html) 上的连接语义不那么明显甚至令人困惑。
 
-For more information regarding the syntax, please check the join sections in [Table API](../tableApi.html#joins) and [SQL](../sql.html#joins).
+因此，有几种方法可以使用Table API或SQL实际执行连接。
+
+有关语法的更多信息，请查看[Table API](../tableApi.html#joins) 和[SQL](../sql.html#joins)中的连接部分。
 
 * This will be replaced by the TOC
 {:toc}
 
-Regular Joins
+Regular 连接Joins
 -------------
 
 Regular joins are the most generic type of join in which any new records or changes to either side of the join input are visible and are affecting the whole join result.
@@ -48,7 +49,7 @@ These semantics allow for any kind of updating (insert, update, delete) input ta
 However, this operation has an important implication: it requires to keep both sides of the join input in Flink's state forever.
 Thus, the resource usage will grow indefinitely as well, if one or both input tables are continuously growing.
 
-Time-windowed Joins
+时间窗口Join Time-windowed Joins
 -------------------
 
 A time-windowed join is defined by a join predicate, that checks if the [time attributes](time_attributes.html) of the input
@@ -65,7 +66,7 @@ WHERE o.id = s.orderId AND
 
 Compared to a regular join operation, this kind of join only supports append-only tables with time attributes. Since time attributes are quasi-monontic increasing, Flink can remove old values from its state without affecting the correctness of the result.
 
-Join with a Temporal Table
+与临时表联接
 --------------------------
 
 A join with a temporal table joins an append-only table (left input/probe side) with a temporal table (right input/build side),
@@ -154,7 +155,7 @@ As time passes, the previous and no longer needed versions of the record (for th
 
 Such behaviour makes a temporal table join a good candidate to express stream enrichment in relational terms.
 
-### Usage
+### 用法
 
 After [defining temporal table function](temporal_tables.html#defining-temporal-table-function), we can start using it.
 Temporal table functions can be used in the same way as normal table functions would be used.
@@ -192,7 +193,7 @@ val result = orders
 **Note**: State retention defined in a [query configuration](query_configuration.html) is not yet implemented for temporal joins.
 This means that the required state to compute the query result might grow infinitely depending on the number of distinct primary keys for the history table.
 
-### Processing-time Temporal Joins
+### 处理时间的临时Join Processing-time Temporal Joins
 
 With a processing-time time attribute, it is impossible to pass _past_ time attributes as an argument to the temporal table function.
 By definition, it is always the current timestamp. Thus, invocations of a processing-time temporal table function will always return the latest known versions of the underlying table
@@ -205,7 +206,7 @@ One can think about a processing-time temporal join as a simple `HashMap<K, V>` 
 When a new record from the build side has the same key as some previous record, the old value is just simply overwritten.
 Every record from the probe side is always evaluated against the most recent/current state of the `HashMap`.
 
-### Event-time Temporal Joins
+### 事件时间的临时Join Event-time Temporal Joins
 
 With an event-time time attribute (i.e., a rowtime attribute), it is possible to pass _past_ time attributes to the temporal table function.
 This allows for joining the two tables at a common point in time.

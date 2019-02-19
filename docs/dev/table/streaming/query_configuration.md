@@ -1,5 +1,5 @@
 ---
-title: "Query Configuration"
+title: "查询配置"
 nav-parent_id: streaming_tableapi
 nav-pos: 6
 ---
@@ -22,9 +22,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Table API and SQL queries have the same semantics regardless whether their input is bounded batch input or unbounded stream input. In many cases, continuous queries on streaming input are capable of computing accurate results that are identical to offline computed results. However, this is not possible in general case because continuous queries have to restrict the size of the state they are maintaining in order to avoid to run out of storage and to be able to process unbounded streaming data over a long period of time. As a result, a continuous query might only be able to provide approximated results depending on the characteristics of the input data and the query itself.
 
-Flink's Table API and SQL interface provide parameters to tune the accuracy and resource consumption of continuous queries. The parameters are specified via a `QueryConfig` object. The `QueryConfig` can be obtained from the `TableEnvironment` and is passed back when a `Table` is translated, i.e., when it is [transformed into a DataStream](../common.html#convert-a-table-into-a-datastream-or-dataset) or [emitted via a TableSink](../common.html#emit-a-table).
+无论表达式输入是有界批量输入还是无界流输入，表API和SQL查询都具有相同的语义。在许多情况下，对流输入的连续查询能够计算与离线计算结果相同的准确结果。然而，这在一般情况下是不可能的，因为连续查询必须限制它们维护的状态的大小，以避免耗尽存储并且能够在很长一段时间内处理无界流数据。因此，连续查询可能只能提供近似结果，具体取决于输入数据的特征和查询本身。
+
+Flink的Table API和SQL接口提供参数来调整连续查询的准确性和资源消耗。参数通过`QueryConfig`对象指定。 `QueryConfig`可以从`TableEnvironment`获得，并在`Table`被翻译时传回，即，当它被[转换为DataStream](../common.html#convert-a-table-into-a-datastream-or-dataset)时或[通过TableSink发出](../common.html#emit-a-table)。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
