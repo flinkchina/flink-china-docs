@@ -1,5 +1,5 @@
 ---
-title: "Release Notes - Flink 1.5"
+title: "Flink1.5发布说明"
 ---
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -20,9 +20,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-These release notes discuss important aspects, such as configuration, behavior, or dependencies, that changed between Flink 1.4 and Flink 1.5. Please read these notes carefully if you are planning to upgrade your Flink version to 1.5.
-
-### Update Configuration for Reworked Job Deployment
+这些发布说明讨论了在Flink1.4和Flink1.5之间发生变化的重要方面，如配置、行为或依赖关系。如果您打算将Flink版本升级到1.5，请仔细阅读这些说明。
+### Update Configuration for Reworked Job Deployment 为重新部署的Job更新配置
 
 Flink’s reworked cluster and job deployment component improves the integration with resource managers and enables dynamic resource allocation. One result of these changes is, that you no longer have to specify the number of containers when submitting applications to YARN and Mesos. Flink will automatically determine the number of containers from the parallelism of the application.
 
@@ -35,7 +34,7 @@ Please report any problems or possible improvements that you notice to the Flink
 
 *Note*: We plan to remove the legacy mode in the next release. 
 
-### Update Configuration for Reworked Network Stack
+### 为重新工作的网络堆栈更新配置
 
 The changes on the networking stack for credit-based flow control and improved latency affect the configuration of network buffers. In a nutshell, the networking stack can require more memory to run applications. Hence, you might need to adjust the network configuration of your Flink setup. 
 
@@ -48,7 +47,7 @@ Please consult the section about [network buffer configuration]({{ site.baseurl 
 
 *Note*: We plan to remove the old model and this configuration in the next release.
 
-### Hadoop Classpath Discovery
+### Hadoop类路径发现
 
 We removed the automatic Hadoop classpath discovery via the Hadoop binary. If you want Flink to pick up the Hadoop classpath you have to export `HADOOP_CLASSPATH`. On cloud environments and most Hadoop distributions you would do 
 
@@ -56,7 +55,7 @@ We removed the automatic Hadoop classpath discovery via the Hadoop binary. If yo
 export HADOOP_CLASSPATH=`hadoop classpath`.
 ```
 
-### Breaking Changes of the REST API
+### REST API重大变化
 
 In an effort to harmonize, extend, and improve the REST API, a few handlers and return values were changed.
 
@@ -66,11 +65,11 @@ In an effort to harmonize, extend, and improve the REST API, a few handlers and 
 
 Please check the [REST API documentation]({{ site.baseurl }}/monitoring/rest_api.html#available-requests) for details.
 
-### Kafka Producer Flushes on Checkpoint by Default
+### 生产者默认刷新检查点
 
 The Flink Kafka Producer now flushes on checkpoints by default. Prior to version 1.5, the behaviour was disabled by default and users had to explicitly call `setFlushOnCheckpoints(true)` on the producer to enable it.
 
-### Updated Kinesis Dependency
+### 更新Kinesis依赖
 
 The Kinesis dependencies of Flink’s Kinesis connector have been updated to the following versions.
 
@@ -81,7 +80,7 @@ The Kinesis dependencies of Flink’s Kinesis connector have been updated to the
 ```
 
 <!-- Remove once FLINK-10712 has been fixed -->
-### Limitations of failover strategies
+### 故障转移策略的局限性(注:FLINK-10712修复后删除)
 Flink's non-default failover strategies are still a very experimental feature which come with a set of limitations.
 You should only use this feature if you are executing a stateless streaming job.
 In any other cases, it is highly recommended to remove the config option `jobmanager.execution.failover-strategy` from your `flink-conf.yaml` or set it to `"full"`.
