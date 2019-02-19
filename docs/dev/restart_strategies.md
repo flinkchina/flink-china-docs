@@ -264,9 +264,6 @@ env.setRestartStrategy(RestartStrategies.noRestart())
 
 ### Fallback Restart Strategy 备用重启策略
 
-The cluster defined restart strategy is used. 
-This is helpful for streaming programs which enable checkpointing.
-By default, a fixed delay restart strategy is chosen if there is no other restart strategy defined.
 使用集群定义的重启策略。
 这对于启用检查点的流程序很有帮助。
 默认情况下，如果没有定义其他重启策略，则选择固定延迟重启策略。
