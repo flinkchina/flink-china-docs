@@ -1,5 +1,5 @@
 ---
-title: "RabbitMQ Connector"
+title: "RabbitMQ连接器"
 nav-title: RabbitMQ
 nav-parent_id: connectors
 nav-pos: 6
@@ -23,22 +23,19 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# License of the RabbitMQ Connector
+# RabbitMQ连接器的许可证
 
-Flink's RabbitMQ connector defines a Maven dependency on the
-"RabbitMQ AMQP Java Client", is triple-licensed under the Mozilla Public License 1.1 ("MPL"), the GNU General Public License version 2 ("GPL") and the Apache License version 2 ("ASL").
 
-Flink itself neither reuses source code from the "RabbitMQ AMQP Java Client"
-nor packages binaries from the "RabbitMQ AMQP Java Client".
+Flink的RabbitMQ连接器定义了对“RabbitMQ AMQP Java客户端”的Maven依赖，在Mozilla Public License 1.1（“MPL”），GNU通用公共许可证版本2（“GPL”）和Apache许可证版本2下获得三重许可。（ “ASL”）。
 
-Users that create and publish derivative work based on Flink's
-RabbitMQ connector (thereby re-distributing the "RabbitMQ AMQP Java Client")
-must be aware that this may be subject to conditions declared in the Mozilla Public License 1.1 ("MPL"), the GNU General Public License version 2 ("GPL") and the Apache License version 2 ("ASL").
+Flink本身既不重用“RabbitMQ AMQP Java Client”中的源代码，也不从“RabbitMQ AMQP Java Client”中打包二进制文件。
 
-# RabbitMQ Connector
+基于Flink的RabbitMQ连接器创建和发布衍生作品的用户（从而重新分发“RabbitMQ AMQP Java客户端”）必须意识到这可能受到Mozilla公共许可证1.1（“MPL”），GNU中声明的条件的约束。 通用公共许可证版本2（“GPL”）和Apache许可证版本2（“ASL”）。
 
-This connector provides access to data streams from [RabbitMQ](http://www.rabbitmq.com/). To use this connector, add the following dependency to your project:
 
+# RabbitMQ连接器
+
+此连接器提供对[RabbitMQ](http://www.rabbitmq.com/)的数据流的访问。 要使用此连接器，请将以下依赖项添加到项目中：
 {% highlight xml %}
 <dependency>
   <groupId>org.apache.flink</groupId>
@@ -47,45 +44,32 @@ This connector provides access to data streams from [RabbitMQ](http://www.rabbit
 </dependency>
 {% endhighlight %}
 
-Note that the streaming connectors are currently not part of the binary distribution. See linking with them for cluster execution [here]({{site.baseurl}}/dev/linking.html).
+请注意，流连接器当前不是二进制分发的一部分。 请参阅与它们链接以进行集群执行[此处]({{site.baseurl}}/dev/linking.html)。
+#### 安装RabbitMQ
 
-#### Installing RabbitMQ
-Follow the instructions from the [RabbitMQ download page](http://www.rabbitmq.com/download.html). After the installation the server automatically starts, and the application connecting to RabbitMQ can be launched.
+按照[RabbitMQ下载页面](http://www.rabbitmq.com/download.html)中的说明进行操作。 安装后，服务器自动启动，并且可以启动连接到RabbitMQ的应用程序。
+#### RabbitMQ源
 
-#### RabbitMQ Source
+这个连接器提供了一个`RMQSource` 类来使用RabbitMQ队列中的消息。根据Flink的配置方式，这个源source提供了三种不同级别的保证:
 
-This connector provides a `RMQSource` class to consume messages from a RabbitMQ
-queue. This source provides three different levels of guarantees, depending
-on how it is configured with Flink:
+1. **Exactly-once**: 为了使用RabbitMQ源实现精确的一次exactly-once保证，需要执行以下操作-
 
-1. **Exactly-once**: In order to achieve exactly-once guarantees with the
-RabbitMQ source, the following is required -
- - *Enable checkpointing*: With checkpointing enabled, messages are only
- acknowledged (hence, removed from the RabbitMQ queue) when checkpoints
- are completed.
- - *Use correlation ids*: Correlation ids are a RabbitMQ application feature.
- You have to set it in the message properties when injecting messages into RabbitMQ.
- The correlation id is used by the source to deduplicate any messages that
- have been reprocessed when restoring from a checkpoint.
- - *Non-parallel source*: The source must be non-parallel (parallelism set
- to 1) in order to achieve exactly-once. This limitation is mainly due to
- RabbitMQ's approach to dispatching messages from a single queue to multiple
- consumers.
+ - *Enable checkpointing*: 启用检查点后，只有在检查点完成时才确认消息（hence，从rabbitmq队列中删除消息）。
+ - *Use correlation ids*: Correlation ids是RabbitMQ应用程序的一项功能。
+  在将消息注入RabbitMQ时，必须在消息属性中设置它。
+  源使用相关标识对从检查点还原时已重新处理的任何消息进行重复数据删除。
+ - *Non-parallel source*: 源必须是非并行的（并行度设置为1）才能实现精确一次 exactly-once。 这种限制主要是由于RabbitMQ将消息从单个队列分派给多个消费者的方法。
 
 
 2. **At-least-once**: When checkpointing is enabled, but correlation ids
 are not used or the source is parallel, the source only provides at-least-once
-guarantees.
+guarantees.如果启用了检查点，但不使用关联id或源是并行的，则源只提供至少一次 at-least-once的保证。
 
-3. **No guarantee**: If checkpointing isn't enabled, the source does not
-have any strong delivery guarantees. Under this setting, instead of
-collaborating with Flink's checkpointing, messages will be automatically
-acknowledged once the source receives and processes them.
+3. **No guarantee**: 如果未启用检查点，则源没有任何强大的交付保证。在此设置下，消息不会与Flink的检查点协作，而是在源接收并处理消息时自动得到确认.
 
-Below is a code example for setting up an exactly-once RabbitMQ source.
-Inline comments explain which parts of the configuration can be ignored
-for more relaxed guarantees.
 
+下面是设置一次一次RabbitMQ源的代码示例。
+内联注释说明可以忽略配置的哪些部分以获得更宽松的保证。
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
 {% highlight java %}
@@ -131,9 +115,9 @@ val stream = env
 </div>
 </div>
 
-#### RabbitMQ Sink
-This connector provides a `RMQSink` class for sending messages to a RabbitMQ
-queue. Below is a code example for setting up a RabbitMQ sink.
+#### RabbitMQ 接收器
+
+这个连接器提供了一个“RMQSink”类，用于向RabbitMQ队列发送消息。下面是设置RabbitMQ接收器的代码示例。
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -170,6 +154,6 @@ stream.addSink(new RMQSink[String](
 </div>
 </div>
 
-More about RabbitMQ can be found [here](http://www.rabbitmq.com/).
+有关RabbitMQ的更多信息可在[此处](http://www.rabbitmq.com/) 找到。
 
 {% top %}
