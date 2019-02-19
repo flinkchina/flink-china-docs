@@ -176,13 +176,6 @@ try {
 
 ## 设置最大并行度
 
-The maximum parallelism can be set in places where you can also set a parallelism
-(except client level and system level). Instead of calling `setParallelism()` you call
-`setMaxParallelism()` to set the maximum parallelism.
-
-The default setting for the maximum parallelism is roughly `operatorParallelism + (operatorParallelism / 2)` with
-a lower bound of `127` and an upper bound of `32768`.
-
 最大并行度可以在您还可以设置并行度的地方设置(客户端级别和系统级别除外)。不是调用 `setParallelism()`，而是调用`setMaxParallelism()` 来设置最大的并行度。
 
 最大并行度的默认设置大致为`operatorParallelism + (operatorParallelism / 2)`，下界为“127”，上界为“32768”。
