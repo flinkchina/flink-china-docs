@@ -1,5 +1,5 @@
 ---
-title: "Execution Plans"
+title: "执行计划"
 nav-parent_id: execution
 nav-pos: 40
 ---
@@ -22,18 +22,14 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Depending on various parameters such as data size or number of machines in the cluster, Flink's
-optimizer automatically chooses an execution strategy for your program. In many cases, it can be
-useful to know how exactly Flink will execute your program.
 
-__Plan Visualization Tool__
+根据集群中的数据大小或机器数量等各种参数，Flink的优化器会自动为您的程序选择执行策略。在许多情况下，了解Flink将如何准确地执行您的程序是很有用的。
 
-Flink comes packaged with a visualization tool for execution plans. The HTML document containing
-the visualizer is located under ```tools/planVisualizer.html```. It takes a JSON representation of
-the job execution plan and visualizes it as a graph with complete annotations of execution
-strategies.
+__执行计划的可视化工具__
 
-The following code shows how to print the execution plan JSON from your program:
+Flink附带了一个用于执行计划的可视化工具。包含visualizer的HTML文档位于```tools/planVisualizer.html```下。它采用作业执行计划的JSON表示形式，并将其可视化为具有完整执行策略注释的图形。
+
+下面的代码展示了如何从程序中打印执行计划JSON:
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -57,24 +53,24 @@ println(env.getExecutionPlan())
 </div>
 
 
-To visualize the execution plan, do the following:
+要可视化执行计划，请执行以下操作：
 
-1. **Open** ```planVisualizer.html``` with your web browser,
-2. **Paste** the JSON string into the text field, and
-3. **Press** the draw button.
 
-After these steps, a detailed execution plan will be visualized.
+
+1. 用您的网络浏览器**打开**```planVisualizer.html```
+2. 将JSON字符串**粘贴**到文本字段中，并且
+3. **按**绘制按钮。
+
+在这些步骤之后，一个详细的执行计划将被可视化。
 
 <img alt="A flink job execution graph." src="{{ site.baseurl }}/fig/plan_visualizer.png" width="80%">
 
 
-__Web Interface__
+__Web界面__
 
-Flink offers a web interface for submitting and executing jobs. The interface is part of the JobManager's
-web interface for monitoring, per default running on port 8081. Job submission via this interfaces requires
-that you have set `web.submit.enable: true` in `flink-conf.yaml`.
 
-You may specify program arguments before the job is executed. The plan visualization enables you to show
-the execution plan before executing the Flink job.
+Flink为提交和执行作业提供了一个web界面。该接口是JobManager用于监视的web接口的一部分，默认情况下在端口8081上运行。通过这个接口提交作业需要设置为`web.submit.enable: true`在`flink-conf.yaml`中。
+
+可以在作业执行之前指定程序参数。计划可视化使您能够在执行Flink作业之前显示执行计划。
 
 {% top %}
