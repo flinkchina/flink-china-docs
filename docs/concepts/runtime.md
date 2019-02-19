@@ -27,9 +27,9 @@ under the License.
 {:toc}
 
 
-## 任务和操作符链Tasks and Operator Chains
+## 任务和算子链Tasks and Operator Chains
 
-对于分布式执行，Flink 将操作符子任务*链接*到*任务*。 每个任务由一个线程执行。将操作符链接到任务是一个有用的优化：它减少了线程到线程的开销切换和缓冲，并在减少延迟的同时提高整体吞吐量。链接行为可以配置；请参阅[chaining文档](../dev/stream/operators/#task-chaining-and-resource-groups)详细信息。
+对于分布式执行，Flink 将算子子任务*链接*到*任务*。 每个任务由一个线程执行。将算子链接到任务是一个有用的优化：它减少了线程到线程的开销切换和缓冲，并在减少延迟的同时提高整体吞吐量。链接行为可以配置；请参阅[chaining文档](../dev/stream/operators/#task-chaining-and-resource-groups)详细信息。
 
 下图中的示例数据流使用5个子任务执行，因此使用5个并行线程执行。
 
