@@ -1,5 +1,5 @@
 ---
-title: "Flink DataStream API编程指南"
+title: "DataStream API编程指南"
 nav-title: 流处理(DataStream API)
 nav-id: streaming
 nav-parent_id: dev

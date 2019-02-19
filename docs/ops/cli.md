@@ -1,5 +1,5 @@
 ---
-title:  "Command-Line Interface"
+title:  "命令行接口"
 nav-title: CLI
 nav-parent_id: ops
 nav-pos: 6
