@@ -29,9 +29,6 @@ Apache Flink有两个关系API——Table API和SQL——用于统一的流和�
 
 表API和SQL接口以及Flink的DataStream和DataSet API紧密地集成在一起。您可以轻松地在所有api和基于这些api的库之间切换。例如，您可以使用[CEP库]({{ site.baseurl }}/dev/libs/cep.html)从数据流中提取模式。然后使用表API分析模式，或者在运行[Gelly graph algorithm]({{ site.baseurl }}/dev/libs/gelly)之前，使用SQL查询扫描、过滤和聚合批处理表。
 
-**Please note that the Table API and SQL are not yet feature complete and are being actively developed. Not all operations are supported by every combination of \[Table API, SQL\] and \[stream, batch\] input.**
-
-
 **请注意，表API和SQL尚未完成功能，正在积极开发中。不是所有的操作都支持\[Table API, SQL\]和\[stream, batch\]输入的每个组合。**
 
 设置安装

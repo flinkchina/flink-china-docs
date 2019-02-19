@@ -1,5 +1,5 @@
 ---
-title: "Concepts & Common API"
+title: "概念&通用API"
 nav-parent_id: tableapi
 nav-pos: 0
 ---
@@ -22,15 +22,16 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The Table API and SQL are integrated in a joint API. The central concept of this API is a `Table` which serves as input and output of queries. This document shows the common structure of programs with Table API and SQL queries, how to register a `Table`, how to query a `Table`, and how to emit a `Table`.
+Table API和SQL集成在一个联合API中。 这个API的核心概念是`Table`，它用作查询的输入和输出。 本文档展示了使用Table API和SQL查询的程序的常见结构，如何注册`Table`，如何查询`Table`，以及如何发出`Table`。
 
 * This will be replaced by the TOC
 {:toc}
 
-Structure of Table API and SQL Programs
+Table API和SQL程序的结构
 ---------------------------------------
 
-All Table API and SQL programs for batch and streaming follow the same pattern. The following code example shows the common structure of Table API and SQL programs.
+批处理和流处理的所有Table API和SQL程序都遵循相同的模式。 以下代码示例显示了Table API和SQL程序的常见结构。
+
 
 <div class="codetabs" markdown="1">
 <div data-lang="java" markdown="1">
@@ -93,11 +94,12 @@ env.execute()
 </div>
 </div>
 
-**Note:** Table API and SQL queries can be easily integrated with and embedded into DataStream or DataSet programs. Have a look at the [Integration with DataStream and DataSet API](#integration-with-datastream-and-dataset-api) section to learn how DataStreams and DataSets can be converted into Tables and vice versa.
+**注意:** Table API和SQL查询可以轻松集成并嵌入到DataStream或DataSet程序中。 查看[与DataStream和DataSet API集成](#integration-with-datastream-and-dataset-api)部分，了解如何将DataStream和DataSet转换为Tables，反之亦然。
+
 
 {% top %}
 
-Create a TableEnvironment
+创建TableEnvironment
 -------------------------
 
 The `TableEnvironment` is a central concept of the Table API and SQL integration. It is responsible for:
@@ -153,7 +155,7 @@ val bTableEnv = TableEnvironment.getTableEnvironment(bEnv)
 
 {% top %}
 
-Register Tables in the Catalog
+在Catalog注册Table
 -------------------------------
 
 A `TableEnvironment` maintains a catalog of tables which are registered by name. There are two types of tables, *input tables* and *output tables*. Input tables can be referenced in Table API and SQL queries and provide input data. Output tables can be used to emit the result of a Table API or SQL query to an external system.
@@ -166,7 +168,7 @@ An input table can be registered from various sources:
 
 An output table can be registered using a `TableSink`.
 
-### Register a Table
+### 注册Table
 
 A `Table` is registered in a `TableEnvironment` as follows:
 
@@ -202,7 +204,7 @@ tableEnv.registerTable("projectedTable", projTable)
 
 {% top %}
 
-### Register a TableSource
+### 注册TableSource
 
 A `TableSource` provides access to external data which is stored in a storage system such as a database (MySQL, HBase, ...), a file with a specific encoding (CSV, Apache \[Parquet, Avro, ORC\], ...), or a messaging system (Apache Kafka, RabbitMQ, ...). 
 
@@ -240,7 +242,7 @@ tableEnv.registerTableSource("CsvTable", csvSource)
 
 {% top %}
 
-### Register a TableSink
+### 注册TableSink
 
 A registered `TableSink` can be used to [emit the result of a Table API or SQL query](common.html#emit-a-table) to an external storage system, such as a database, key-value store, message queue, or file system (in different encodings, e.g., CSV, Apache \[Parquet, Avro, ORC\], ...).
 
@@ -286,7 +288,7 @@ tableEnv.registerTableSink("CsvSinkTable", fieldNames, fieldTypes, csvSink)
 
 {% top %}
 
-Register an External Catalog
+注册一个外部的Catalog
 ----------------------------
 
 An external catalog can provide information about external databases and tables such as their name, schema, statistics, and information for how to access data stored in an external database, table, or file.
@@ -327,7 +329,7 @@ Currently, Flink provides an `InMemoryExternalCatalog` for demo and testing purp
 
 {% top %}
 
-Query a Table 
+查询Table
 -------------
 
 ### Table API
@@ -486,7 +488,7 @@ tableEnv.sqlUpdate("""
 
 {% top %}
 
-### Mixing Table API and SQL
+### 混合使用Table API 和 SQL
 
 Table API and SQL queries can be easily mixed because both return `Table` objects:
 
@@ -558,7 +560,7 @@ result.insertInto("CsvSinkTable")
 {% top %}
 
 
-Translate and Execute a Query
+翻译并执行查询
 -----------------------------
 
 Table API and SQL queries are translated into [DataStream]({{ site.baseurl }}/dev/datastream_api.html) or [DataSet]({{ site.baseurl }}/dev/batch) programs depending on whether their input is a streaming or batch input. A query is internally represented as a logical query plan and is translated in two phases: 
@@ -576,18 +578,18 @@ Once translated, a Table API or SQL query is handled like a regular DataStream o
 
 {% top %}
 
-Integration with DataStream and DataSet API
+与DataStream和DataSet API的集成
 -------------------------------------------
 
 Table API and SQL queries can be easily integrated with and embedded into [DataStream]({{ site.baseurl }}/dev/datastream_api.html) and [DataSet]({{ site.baseurl }}/dev/batch) programs. For instance, it is possible to query an external table (for example from a RDBMS), do some pre-processing, such as filtering, projecting, aggregating, or joining with meta data, and then further process the data with either the DataStream or DataSet API (and any of the libraries built on top of these APIs, such as CEP or Gelly). Inversely, a Table API or SQL query can also be applied on the result of a DataStream or DataSet program.
 
 This interaction can be achieved by converting a `DataStream` or `DataSet` into a `Table` and vice versa. In this section, we describe how these conversions are done.
 
-### Implicit Conversion for Scala
+### Scala的隐式转换
 
 The Scala Table API features implicit conversions for the `DataSet`, `DataStream`, and `Table` classes. These conversions are enabled by importing the package `org.apache.flink.table.api.scala._` in addition to `org.apache.flink.api.scala._` for the Scala DataStream API.
 
-### Register a DataStream or DataSet as Table
+### 将数据流或数据集注册为表
 
 A `DataStream` or `DataSet` can be registered in a `TableEnvironment` as a Table. The schema of the resulting table depends on the data type of the registered `DataStream` or `DataSet`. Please check the section about [mapping of data types to table schema](#mapping-of-data-types-to-table-schema) for details.
 
@@ -629,7 +631,7 @@ tableEnv.registerDataStream("myTable2", stream, 'myLong, 'myString)
 
 {% top %}
 
-### Convert a DataStream or DataSet into a Table
+### 将数据流或数据集转换为表
 
 Instead of registering a `DataStream` or `DataSet` in a `TableEnvironment`, it can also be directly converted into a `Table`. This is convenient if you want to use the Table in a Table API query. 
 
@@ -669,7 +671,7 @@ val table2: Table = tableEnv.fromDataStream(stream, 'myLong, 'myString)
 
 {% top %}
 
-### Convert a Table into a DataStream or DataSet
+### 将表转换为DataStream或数据集
 
 A `Table` can be converted into a `DataStream` or `DataSet`. In this way, custom DataStream or DataSet programs can be run on the result of a Table API or SQL query.
 
@@ -681,7 +683,7 @@ When converting a `Table` into a `DataStream` or `DataSet`, you need to specify 
 - **Tuple**: fields are mapped by position, limitation to 22 (Scala) or 25 (Java) fields, no support for `null` values, type-safe access.
 - **Atomic Type**: `Table` must have a single field, no support for `null` values, type-safe access.
 
-#### Convert a Table into a DataStream
+#### 将表转换为数据流
 
 A `Table` that is the result of a streaming query will be updated dynamically, i.e., it is changing as new records arrive on the query's input streams. Hence, the `DataStream` into which such a dynamic query is converted needs to encode the updates of the table. 
 
@@ -747,7 +749,7 @@ val retractStream: DataStream[(Boolean, Row)] = tableEnv.toRetractStream[Row](ta
 
 **Note:** A detailed discussion about dynamic tables and their properties is given in the [Dynamic Tables](streaming/dynamic_tables.html) document.
 
-#### Convert a Table into a DataSet
+#### 将表转换为数据集
 
 A `Table` is converted into a `DataSet` as follows:
 
@@ -792,13 +794,13 @@ val dsTuple: DataSet[(String, Int)] = tableEnv.toDataSet[(String, Int)](table)
 
 {% top %}
 
-### Mapping of Data Types to Table Schema
+### 将数据类型映射到表的Schema模式
 
 Flink's DataStream and DataSet APIs support very diverse types. Composite types such as Tuples (built-in Scala and Flink Java tuples), POJOs, Scala case classes, and Flink's Row type allow for nested data structures with multiple fields that can be accessed in table expressions. Other types are treated as atomic types. In the following, we describe how the Table API converts these types into an internal row representation and show examples of converting a `DataStream` into a `Table`.
 
 The mapping of a data type to a table schema can happen in two ways: **based on the field positions** or **based on the field names**.
 
-**Position-based Mapping**
+**基于位置的映射**
 
 Position-based mapping can be used to give fields a more meaningful name while keeping the field order. This mapping is available for composite data types *with a defined field order* as well as atomic types. Composite data types such as tuples, rows, and case classes have such a field order. However, fields of a POJO must be mapped based on the field names (see next section). Fields can be projected out but can't be renamed using an alias `as`.
 
@@ -842,7 +844,7 @@ val table: Table = tableEnv.fromDataStream(stream, 'myLong, 'myInt)
 </div>
 </div>
 
-**Name-based Mapping**
+**基于命名的映射**
 
 Name-based mapping can be used for any data type including POJOs. It is the most flexible way of defining a table schema mapping. All fields in the mapping are referenced by name and can be possibly renamed using an alias `as`. Fields can be reordered and projected out.
 
@@ -892,7 +894,7 @@ val table: Table = tableEnv.fromDataStream(stream, '_2 as 'myInt, '_1 as 'myLong
 </div>
 </div>
 
-#### Atomic Types
+#### 原子类型
 
 Flink treats primitives (`Integer`, `Double`, `String`) or generic types (types that cannot be analyzed and decomposed) as atomic types. A `DataStream` or `DataSet` of an atomic type is converted into a `Table` with a single attribute. The type of the attribute is inferred from the atomic type and the name of the attribute can be specified.
 
@@ -928,7 +930,7 @@ val table: Table = tableEnv.fromDataStream(stream, 'myLong)
 </div>
 </div>
 
-#### Tuples (Scala and Java) and Case Classes (Scala only)
+#### 元组(Scala和Java)和Case类(仅Scala)
 
 Flink supports Scala's built-in tuples and provides its own tuple classes for Java. DataStreams and DataSets of both kinds of tuples can be converted into tables. Fields can be renamed by providing names for all fields (mapping based on position). If no field names are specified, the default field names are used. If the original field names (`f0`, `f1`, ... for Flink Tuples and `_1`, `_2`, ... for Scala Tuples) are referenced, the API assumes that the mapping is name-based instead of position-based. Name-based mapping allows for reordering fields and projection with alias (`as`).
 
@@ -1048,7 +1050,7 @@ val table: Table = tableEnv.fromDataStream(stream, 'name as 'myName)
 </div>
 </div>
 
-#### Row
+#### Row 行
 
 The `Row` data type supports an arbitrary number of fields and fields with `null` values. Field names can be specified via a `RowTypeInfo` or when converting a `Row` `DataStream` or `DataSet` into a `Table`. The row type supports mapping of fields by position and by name. Fields can be renamed by providing names for all fields (mapping based on position) or selected individually for projection/ordering/renaming (mapping based on name).
 
@@ -1107,14 +1109,14 @@ val table: Table = tableEnv.fromDataStream(stream, 'name as 'myName)
 {% top %}
 
 
-Query Optimization
+查询优化
 ------------------
 
 Apache Flink leverages Apache Calcite to optimize and translate queries. The optimization currently performed include projection and filter push-down, subquery decorrelation, and other kinds of query rewriting. Flink does not yet optimize the order of joins, but executes them in the same order as defined in the query (order of Tables in the `FROM` clause and/or order of join predicates in the `WHERE` clause).
 
 It is possible to tweak the set of optimization rules which are applied in different phases by providing a `CalciteConfig` object. This can be created via a builder by calling `CalciteConfig.createBuilder())` and is provided to the TableEnvironment by calling `tableEnv.getConfig.setCalciteConfig(calciteConfig)`. 
 
-### Explaining a Table
+### Explaining 解释表
 
 The Table API provides a mechanism to explain the logical and optimized query plans to compute a `Table`. 
 This is done through the `TableEnvironment.explain(table)` method. It returns a String describing three plans: 
